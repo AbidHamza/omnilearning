@@ -169,6 +169,18 @@ export const HeartIcon = (p: P) => (
   </svg>
 );
 
+export const SparkleIcon = (p: P) => (
+  <svg {...base} fill="currentColor" stroke="none" {...p}>
+    <path d="M12 2l1.8 5.4a4 4 0 0 0 2.8 2.8L22 12l-5.4 1.8a4 4 0 0 0-2.8 2.8L12 22l-1.8-5.4a4 4 0 0 0-2.8-2.8L2 12l5.4-1.8a4 4 0 0 0 2.8-2.8z" />
+  </svg>
+);
+
+export const QuoteIcon = (p: P) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" width={20} height={20} {...p}>
+    <path d="M9.5 5C6.5 6.3 5 8.8 5 12.5V19h6v-6.8H7.9c.1-1.9.9-3.2 2.6-4L9.5 5zm9 0c-3 1.3-4.5 3.8-4.5 7.5V19h6v-6.8h-3.1c.1-1.9.9-3.2 2.6-4L18.5 5z" />
+  </svg>
+);
+
 /* Category glyphs */
 export const DatabaseIcon = (p: P) => (
   <svg {...base} {...p}>
