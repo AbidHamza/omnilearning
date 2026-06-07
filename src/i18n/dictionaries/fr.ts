@@ -1,0 +1,86 @@
+// Dictionnaire source (français). Sert de référence de type pour en/ar.
+const fr = {
+  common: {
+    explore: "Explorer les formations",
+    viewAll: "Tout voir",
+    search: "Chercher une formation",
+    signIn: "Se connecter",
+    signUp: "S'enregistrer",
+    createAccount: "Créer un compte",
+    save: "Enregistrer",
+    download: "Télécharger",
+    loading: "Chargement…",
+    free: "100% gratuit",
+  },
+  nav: {
+    formations: "Formations",
+    dashboard: "Tableau de bord",
+    support: "Soutenir la plateforme",
+    moderation: "Modération",
+    myAccount: "Mon compte",
+    notifications: "Notifications",
+    settings: "Paramètres",
+    language: "Langue",
+  },
+  roles: {
+    visiteur: "Visiteur",
+    etudiant: "Apprenant",
+    formateur: "Formateur",
+    admin: "Administrateur",
+    switchLabel: "Voir la plateforme en tant que",
+    switchAria: "Changer de rôle (démo)",
+  },
+  footer: {
+    tagline:
+      "Des formations de qualité, entièrement gratuites, pour apprendre à votre rythme et faire évoluer vos compétences.",
+    colPages: "Pages",
+    colFormations: "Formations",
+    colAccount: "Compte",
+    home: "Accueil",
+    catDev: "Développement Web",
+    catCyber: "Cybersécurité",
+    catData: "Data engineering",
+    catDesign: "Design UX",
+    rights: "© 2026 OmniLearn. Tous droits réservés.",
+    motto: "Apprenez. Pratiquez. Progressez.",
+  },
+  home: {
+    heroBadge: "Plateforme e-learning · 100% gratuite",
+    heroTitle: "Apprenez les compétences",
+    heroHighlight: "tech de demain",
+    heroSubtitle:
+      "Vidéos, cours et quiz conçus par des experts. Développez vos compétences à votre rythme, gratuitement.",
+    popularTitle: "Des cours populaires parmi les apprenants",
+    themesTitle: "Différents thèmes de formations",
+    whyTitle: "Pourquoi apprendre avec OmniLearn ?",
+    features: [
+      "Accédez à un catalogue de formations de qualité, entièrement gratuites.",
+      "Apprenez à votre rythme, où que vous soyez et quand vous le souhaitez.",
+      "Bénéficiez de l'expertise de formateurs passionnés et reconnus dans leur domaine.",
+      "Obtenez des certificats pour valoriser vos compétences sur le marché.",
+    ],
+    heroAlt: "Apprenants en formation",
+  },
+  auth: {
+    loginTitle: "Se connecter",
+    identifier: "Identifiant",
+    identifierPlaceholder: "Votre email ou identifiant",
+    password: "Mot de passe",
+    remember: "Se souvenir de moi",
+    forgot: "Mot de passe oublié ?",
+    noAccount: "Vous n'avez pas encore de compte ?",
+    orContinue: "Ou continuez avec",
+    invalid: "Identifiant ou mot de passe incorrect.",
+    demoTitle: "Comptes de démonstration",
+    demoHint: "Cliquez pour pré-remplir, puis connectez-vous.",
+    loginImageAlt: "Apprenant connecté à la plateforme",
+  },
+  notFound: {
+    title: "Page introuvable",
+    text: "La page que vous cherchez n'existe pas ou a été déplacée.",
+    back: "Retour à l'accueil",
+  },
+} as const;
+
+export default fr;
+export type Dict = typeof fr;

@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@theme {
+  /* Surfaces */
+  --color-bg: #fbfdfd;
+  --color-surface: #f2f4f4;
+  --color-surface-2: #e9edee;
+
+  /* Text */
+  --color-ink: #0a151d;
+  --color-muted: #445050;
+  --color-muted-soft: #a1a8a8;
+
+  /* Lines */
+  --color-line: #dbe8eb;
+  --color-line-soft: #e8e8e8;
+
+  /* Brand teal */
+  --color-brand: #75c6cd;
+  --color-brand-soft: #c3dfe8;
+  --color-brand-band: #dbe8eb;
+
+  /* Interactive blue */
+  --color-primary: #3489ca;
+  --color-primary-soft: #e1eef8;
+  --color-primary-dark: #215775;
+  --color-primary-deep: #08234b;
+
+  /* Accents */
+  --color-accent: #0ca8d3;
+  --color-violet: #9746ff;
+
+  /* States */
+  --color-success: #1f9d6b;
+  --color-success-soft: #e3f6ee;
+  --color-warning: #e8a13a;
+  --color-danger: #d6493a;
+  --color-danger-soft: #fbeceb;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 16px;
+}
+
+/* Arabe : police dédiée + suppression du letter-spacing négatif (illisible en arabe). */
+[dir="rtl"] body,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] .font-display {
+  font-family: var(--font-arabic);
+  letter-spacing: normal;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.container-page {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Pill input shared across forms (matches wireframe rounded fields) */
+.field {
+  height: 3rem;
+  width: 100%;
+  border-radius: 9999px;
+  border: 1px solid var(--color-line);
+  background: var(--color-bg);
+  padding-inline: 1.25rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+.field::placeholder {
+  color: var(--color-muted-soft);
+}
+
+textarea.field {
+  height: auto;
+  border-radius: 18px;
+  padding: 0.85rem 1.1rem;
+  resize: vertical;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise {
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
