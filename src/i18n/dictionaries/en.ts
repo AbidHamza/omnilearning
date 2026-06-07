@@ -1,0 +1,86 @@
+import type { Dict } from "./fr";
+
+const en: Dict = {
+  common: {
+    explore: "Explore courses",
+    viewAll: "View all",
+    search: "Search for a course",
+    signIn: "Sign in",
+    signUp: "Sign up",
+    createAccount: "Create an account",
+    save: "Save",
+    download: "Download",
+    loading: "Loading…",
+    free: "100% free",
+  },
+  nav: {
+    formations: "Courses",
+    dashboard: "Dashboard",
+    support: "Support the platform",
+    moderation: "Moderation",
+    myAccount: "My account",
+    notifications: "Notifications",
+    settings: "Settings",
+    language: "Language",
+  },
+  roles: {
+    visiteur: "Visitor",
+    etudiant: "Learner",
+    formateur: "Instructor",
+    admin: "Administrator",
+    switchLabel: "View the platform as",
+    switchAria: "Switch role (demo)",
+  },
+  footer: {
+    tagline:
+      "Quality courses, entirely free, to learn at your own pace and grow your skills.",
+    colPages: "Pages",
+    colFormations: "Courses",
+    colAccount: "Account",
+    home: "Home",
+    catDev: "Web Development",
+    catCyber: "Cybersecurity",
+    catData: "Data engineering",
+    catDesign: "UX Design",
+    rights: "© 2026 OmniLearn. All rights reserved.",
+    motto: "Learn. Practice. Progress.",
+  },
+  home: {
+    heroBadge: "E-learning platform · 100% free",
+    heroTitle: "Learn the tech skills",
+    heroHighlight: "of tomorrow",
+    heroSubtitle:
+      "Videos, courses and quizzes designed by experts. Build your skills at your own pace, for free.",
+    popularTitle: "Popular courses among learners",
+    themesTitle: "Browse course topics",
+    whyTitle: "Why learn with OmniLearn?",
+    features: [
+      "Access a catalogue of quality courses, entirely free.",
+      "Learn at your own pace, wherever you are and whenever you want.",
+      "Benefit from the expertise of passionate, recognised instructors.",
+      "Earn certificates to showcase your skills on the job market.",
+    ],
+    heroAlt: "Learners in a course",
+  },
+  auth: {
+    loginTitle: "Sign in",
+    identifier: "Username",
+    identifierPlaceholder: "Your email or username",
+    password: "Password",
+    remember: "Remember me",
+    forgot: "Forgot your password?",
+    noAccount: "Don't have an account yet?",
+    orContinue: "Or continue with",
+    invalid: "Incorrect username or password.",
+    demoTitle: "Demo accounts",
+    demoHint: "Click to pre-fill, then sign in.",
+    loginImageAlt: "Learner signed in to the platform",
+  },
+  notFound: {
+    title: "Page not found",
+    text: "The page you are looking for doesn't exist or has been moved.",
+    back: "Back to home",
+  },
+};
+
+export default en;
