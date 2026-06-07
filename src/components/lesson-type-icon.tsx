@@ -1,15 +1,12 @@
 import type { LessonType } from "@/lib/types";
 import { DocIcon, PlayIcon, QuizIcon } from "./icons";
 
-const map = {
-  video: { Icon: PlayIcon, label: "Vidéo" },
-  text: { Icon: DocIcon, label: "Texte" },
-  quiz: { Icon: QuizIcon, label: "Quiz" },
+// Les libellés de type de leçon sont gérés via i18n (t.lessonType.*).
+const iconByType = {
+  video: PlayIcon,
+  text: DocIcon,
+  quiz: QuizIcon,
 } as const;
-
-export function lessonTypeLabel(type: LessonType) {
-  return map[type].label;
-}
 
 export default function LessonTypeIcon({
   type,
@@ -18,10 +15,11 @@ export default function LessonTypeIcon({
   type: LessonType;
   className?: string;
 }) {
-  const { Icon } = map[type];
+  const Icon = iconByType[type];
   return (
     <span
       className={`grid place-items-center rounded-lg bg-surface text-muted ${className}`}
+      aria-hidden="true"
     >
       <Icon width={18} height={18} />
     </span>

@@ -4,14 +4,16 @@ import { useMemo, useState } from "react";
 import type { Category, Course } from "@/lib/types";
 import CourseCard from "./course-card";
 import { ChevronUp, SearchIcon } from "./icons";
+import { useT } from "@/i18n/provider";
 
-const levels = ["Débutant", "Intermédiaire", "Avancé"];
-const durations = [
-  { id: "lt1", label: "Moins de 1 heure", max: 1 },
-  { id: "1-3", label: "Entre 1 heure et 3 heures", min: 1, max: 3 },
-  { id: "3-6", label: "Entre 3 heures et 6 heures", min: 3, max: 6 },
-  { id: "gt6", label: "Plus de 6 heures", min: 6 },
-];
+// Les valeurs des niveaux correspondent aux données (fr) ; seul l'affichage est traduit.
+const levelValues = ["Débutant", "Intermédiaire", "Avancé"] as const;
+const durationDefs = [
+  { id: "lt1", max: 1 },
+  { id: "1-3", min: 1, max: 3 },
+  { id: "3-6", min: 3, max: 6 },
+  { id: "gt6", min: 6 },
+] as const;
 
 export default function CatalogClient({
   courses,
@@ -24,6 +26,21 @@ export default function CatalogClient({
   initialQ: string;
   initialCat: string;
 }) {
+  const t = useT();
+  const tc = t.catalog;
+
+  const levelLabels: Record<string, string> = {
+    Débutant: tc.levelBeginner,
+    Intermédiaire: tc.levelIntermediate,
+    Avancé: tc.levelAdvanced,
+  };
+  const durationLabels: Record<string, string> = {
+    lt1: tc.durLt1,
+    "1-3": tc.dur13,
+    "3-6": tc.dur36,
+    gt6: tc.durGt6,
+  };
+
   const [q, setQ] = useState(initialQ);
   const [selLevels, setSelLevels] = useState<string[]>([]);
   const [selDur, setSelDur] = useState<string[]>([]);
@@ -50,17 +67,19 @@ export default function CatalogClient({
       const matchDur =
         !selDur.length ||
         selDur.some((id) => {
-          const d = durations.find((x) => x.id === id)!;
+          const d = durationDefs.find((x) => x.id === id)!;
+          const min = "min" in d ? d.min : undefined;
+          const max = "max" in d ? d.max : undefined;
           return (
-            (d.min === undefined || c.hours >= d.min) &&
-            (d.max === undefined || c.hours < d.max)
+            (min === undefined || c.hours >= min) &&
+            (max === undefined || c.hours < max)
           );
         });
       return matchQ && matchLevel && matchCat && matchDur;
     });
   }, [courses, q, selLevels, selDur, selCats]);
 
-  const label = q || initialCat || "toutes les formations";
+  const label = q || initialCat || tc.defaultLabel;
 
   return (
     <div className="container-page grid gap-10 py-10 lg:grid-cols-[240px_1fr]">
@@ -70,39 +89,40 @@ export default function CatalogClient({
           <SearchIcon
             width={17}
             height={17}
-            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-soft"
+            className="pointer-events-none absolute inset-inline-start-4 top-1/2 -translate-y-1/2 text-muted-soft"
           />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Chercher une formation"
-            className="h-11 w-full rounded-full border border-line bg-surface pl-11 pr-4 text-sm outline-none focus:border-primary focus:bg-bg"
+            placeholder={tc.searchPlaceholder}
+            aria-label={tc.searchPlaceholder}
+            className="h-11 w-full rounded-full border border-line bg-surface ps-11 pe-4 text-sm outline-none focus:border-primary focus:bg-bg"
           />
         </div>
 
-        <FilterGroup title="Niveau de difficulté">
-          {levels.map((l) => (
+        <FilterGroup title={tc.filterLevel}>
+          {levelValues.map((l) => (
             <Check
               key={l}
-              label={l}
+              label={levelLabels[l]}
               checked={selLevels.includes(l)}
               onChange={() => toggle(selLevels, setSelLevels, l)}
             />
           ))}
         </FilterGroup>
 
-        <FilterGroup title="Durée de vidéo">
-          {durations.map((d) => (
+        <FilterGroup title={tc.filterDuration}>
+          {durationDefs.map((d) => (
             <Check
               key={d.id}
-              label={d.label}
+              label={durationLabels[d.id]}
               checked={selDur.includes(d.id)}
               onChange={() => toggle(selDur, setSelDur, d.id)}
             />
           ))}
         </FilterGroup>
 
-        <FilterGroup title="Catégorie">
+        <FilterGroup title={tc.filterCategory}>
           {categories.map((c) => (
             <Check
               key={c.id}
@@ -117,18 +137,18 @@ export default function CatalogClient({
       {/* Results */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          {filtered.length} résultat{filtered.length > 1 ? "s" : ""} pour{" "}
+          {filtered.length} {tc.resultsFor}{" "}
           <span className="text-primary-dark">«&nbsp;{label}&nbsp;»</span>
         </h1>
 
         {filtered.length === 0 ? (
           <div className="mt-10 rounded-2xl border border-dashed border-line p-12 text-center text-muted">
-            Aucune formation ne correspond à vos filtres.
+            {tc.empty}
           </div>
         ) : (
           <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {filtered.map((c) => (
-              <CourseCard key={c.slug} course={c} />
+              <CourseCard key={c.slug} course={c} labels={t.card} />
             ))}
           </div>
         )}
