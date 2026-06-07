@@ -45,21 +45,142 @@ const fr = {
     motto: "Apprenez. Pratiquez. Progressez.",
   },
   home: {
-    heroBadge: "Plateforme e-learning · 100% gratuite",
+    heroBadge: "100% gratuit, pour toujours",
     heroTitle: "Apprenez les compétences",
     heroHighlight: "tech de demain",
     heroSubtitle:
-      "Vidéos, cours et quiz conçus par des experts. Développez vos compétences à votre rythme, gratuitement.",
+      "Vidéos, cours et quiz conçus par des experts. Progressez à votre rythme et obtenez des certificats, sans rien payer.",
+    heroCtaPrimary: "Commencer gratuitement",
+    heroCtaSecondary: "Voir les formations",
+    heroReassurance: "Aucune carte bancaire requise",
+    heroAlt: "Apprenants en formation",
+
+    // Mockup produit du hero
+    mockTitle: "Cybersécurité",
+    mockSubtitle: "Module 2 · Identifier les menaces",
+    mockProgressLabel: "Progression",
+    mockLessonVideo: "Comprendre les menaces et leurs impacts",
+    mockLessonText: "Sécuriser ses informations personnelles",
+    mockLessonQuiz: "Quiz : les menaces de cybersécurité",
+    mockDuration: "20 h de contenu",
+    mockLevel: "Niveau débutant",
+
+    // Bande de stats
+    statsTitle: "La plateforme en quelques chiffres",
+    statLearners: "Apprenants actifs",
+    statCourses: "Formations en ligne",
+    statHours: "Heures de contenu",
+    statSatisfaction: "Apprenants satisfaits",
+
     popularTitle: "Des cours populaires parmi les apprenants",
-    themesTitle: "Différents thèmes de formations",
+    popularSubtitle:
+      "Les formations les plus suivies ce mois-ci, choisies par notre communauté.",
+    themesTitle: "Explorez par thème",
+    themesSubtitle: "Neuf domaines, un seul endroit pour monter en compétences.",
+
     whyTitle: "Pourquoi apprendre avec OmniLearn ?",
+    whySubtitle:
+      "Tout ce qu'il faut pour apprendre sérieusement, sans le prix d'une école.",
     features: [
       "Accédez à un catalogue de formations de qualité, entièrement gratuites.",
       "Apprenez à votre rythme, où que vous soyez et quand vous le souhaitez.",
       "Bénéficiez de l'expertise de formateurs passionnés et reconnus dans leur domaine.",
       "Obtenez des certificats pour valoriser vos compétences sur le marché.",
     ],
-    heroAlt: "Apprenants en formation",
+    featureTitles: [
+      "Catalogue gratuit",
+      "À votre rythme",
+      "Formateurs experts",
+      "Certificats reconnus",
+    ],
+
+    // Témoignages
+    testimonialsTitle: "Ils ont appris avec OmniLearn",
+    testimonialsSubtitle:
+      "Des parcours réels, de la première vidéo au premier emploi.",
+    testimonials: [
+      {
+        quote:
+          "J'ai décroché mon premier poste de développeuse en six mois. Les quiz m'ont vraiment forcée à comprendre, pas juste à regarder.",
+        name: "Laura Durand",
+        role: "Développeuse front-end",
+      },
+      {
+        quote:
+          "Le format vidéo plus exercices est parfait quand on travaille à côté. J'ai suivi la formation cybersécurité le soir, à mon rythme.",
+        name: "Yanis Bouchard",
+        role: "Analyste sécurité junior",
+      },
+      {
+        quote:
+          "Enfin une plateforme où le contenu gratuit n'est pas au rabais. Le certificat m'a aidée à négocier une évolution au travail.",
+        name: "Nadia Cherif",
+        role: "Cheffe de projet",
+      },
+    ],
+
+    // Accès gratuit (section pricing)
+    pricingTitle: "Tout est gratuit. Vraiment.",
+    pricingSubtitle:
+      "Pas d'essai limité, pas d'option premium cachée. Vous créez un compte, vous apprenez.",
+    pricingPlan: "Compte gratuit",
+    pricingPrice: "0 €",
+    pricingPeriod: "pour toujours",
+    pricingIncludes: [
+      "Accès à toutes les formations et mises à jour",
+      "Vidéos, cours écrits et quiz interactifs",
+      "Suivi de progression sur tous vos appareils",
+      "Certificats à télécharger à chaque réussite",
+      "Aucune publicité, aucune carte bancaire",
+    ],
+    pricingCta: "Créer mon compte gratuit",
+    pricingNote: "Inscription en moins d'une minute.",
+
+    // FAQ
+    faqTitle: "Questions fréquentes",
+    faqSubtitle: "Tout ce que vous voulez savoir avant de commencer.",
+    faq: [
+      {
+        q: "OmniLearn est-il vraiment 100% gratuit ?",
+        a: "Oui. L'accès aux formations, aux quiz et aux certificats est gratuit, sans limite de durée. La plateforme vit grâce aux dons de sa communauté.",
+      },
+      {
+        q: "Ai-je besoin d'une carte bancaire pour m'inscrire ?",
+        a: "Non. La création de compte ne demande qu'une adresse email. Aucune information de paiement n'est requise, ni maintenant ni plus tard.",
+      },
+      {
+        q: "Les certificats ont-ils de la valeur ?",
+        a: "Chaque certificat atteste de la réussite des quiz et exercices d'une formation. Il s'ajoute à votre profil et se partage sur votre CV ou LinkedIn.",
+      },
+      {
+        q: "Puis-je apprendre à mon rythme ?",
+        a: "Oui. Les cours restent accessibles à tout moment et votre progression est sauvegardée. Vous reprenez exactement où vous vous êtes arrêté, sur n'importe quel appareil.",
+      },
+    ],
+
+    // CTA final
+    ctaTitle: "Prêt à apprendre quelque chose de nouveau ?",
+    ctaSubtitle:
+      "Rejoignez les apprenants qui montent en compétences chaque jour, gratuitement.",
+    ctaButton: "Commencer maintenant",
+  },
+  course: {
+    backToAll: "Toutes les formations",
+    durationLabel: "Durée",
+    hoursUnit: "heures",
+    languageLabel: "Langue",
+    levelLabel: "Niveau",
+    softwareLabel: "Logiciels",
+    prerequisites: "Prérequis :",
+    description: "Description",
+    trailer: "Bande-annonce",
+    summary: "Sommaire",
+    objectives: "Objectifs",
+    skills: "Compétences acquises",
+    contentType: "Type de contenu",
+    instructorTitle: "Votre formateur",
+    start: "Commencer la formation",
+    videoFallback: "Lecture de la vidéo",
   },
   auth: {
     loginTitle: "Se connecter",
@@ -83,4 +204,19 @@ const fr = {
 } as const;
 
 export default fr;
-export type Dict = typeof fr;
+
+/**
+ * Élargit les types littéraux de `fr` vers `string` tout en conservant
+ * la structure exacte : mêmes clés et mêmes longueurs de tableaux (tuples).
+ * Les autres dictionnaires (en, ar) doivent donc reproduire la structure à
+ * l'identique, sans être contraints aux mêmes valeurs textuelles françaises.
+ */
+type Widen<T> = T extends string
+  ? string
+  : T extends readonly unknown[]
+    ? { readonly [K in keyof T]: Widen<T[K]> }
+    : T extends object
+      ? { readonly [K in keyof T]: Widen<T[K]> }
+      : T;
+
+export type Dict = Widen<typeof fr>;

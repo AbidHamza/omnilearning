@@ -128,3 +128,62 @@ textarea.field {
 .rise {
   animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+/* Entrée échelonnée pour les listes/sections au chargement. */
+.rise-stagger > * {
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.rise-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.rise-stagger > *:nth-child(2) { animation-delay: 0.12s; }
+.rise-stagger > *:nth-child(3) { animation-delay: 0.19s; }
+.rise-stagger > *:nth-child(4) { animation-delay: 0.26s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .rise-stagger > * {
+    animation: none;
+  }
+}
+
+/* Mesh de fond pour le hero : nappes radiales teal/bleu sur fond clair. */
+.hero-mesh {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(48rem 32rem at 78% -8%, color-mix(in srgb, var(--color-brand) 38%, transparent), transparent 60%),
+    radial-gradient(40rem 28rem at 8% 0%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 55%),
+    radial-gradient(36rem 30rem at 92% 88%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 60%);
+}
+
+/* Grille fine en surimpression, masquée vers les bords. */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--color-ink) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-ink) 5%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(60% 60% at 50% 35%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(60% 60% at 50% 35%, #000 30%, transparent 100%);
+}
+
+/* Carte verre dépoli réutilisée dans le mockup produit. */
+.glass-card {
+  background: color-mix(in srgb, var(--color-bg) 86%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
+    0 30px 60px -28px rgba(10, 21, 29, 0.4),
+    0 12px 24px -16px rgba(10, 21, 29, 0.25);
+}
+
+/* Accordéon FAQ natif : rotation du chevron à l'ouverture. */
+details[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+.faq-chevron {
+  transition: transform 0.25s ease;
+}
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
