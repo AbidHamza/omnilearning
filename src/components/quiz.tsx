@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { QuizQuestion } from "@/lib/types";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, XIcon } from "./icons";
+import { useT } from "@/i18n/provider";
 
 export default function Quiz({
   questions,
@@ -11,6 +12,7 @@ export default function Quiz({
   questions: QuizQuestion[];
   onFinished?: () => void;
 }) {
+  const t = useT();
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
@@ -65,17 +67,16 @@ export default function Quiz({
           {pass ? <CheckIcon width={32} height={32} /> : <XIcon width={32} height={32} />}
         </div>
         <h3 className="mt-5 text-2xl font-bold">
-          {pass ? "Quiz réussi !" : "Continuez vos efforts"}
+          {pass ? t.quiz.passed : t.quiz.failed}
         </h3>
         <p className="mt-2 text-muted">
-          Vous avez obtenu {score} bonne{score > 1 ? "s" : ""} réponse
-          {score > 1 ? "s" : ""} sur {questions.length} ({ratio}%).
+          {t.quiz.scoreLine} : {score}/{questions.length} ({ratio}%)
         </p>
         <button
           onClick={restart}
           className="mt-6 rounded-full border border-line px-6 py-2.5 text-sm font-semibold transition hover:bg-surface"
         >
-          Recommencer le quiz
+          {t.quiz.restart}
         </button>
       </div>
     );
@@ -85,24 +86,24 @@ export default function Quiz({
     <div className="rounded-[var(--radius-card)] border border-line bg-bg p-6 sm:p-8">
       <div className="flex items-start justify-between gap-4">
         <h3 className="font-display text-xl font-bold">
-          Question {index + 1} sur {questions.length}
+          {t.quiz.questionOf} {index + 1} {t.quiz.questionSep} {questions.length}
         </h3>
         <div className="flex shrink-0 gap-2">
           <button
             onClick={prev}
             disabled={index === 0}
-            aria-label="Question précédente"
+            aria-label={t.quiz.prev}
             className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition hover:border-primary hover:text-primary-dark disabled:opacity-40"
           >
-            <ArrowLeftIcon width={16} height={16} />
+            <ArrowLeftIcon width={16} height={16} className="rtl:rotate-180" />
           </button>
           <button
             onClick={next}
             disabled={!checked}
-            aria-label="Question suivante"
+            aria-label={t.quiz.next}
             className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition hover:border-primary hover:text-primary-dark disabled:opacity-40"
           >
-            <ArrowRightIcon width={16} height={16} />
+            <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
           </button>
         </div>
       </div>
@@ -126,7 +127,7 @@ export default function Quiz({
               key={i}
               disabled={checked}
               onClick={() => setSelected(i)}
-              className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-left text-sm transition ${ring} ${
+              className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-start text-sm transition ${ring} ${
                 !checked ? "hover:border-primary" : ""
               }`}
             >
@@ -171,14 +172,14 @@ export default function Quiz({
             disabled={selected === null}
             className="rounded-full bg-primary px-10 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Valider
+            {t.quiz.validate}
           </button>
         ) : (
           <button
             onClick={next}
             className="rounded-full bg-primary px-10 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
           >
-            {isLast ? "Voir le résultat" : "Question suivante"}
+            {isLast ? t.quiz.showResult : t.quiz.next}
           </button>
         )}
       </div>

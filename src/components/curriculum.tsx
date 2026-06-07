@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Course } from "@/lib/types";
 import { ChevronDown } from "./icons";
-import LessonTypeIcon, { lessonTypeLabel } from "./lesson-type-icon";
+import LessonTypeIcon from "./lesson-type-icon";
+import { useT } from "@/i18n/provider";
 
 export default function Curriculum({ course }: { course: Course }) {
+  const t = useT();
   const [open, setOpen] = useState<Record<string, boolean>>(
     Object.fromEntries(course.parts.map((p, i) => [p.id, i === 0]))
   );
@@ -27,8 +29,8 @@ export default function Curriculum({ course }: { course: Course }) {
                   isOpen ? "" : "-rotate-90"
                 }`}
               />
-              <span className="ml-auto text-sm text-muted">
-                {part.lessons.length} leçons
+              <span className="ms-auto text-sm text-muted">
+                {part.lessons.length} {t.curriculum.lessonsCount}
               </span>
             </button>
 
@@ -44,10 +46,10 @@ export default function Curriculum({ course }: { course: Course }) {
                     <div className="min-w-0">
                       <div className="truncate font-medium">{lesson.title}</div>
                       <div className="text-sm text-muted">
-                        {lessonTypeLabel(lesson.type)}
+                        {t.lessonType[lesson.type]}
                       </div>
                     </div>
-                    <span className="ml-auto shrink-0 text-sm text-muted">
+                    <span className="ms-auto shrink-0 text-sm text-muted">
                       {lesson.duration}
                     </span>
                   </Link>

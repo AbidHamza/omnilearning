@@ -42,6 +42,87 @@
   --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 
   --radius-card: 16px;
+
+  /* Ombre portée des cartes : variabilisée pour s'adapter au thème sombre. */
+  --shadow-card: 0 18px 40px -18px rgba(10, 21, 29, 0.3);
+}
+
+/*
+ * Thème sombre : on réassigne les mêmes jetons sémantiques que le thème clair.
+ * Comme toute l'UI s'appuie sur bg/surface/ink/muted/line/brand…, le passage
+ * en sombre se propage automatiquement à l'ensemble des composants.
+ * Les sections volontairement foncées (bandeau stats, footer, CTA en bg-ink)
+ * restent foncées : on remonte juste légèrement leur teinte pour le contraste.
+ */
+.dark {
+  /* Surfaces */
+  --color-bg: #0b1418;
+  --color-surface: #121e24;
+  --color-surface-2: #1a2930;
+
+  /* Text */
+  --color-ink: #eef4f5;
+  --color-muted: #9fb0b3;
+  --color-muted-soft: #6a7b7f;
+
+  /* Lines */
+  --color-line: #213038;
+  --color-line-soft: #1c2a31;
+
+  /* Brand teal — éclairci pour rester lisible sur fond sombre */
+  --color-brand: #6fd0d8;
+  --color-brand-soft: #1d3a42;
+  --color-brand-band: #101e24;
+
+  /* Interactive blue — éclairci pour le contraste AA sur fond sombre */
+  --color-primary: #5aa9e6;
+  --color-primary-soft: #16303f;
+  --color-primary-dark: #9ecdf0;
+  --color-primary-deep: #c4e2f6;
+
+  /* Accents */
+  --color-accent: #38c4e6;
+
+  /* States */
+  --color-success: #46c08c;
+  --color-success-soft: #133227;
+  --color-warning: #f0b65a;
+  --color-danger: #ef6a5c;
+  --color-danger-soft: #361a18;
+
+  /* Sections déjà foncées (bg-ink) : remontées d'un cran pour s'en détacher */
+  --color-ink-section: #0f1c22;
+
+  --shadow-card: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+}
+
+/*
+ * Sections volontairement foncées (bandeau stats, footer, CTA).
+ * En clair elles s'appuient sur l'encre (#0a151d) ; en sombre, comme l'encre
+ * devient claire, on bascule sur une teinte foncée dédiée. Le texte interne
+ * reste blanc dans les deux thèmes, d'où ce jeton fixe.
+ */
+.section-dark {
+  background-color: #0a151d;
+}
+.dark .section-dark {
+  background-color: var(--color-ink-section);
+}
+
+/* Évite tout flash de transition au tout premier rendu / au switch de thème. */
+.theme-transition,
+.theme-transition * {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.2s ease,
+    fill 0.2s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-transition,
+  .theme-transition * {
+    transition: none !important;
+  }
 }
 
 /* Arabe : police dédiée + suppression du letter-spacing négatif (illisible en arabe). */
@@ -172,6 +253,33 @@ textarea.field {
     0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
     0 30px 60px -28px rgba(10, 21, 29, 0.4),
     0 12px 24px -16px rgba(10, 21, 29, 0.25);
+}
+.dark .glass-card {
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 30px 60px -28px rgba(0, 0, 0, 0.7),
+    0 12px 24px -16px rgba(0, 0, 0, 0.5);
+}
+
+/*
+ * Anneau de focus clavier homogène sur tout élément interactif.
+ * On ne l'affiche qu'au focus clavier (focus-visible), pas au clic souris.
+ */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+/* Les champs en pilule gèrent déjà leur focus via .field ; pas de double anneau. */
+.field:focus-visible {
+  outline: none;
 }
 
 /* Accordéon FAQ natif : rotation du chevron à l'ouverture. */

@@ -93,7 +93,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             <div className="glass-card relative rounded-[26px] border border-bg/60 p-5">
               {/* En-tête de la carte cours */}
               <div className="flex items-center gap-3">
-                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-ink text-brand">
+                <span className="section-dark grid h-11 w-11 place-items-center rounded-2xl text-brand">
                   <PlayIcon width={20} height={20} />
                 </span>
                 <div className="min-w-0">
@@ -171,7 +171,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       </section>
 
       {/* ── Bande de stats ─────────────────────────────────────────── */}
-      <section className="border-y border-line bg-ink">
+      <section className="section-dark border-y border-line">
         <div className="container-page py-10">
           <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
             {stats.map((s, i) => {
@@ -219,6 +219,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               <CourseCard
                 key={c.slug}
                 course={c}
+                labels={t.card}
                 variant="compact"
                 className="w-[230px] shrink-0"
               />
@@ -418,7 +419,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
 
       {/* ── CTA final ──────────────────────────────────────────────── */}
       <section className="container-page pb-20">
-        <div className="relative overflow-hidden rounded-[28px] bg-ink px-8 py-14 text-center sm:px-12">
+        <div className="section-dark relative overflow-hidden rounded-[28px] px-8 py-14 text-center sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-90">
             <div className="absolute -top-16 start-1/4 h-56 w-56 rounded-full bg-brand/30 blur-3xl" />
             <div className="absolute -bottom-20 end-1/4 h-56 w-56 rounded-full bg-primary/30 blur-3xl" />

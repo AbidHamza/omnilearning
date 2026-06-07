@@ -11,6 +11,7 @@ import {
   SearchIcon,
   XIcon,
 } from "./icons";
+import ThemeToggle from "./theme-toggle";
 import { homeByRole, roleLabels, useSession } from "@/lib/session";
 import type { Role } from "@/lib/types";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
@@ -92,7 +93,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
       <div className="container-page flex h-[68px] items-center gap-4">
         <LocaleLink href="/" className="flex shrink-0 items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-ink text-brand">
+          <span className="section-dark grid h-9 w-9 place-items-center rounded-xl text-brand">
             <GraduationIcon width={19} height={19} />
           </span>
           <span className="hidden font-display text-[17px] font-extrabold tracking-tight sm:block">
@@ -134,6 +135,7 @@ export default function Navbar() {
             </nav>
 
             <div className="ms-auto flex items-center gap-2 lg:ms-0">
+              <ThemeToggle />
               <LanguageSwitcher />
 
               <RoleSwitcher
@@ -195,6 +197,7 @@ export default function Navbar() {
 
         {bare && (
           <div className="ms-auto flex items-center gap-3">
+            <ThemeToggle />
             <LanguageSwitcher />
             <LocaleLink
               href="/connexion"

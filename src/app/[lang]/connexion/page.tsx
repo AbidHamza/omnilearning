@@ -142,7 +142,7 @@ export default function ConnexionPage() {
               <button
                 key={i}
                 type="button"
-                className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg transition hover:border-primary hover:bg-surface"
+                className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg text-ink transition hover:border-primary hover:bg-surface"
               >
                 <Icon width={22} height={22} />
               </button>

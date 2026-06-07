@@ -37,7 +37,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="mt-24 bg-ink text-white">
+    <footer className="section-dark mt-24 text-white">
       <div className="container-page grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2.5">

@@ -2,8 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { allLessons, courses, getCourse } from "@/lib/data";
 import Quiz from "@/components/quiz";
-import LessonTypeIcon, { lessonTypeLabel } from "@/components/lesson-type-icon";
-import { PlayIcon } from "@/components/icons";
+import LessonTypeIcon from "@/components/lesson-type-icon";
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, PlayIcon } from "@/components/icons";
 import { isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 
@@ -39,14 +39,15 @@ export default async function LessonPage(
       <div className="min-w-0">
         <Link
           href={lp(`/formations/${course.slug}`)}
-          className="text-sm text-muted hover:text-ink"
+          className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink"
         >
-          ← {course.title}
+          <ArrowLeftIcon width={15} height={15} className="rtl:rotate-180" />
+          {course.title}
         </Link>
 
         <div className="mt-3 flex items-center gap-2 text-sm text-muted">
           <span className="rounded-full bg-surface px-2.5 py-0.5">
-            {lessonTypeLabel(lesson.type)}
+            {t.lessonType[lesson.type]}
           </span>
           <span>· {lesson.duration}</span>
         </div>
@@ -86,9 +87,10 @@ export default async function LessonPage(
           {prev ? (
             <Link
               href={lp(`/formations/${course.slug}/${prev.id}`)}
-              className="rounded-full border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
+              className="inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
             >
-              ← Précédent
+              <ArrowLeftIcon width={16} height={16} className="rtl:rotate-180" />
+              {c.prevLesson}
             </Link>
           ) : (
             <span />
@@ -96,16 +98,18 @@ export default async function LessonPage(
           {next ? (
             <Link
               href={lp(`/formations/${course.slug}/${next.id}`)}
-              className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
             >
-              Leçon suivante →
+              {c.nextLesson}
+              <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
             </Link>
           ) : (
             <Link
               href={lp("/tableau-de-bord")}
-              className="rounded-full bg-success px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-full bg-success px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
             >
-              Terminer la formation ✓
+              {c.finish}
+              <CheckIcon width={16} height={16} />
             </Link>
           )}
         </div>
@@ -114,7 +118,7 @@ export default async function LessonPage(
       <aside className="lg:sticky lg:top-20 lg:self-start">
         <div className="overflow-hidden rounded-[var(--radius-card)] border border-line">
           <div className="border-b border-line bg-surface px-4 py-3 text-sm font-semibold">
-            Programme · {lessons.length} leçons
+            {c.programLabel} · {lessons.length} {c.lessonsCount}
           </div>
           <div className="max-h-[70vh] overflow-y-auto">
             {course.parts.map((part) => (
