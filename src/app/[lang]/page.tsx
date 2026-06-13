@@ -1,7 +1,7 @@
 import Link from "next/link";
 import CourseCard from "@/components/course-card";
 import CategoryIcon from "@/components/category-icon";
-import { categories, popularSlugs, getCourse } from "@/lib/data";
+import { getCategories, getCourses, popularSlugs } from "@/lib/courses";
 import {
   ArrowRightIcon,
   AwardIcon,
@@ -32,8 +32,10 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   const t = await getDictionary(lang);
   const lp = (path: string) => localePath(lang, path);
 
+  const [allCourses, categories] = await Promise.all([getCourses(), getCategories()]);
+  const bySlug = new Map(allCourses.map((c) => [c.slug, c]));
   const popular = popularSlugs
-    .map(getCourse)
+    .map((s) => bySlug.get(s))
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
 
   const stats = [

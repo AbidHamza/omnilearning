@@ -1,0 +1,122 @@
+"use server";
+
+import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
+
+// Persiste la progression (inscriptions, leçons terminées, tentatives de quiz)
+// liée à l'utilisateur connecté. No-op silencieux si non connecté (mode démo).
+
+async function currentUserId(): Promise<string | null> {
+  const session = await auth();
+  return session?.user?.id ?? null;
+}
+
+/** Garantit une inscription (enrollment) pour (user, course). Renvoie son id. */
+async function ensureEnrollment(userId: string, courseId: string) {
+  return prisma.enrollment.upsert({
+    where: { userId_courseId: { userId, courseId } },
+    update: { lastAccessedAt: new Date() },
+    create: { userId, courseId, lastAccessedAt: new Date() },
+  });
+}
+
+/** Recalcule le % de progression d'une inscription à partir des leçons terminées. */
+async function recomputeProgress(enrollmentId: string, courseId: string) {
+  const totalLessons = await prisma.lesson.count({
+    where: { part: { courseId } },
+  });
+  const done = await prisma.lessonProgress.count({
+    where: { enrollmentId, isCompleted: true },
+  });
+  const progress = totalLessons > 0 ? Math.round((done / totalLessons) * 100) : 0;
+  await prisma.enrollment.update({
+    where: { id: enrollmentId },
+    data: {
+      progress,
+      completedAt: progress >= 100 ? new Date() : null,
+    },
+  });
+  return progress;
+}
+
+/** S'inscrire à un cours (bouton "Commencer"). */
+export async function enrollAction(courseSlug: string) {
+  const userId = await currentUserId();
+  if (!userId) return { ok: false as const };
+  const course = await prisma.course.findUnique({ where: { slug: courseSlug } });
+  if (!course) return { ok: false as const };
+  await ensureEnrollment(userId, course.id);
+  return { ok: true as const };
+}
+
+/** Marque une leçon comme terminée (vidéo/texte vue, ou quiz réussi). */
+export async function markLessonCompleteAction(courseSlug: string, lessonKey: string) {
+  const userId = await currentUserId();
+  if (!userId) return { ok: false as const };
+
+  const course = await prisma.course.findUnique({ where: { slug: courseSlug } });
+  if (!course) return { ok: false as const };
+
+  const lesson = await prisma.lesson.findFirst({
+    where: { key: lessonKey, part: { courseId: course.id } },
+  });
+  if (!lesson) return { ok: false as const };
+
+  const enrollment = await ensureEnrollment(userId, course.id);
+
+  await prisma.lessonProgress.upsert({
+    where: { enrollmentId_lessonId: { enrollmentId: enrollment.id, lessonId: lesson.id } },
+    update: { isCompleted: true, completedAt: new Date() },
+    create: {
+      enrollmentId: enrollment.id,
+      lessonId: lesson.id,
+      isCompleted: true,
+      completedAt: new Date(),
+    },
+  });
+
+  await prisma.enrollment.update({
+    where: { id: enrollment.id },
+    data: { lastLesson: lesson.title, lastAccessedAt: new Date() },
+  });
+
+  const progress = await recomputeProgress(enrollment.id, course.id);
+  return { ok: true as const, progress };
+}
+
+/** Enregistre une tentative de quiz et marque la leçon terminée si réussie. */
+export async function recordQuizAttemptAction(input: {
+  courseSlug: string;
+  lessonKey: string;
+  answers: number[];
+  score: number;
+  maxScore: number;
+}) {
+  const userId = await currentUserId();
+  if (!userId) return { ok: false as const };
+
+  const course = await prisma.course.findUnique({ where: { slug: input.courseSlug } });
+  if (!course) return { ok: false as const };
+  const lesson = await prisma.lesson.findFirst({
+    where: { key: input.lessonKey, part: { courseId: course.id } },
+  });
+  if (!lesson) return { ok: false as const };
+
+  const isPassed = input.maxScore > 0 && input.score / input.maxScore >= 0.7;
+
+  await prisma.quizAttempt.create({
+    data: {
+      userId,
+      lessonId: lesson.id,
+      answers: JSON.stringify(input.answers),
+      score: input.score,
+      maxScore: input.maxScore,
+      isPassed,
+    },
+  });
+
+  if (isPassed) {
+    await markLessonCompleteAction(input.courseSlug, input.lessonKey);
+  }
+  return { ok: true as const, isPassed };
+}

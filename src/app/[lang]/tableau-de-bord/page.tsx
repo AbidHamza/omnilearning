@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { currentUser, getCourse, courses } from "@/lib/data";
+import { studentUser } from "@/lib/data";
+import { getCourses } from "@/lib/courses";
+import { getCurrentUser } from "@/lib/dal";
 import CourseCard from "@/components/course-card";
 import ProgressChart from "@/components/progress-chart";
 import { BoltIcon, ClockIcon, LayersIcon, PencilIcon } from "@/components/icons";
@@ -14,10 +16,18 @@ const strike = [
   { day: "Dim.", on: false },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  // Utilisateur réel si connecté, sinon l'étudiant de démo (mode démo).
+  const session = await getCurrentUser();
+  const currentUser = session?.user ?? studentUser;
+  const allCourses = await getCourses();
+  const bySlug = new Map(allCourses.map((c) => [c.slug, c]));
+
   const enrolled = currentUser.enrolled
-    .map((e) => ({ ...e, course: getCourse(e.slug)! }))
-    .filter((e) => e.course);
+    .map((e) => ({ ...e, course: bySlug.get(e.slug) }))
+    .filter((e): e is typeof e & { course: NonNullable<typeof e.course> } =>
+      Boolean(e.course),
+    );
 
   const totalHours = enrolled.reduce((s, e) => s + e.course.hours, 0);
   const totalQuiz = enrolled.reduce(
@@ -31,7 +41,7 @@ export default function DashboardPage() {
   );
 
   const enrolledSlugs = new Set(currentUser.enrolled.map((e) => e.slug));
-  const recommended = courses.filter((c) => !enrolledSlugs.has(c.slug)).slice(0, 4);
+  const recommended = allCourses.filter((c) => !enrolledSlugs.has(c.slug)).slice(0, 4);
 
   const totals = [
     { label: `${totalHours} heures`, icon: ClockIcon },
@@ -50,7 +60,7 @@ export default function DashboardPage() {
           <h2 className="text-sm text-muted">Les cours suivis</h2>
           <div className="mt-4 space-y-6">
             {enrolled.slice(0, 2).map((e) => {
-              const first = e.course.parts[0].lessons[0];
+              const first = e.course.parts[0]?.lessons[0];
               return (
                 <div key={e.slug}>
                   <div className="flex items-center justify-between">
@@ -71,7 +81,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="mt-3 flex justify-end">
                     <Link
-                      href={`/formations/${e.slug}/${first.id}`}
+                      href={first ? `/formations/${e.slug}/${first.id}` : `/formations/${e.slug}`}
                       className="rounded-full border border-line bg-bg px-5 py-1.5 text-sm font-semibold transition hover:border-primary hover:text-primary-dark"
                     >
                       Continuez

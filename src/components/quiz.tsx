@@ -1,16 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { QuizQuestion } from "@/lib/types";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, XIcon } from "./icons";
 import { useT } from "@/i18n/provider";
+import { recordQuizAttemptAction } from "@/lib/actions/progress";
 
 export default function Quiz({
   questions,
   onFinished,
+  courseSlug,
+  lessonKey,
 }: {
   questions: QuizQuestion[];
   onFinished?: () => void;
+  // Si fournis : la tentative est persistée en DB pour l'utilisateur connecté.
+  courseSlug?: string;
+  lessonKey?: string;
 }) {
   const t = useT();
   const [index, setIndex] = useState(0);
@@ -18,6 +24,7 @@ export default function Quiz({
   const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const answers = useRef<number[]>([]);
 
   const question = questions[index];
   const isLast = index === questions.length - 1;
@@ -25,6 +32,7 @@ export default function Quiz({
   function check() {
     if (selected === null) return;
     setChecked(true);
+    answers.current[index] = selected;
     if (selected === question.correctIndex) setScore((s) => s + 1);
   }
 
@@ -32,6 +40,16 @@ export default function Quiz({
     if (isLast) {
       setDone(true);
       onFinished?.();
+      // Persiste la tentative (no-op serveur si non connecté).
+      if (courseSlug && lessonKey) {
+        void recordQuizAttemptAction({
+          courseSlug,
+          lessonKey,
+          answers: answers.current,
+          score,
+          maxScore: questions.length,
+        });
+      }
       return;
     }
     setIndex((i) => i + 1);
