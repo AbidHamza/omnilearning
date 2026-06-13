@@ -59,22 +59,24 @@ export default function CourseCard({
   return (
     <Link
       href={href}
-      className={`group flex flex-col overflow-hidden rounded-2xl bg-bg ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-18px_rgba(10,21,29,0.3)] ${className}`}
+      className={`group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] bg-bg ring-1 ring-line transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_-24px_rgba(17,34,28,0.4)] ${className}`}
     >
+      {/* Filet d'accent ocre qui se révèle au survol, en haut de la carte. */}
+      <span className="absolute inset-x-0 top-0 z-10 h-1 origin-left scale-x-0 bg-accent transition-transform duration-300 group-hover:scale-x-100" />
       <div className="relative aspect-[16/9] overflow-hidden">
         <Image
           src={course.image}
           alt={course.title}
           fill
           sizes="(min-width:1024px) 360px, 100vw"
-          className="object-cover transition duration-500 group-hover:scale-105"
+          className="object-cover transition duration-500 group-hover:scale-[1.07]"
         />
-        <span className="absolute start-3 top-3 rounded-full bg-bg/95 px-2.5 py-1 text-xs font-semibold text-primary-dark shadow-sm">
+        <span className="absolute start-3 top-3 rounded-full bg-bg/95 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-dark shadow-sm backdrop-blur">
           {course.category}
         </span>
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-display text-lg font-bold leading-snug group-hover:text-primary-dark">
+        <h3 className="font-display text-xl font-semibold leading-tight transition-colors group-hover:text-primary">
           {course.title}
         </h3>
         <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted">

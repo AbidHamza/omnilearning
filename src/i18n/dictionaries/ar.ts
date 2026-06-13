@@ -32,8 +32,6 @@ const ar: Dict = {
     etudiant: "متعلّم",
     formateur: "مدرّب",
     admin: "مشرف",
-    switchLabel: "اعرض المنصة بصفتك",
-    switchAria: "تغيير الدور (تجريبي)",
   },
   footer: {
     tagline:
@@ -239,8 +237,7 @@ const ar: Dict = {
     noAccount: "ليس لديك حساب بعد؟",
     orContinue: "أو تابع باستخدام",
     invalid: "المعرّف أو كلمة المرور غير صحيحة.",
-    demoTitle: "حسابات تجريبية",
-    demoHint: "انقر للتعبئة المسبقة ثم سجّل الدخول.",
+    logout: "تسجيل الخروج",
     loginImageAlt: "متعلّم مسجّل الدخول إلى المنصة",
   },
   notFound: {

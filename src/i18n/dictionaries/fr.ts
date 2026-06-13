@@ -31,8 +31,6 @@ const fr = {
     etudiant: "Apprenant",
     formateur: "Formateur",
     admin: "Administrateur",
-    switchLabel: "Voir la plateforme en tant que",
-    switchAria: "Changer de rôle (démo)",
   },
   footer: {
     tagline:
@@ -242,8 +240,7 @@ const fr = {
     noAccount: "Vous n'avez pas encore de compte ?",
     orContinue: "Ou continuez avec",
     invalid: "Identifiant ou mot de passe incorrect.",
-    demoTitle: "Comptes de démonstration",
-    demoHint: "Cliquez pour pré-remplir, puis connectez-vous.",
+    logout: "Se déconnecter",
     loginImageAlt: "Apprenant connecté à la plateforme",
   },
   notFound: {

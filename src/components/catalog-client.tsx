@@ -136,9 +136,10 @@ export default function CatalogClient({
 
       {/* Results */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
+        <span className="rule-accent mb-3" />
+        <h1 className="text-3xl font-semibold sm:text-[2.1rem]">
           {filtered.length} {tc.resultsFor}{" "}
-          <span className="text-primary-dark">«&nbsp;{label}&nbsp;»</span>
+          <span className="font-accent text-primary">«&nbsp;{label}&nbsp;»</span>
         </h1>
 
         {filtered.length === 0 ? (

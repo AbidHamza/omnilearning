@@ -38,7 +38,7 @@ export default async function CoursePage(
         ← {c.backToAll}
       </Link>
 
-      <h1 className="mt-4 text-4xl font-extrabold tracking-tight">
+      <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight sm:text-[2.75rem]">
         {course.title}
       </h1>
 

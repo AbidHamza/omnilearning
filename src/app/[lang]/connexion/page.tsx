@@ -1,29 +1,20 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
-import { GoogleIcon, GithubIcon, AppleIcon } from "@/components/icons";
+import { GoogleIcon, GithubIcon, AppleIcon, GraduationIcon } from "@/components/icons";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
 import { useT } from "@/i18n/provider";
-import { homeByRole, useSession } from "@/lib/session";
-import { accounts, type LoginRole } from "@/lib/accounts";
+import { homeByRole } from "@/lib/session";
 import { loginAction } from "@/lib/actions/auth";
 import { oauthSignIn } from "@/lib/actions/oauth";
 
 export default function ConnexionPage() {
   const t = useT();
   const router = useLocaleRouter();
-  const { setRole } = useSession();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
-
-  const roleLabel: Record<LoginRole, string> = {
-    etudiant: t.roles.etudiant,
-    formateur: t.roles.formateur,
-    admin: t.roles.admin,
-  };
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,23 +29,17 @@ export default function ConnexionPage() {
       setError(true);
       return;
     }
-    // Synchronise le rôle de démo côté client pour un rendu immédiat puis navigue.
-    setRole(res.role);
+    // Le rôle réel vient de la session : on navigue vers l'espace correspondant.
     router.push(homeByRole[res.role]);
     router.refresh();
-  }
-
-  function prefill(email: string, pw: string) {
-    setIdentifier(email);
-    setPassword(pw);
-    setError(false);
   }
 
   return (
     <div className="grid min-h-[calc(100vh-68px)] lg:grid-cols-2">
       <div className="flex items-center justify-center px-6 py-12">
         <form onSubmit={submit} className="w-full max-w-sm">
-          <h1 className="text-3xl font-extrabold tracking-tight">
+          <span className="rule-accent mb-4" />
+          <h1 className="text-[2.4rem] font-semibold leading-tight">
             {t.auth.loginTitle}
           </h1>
 
@@ -129,26 +114,7 @@ export default function ConnexionPage() {
             </LocaleLink>
           </p>
 
-          {/* Comptes de démonstration (local) */}
-          <div className="mt-6 rounded-2xl border border-line bg-surface p-4">
-            <p className="text-sm font-semibold">{t.auth.demoTitle}</p>
-            <p className="mt-0.5 text-xs text-muted">{t.auth.demoHint}</p>
-            <div className="mt-3 space-y-1.5">
-              {accounts.map((a) => (
-                <button
-                  key={a.email}
-                  type="button"
-                  onClick={() => prefill(a.email, a.password)}
-                  className="flex w-full items-center justify-between rounded-lg bg-bg px-3 py-2 text-start text-xs transition hover:ring-1 hover:ring-primary"
-                >
-                  <span className="font-medium">{roleLabel[a.role]}</span>
-                  <span className="text-muted-soft">{a.email}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <p className="mt-6 text-sm text-muted">{t.auth.orContinue}</p>
+          <p className="mt-8 text-sm text-muted">{t.auth.orContinue}</p>
           <div className="mt-3 flex gap-3">
             <button
               type="button"
@@ -177,16 +143,34 @@ export default function ConnexionPage() {
         </form>
       </div>
 
-      <div className="relative hidden lg:block">
-        <Image
-          src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80"
-          alt={t.auth.loginImageAlt}
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
+      {/* Panneau de marque éditorial (pas de photo stock générique). */}
+      <div className="section-dark relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-14">
+        <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
+        <div className="pointer-events-none absolute -top-24 end-0 h-72 w-72 rounded-full bg-brand/25 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 start-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+
+        <div className="relative flex items-center gap-2.5 text-white">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-brand">
+            <GraduationIcon width={19} height={19} />
+          </span>
+          <span className="font-display text-lg font-semibold">
+            Omni<span className="font-accent text-brand">Learn</span>
+          </span>
+        </div>
+
+        <div className="relative">
+          <p className="font-display text-3xl font-medium leading-tight text-white">
+            « Apprendre ne devrait jamais avoir de{" "}
+            <span className="font-accent text-accent">prix</span>. »
+          </p>
+          <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/60">
+            {t.home.heroSubtitle}
+          </p>
+        </div>
+
+        <p className="relative text-xs uppercase tracking-[0.18em] text-white/40">
+          {t.footer.motto}
+        </p>
       </div>
     </div>
   );
