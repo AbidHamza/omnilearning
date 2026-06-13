@@ -8,15 +8,12 @@ export interface Account {
   role: LoginRole;
 }
 
-// Comptes de démonstration locaux. Aucun appel réseau : la validation se fait
-// côté client à partir de cette liste (la session est ensuite stockée localement).
+// Comptes de DÉMONSTRATION uniquement (affichés sur la page de connexion pour
+// pré-remplir le formulaire). L'authentification réelle passe désormais par
+// Auth.js + DB (voir src/lib/auth.ts). Ces identifiants correspondent aux comptes
+// créés par le seed (prisma/seed.ts) ; le mot de passe est hashé en base.
 export const accounts: Account[] = [
   { email: "etudiant@omnilearn.tech", password: "omni1234", role: "etudiant" },
   { email: "formateur@omnilearn.tech", password: "omni1234", role: "formateur" },
   { email: "admin@omnilearn.tech", password: "omni1234", role: "admin" },
 ];
-
-export function authenticate(identifier: string, password: string): Account | null {
-  const email = identifier.trim().toLowerCase();
-  return accounts.find((a) => a.email === email && a.password === password) ?? null;
-}

@@ -5,6 +5,7 @@ import "../globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { SessionProvider } from "@/lib/session";
+import { getCurrentUser } from "@/lib/dal";
 import { I18nProvider } from "@/i18n/provider";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localeDir, locales, type Locale } from "@/i18n/config";
@@ -97,6 +98,7 @@ export default async function RootLayout({
 
   const dict = await getDictionary(lang);
   const dir = localeDir[lang];
+  const session = await getCurrentUser();
 
   return (
     <html
@@ -115,7 +117,7 @@ export default async function RootLayout({
       </head>
       <body className="flex min-h-full flex-col">
         <I18nProvider locale={lang} dict={dict} dir={dir}>
-          <SessionProvider>
+          <SessionProvider serverRole={session?.role} serverUser={session?.user}>
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />

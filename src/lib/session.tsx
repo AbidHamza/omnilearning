@@ -74,13 +74,27 @@ function writeRole(next: Role) {
 
 const noopSubscribe = () => () => {};
 
-export function SessionProvider({ children }: { children: ReactNode }) {
-  const role = useSyncExternalStore(subscribe, readRole, () => DEFAULT_ROLE);
+export function SessionProvider({
+  children,
+  serverRole,
+  serverUser,
+}: {
+  children: ReactNode;
+  // Session serveur réelle (NextAuth) si présente : elle prime sur le rôle de
+  // démo stocké en localStorage. Sinon on garde le sélecteur de rôle de démo.
+  serverRole?: Role;
+  serverUser?: User | null;
+}) {
+  const localRole = useSyncExternalStore(subscribe, readRole, () => DEFAULT_ROLE);
   const ready = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const setRole = useCallback((next: Role) => writeRole(next), []);
 
+  const authed = Boolean(serverRole);
+  const role = authed ? (serverRole as Role) : localRole;
+  const user = authed ? (serverUser ?? userByRole[role]) : userByRole[localRole];
+
   return (
-    <SessionContext.Provider value={{ role, setRole, user: userByRole[role], ready }}>
+    <SessionContext.Provider value={{ role, setRole, user, ready: ready || authed }}>
       {children}
     </SessionContext.Provider>
   );

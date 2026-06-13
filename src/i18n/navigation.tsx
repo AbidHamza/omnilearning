@@ -28,6 +28,7 @@ export function useLocaleRouter() {
     (path: string) => router.replace(localePath(locale, path)),
     [router, locale],
   );
+  const refresh = useCallback(() => router.refresh(), [router]);
 
-  return { push, replace };
+  return { push, replace, refresh };
 }

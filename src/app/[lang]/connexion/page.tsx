@@ -6,7 +6,9 @@ import { GoogleIcon, GithubIcon, AppleIcon } from "@/components/icons";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
 import { useT } from "@/i18n/provider";
 import { homeByRole, useSession } from "@/lib/session";
-import { accounts, authenticate, type LoginRole } from "@/lib/accounts";
+import { accounts, type LoginRole } from "@/lib/accounts";
+import { loginAction } from "@/lib/actions/auth";
+import { oauthSignIn } from "@/lib/actions/oauth";
 
 export default function ConnexionPage() {
   const t = useT();
@@ -15,6 +17,7 @@ export default function ConnexionPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const roleLabel: Record<LoginRole, string> = {
     etudiant: t.roles.etudiant,
@@ -22,15 +25,23 @@ export default function ConnexionPage() {
     admin: t.roles.admin,
   };
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const account = authenticate(identifier, password);
-    if (!account) {
+    setPending(true);
+    setError(false);
+    const fd = new FormData();
+    fd.set("email", identifier);
+    fd.set("password", password);
+    const res = await loginAction(fd);
+    setPending(false);
+    if (!res.ok) {
       setError(true);
       return;
     }
-    setRole(account.role);
-    router.push(homeByRole[account.role]);
+    // Synchronise le rôle de démo côté client pour un rendu immédiat puis navigue.
+    setRole(res.role);
+    router.push(homeByRole[res.role]);
+    router.refresh();
   }
 
   function prefill(email: string, pw: string) {
@@ -95,7 +106,8 @@ export default function ConnexionPage() {
 
           <button
             type="submit"
-            className="mt-6 w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            disabled={pending}
+            className="mt-6 w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
           >
             {t.auth.loginTitle}
           </button>
@@ -138,15 +150,29 @@ export default function ConnexionPage() {
 
           <p className="mt-6 text-sm text-muted">{t.auth.orContinue}</p>
           <div className="mt-3 flex gap-3">
-            {[GoogleIcon, GithubIcon, AppleIcon].map((Icon, i) => (
-              <button
-                key={i}
-                type="button"
-                className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg text-ink transition hover:border-primary hover:bg-surface"
-              >
-                <Icon width={22} height={22} />
-              </button>
-            ))}
+            <button
+              type="button"
+              onClick={() => oauthSignIn("google", "/tableau-de-bord")}
+              aria-label="Google"
+              className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg text-ink transition hover:border-primary hover:bg-surface"
+            >
+              <GoogleIcon width={22} height={22} />
+            </button>
+            <button
+              type="button"
+              onClick={() => oauthSignIn("github", "/tableau-de-bord")}
+              aria-label="GitHub"
+              className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg text-ink transition hover:border-primary hover:bg-surface"
+            >
+              <GithubIcon width={22} height={22} />
+            </button>
+            <button
+              type="button"
+              aria-label="Apple"
+              className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg text-ink transition hover:border-primary hover:bg-surface"
+            >
+              <AppleIcon width={22} height={22} />
+            </button>
           </div>
         </form>
       </div>
