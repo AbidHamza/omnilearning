@@ -1,0 +1,268 @@
+// Schéma Prisma — OmniLearning (Option C, fondation backend)
+// Adapté de l'ancienne codebase (Next.js 14) — voir prisma/schema.sqlite.prisma d'origine.
+// Provider SQLite en dev (zéro setup), Postgres en prod via DATABASE_URL.
+// SQLite ne supporte ni enums, ni Json natif, ni String[] : on stocke en String/JSON-string.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Prisma 7 : l'URL n'est plus ici mais dans prisma.config.ts (migrations) et
+  // via un driver adapter passé au PrismaClient (runtime). Voir src/lib/db.ts.
+  // En prod : passer provider="postgresql".
+  provider = "sqlite"
+}
+
+// ----- Auth.js / NextAuth (adapter Prisma) -----
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String? // hash bcrypt ; null pour comptes OAuth
+  name          String?
+  image         String?
+  // USER (étudiant) | INSTRUCTOR (formateur) | ADMIN
+  role          String    @default("USER")
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  enrollments   Enrollment[]
+  courses       Course[]       @relation("InstructorCourses")
+  drafts        CourseDraft[]
+  quizAttempts  QuizAttempt[]
+  subscriptions Subscription[]
+
+  // ID client Stripe (pour le portail + abonnements)
+  stripeCustomerId String? @unique
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ----- Catalogue de formations -----
+
+model Category {
+  id      String   @id @default(cuid())
+  // Identifiant stable utilisé dans l'UI (ex: "dev-web")
+  slug    String   @unique
+  label   String
+  icon    String
+  courses Course[]
+
+  @@index([slug])
+}
+
+model Course {
+  id               String  @id @default(cuid())
+  slug             String  @unique
+  title            String
+  tagline          String
+  description      String
+  category         String
+  level            String  @default("Débutant") // Débutant | Intermédiaire | Avancé
+  instructorName   String
+  instructorBio    String?
+  hours            Int     @default(0)
+  rating           Float   @default(0)
+  learners         Int     @default(0)
+  accent           String  @default("#215775")
+  image            String
+  language         String?
+  software         String?
+  // Listes sérialisées en JSON-string (SQLite)
+  prerequisites    String?
+  summary          String?
+  objectives       String?
+  skills           String?
+  contentTypes     String?
+  status           String  @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED
+  // Liens optionnels vers les entités relationnelles
+  instructorId     String?
+  categoryId       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  instructor   User?         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  categoryRel  Category?     @relation(fields: [categoryId], references: [id])
+  parts        CoursePart[]
+  enrollments  Enrollment[]
+
+  @@index([slug])
+  @@index([status])
+}
+
+model CoursePart {
+  id       String   @id @default(cuid())
+  courseId String
+  title    String
+  order    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@index([courseId])
+}
+
+model Lesson {
+  id          String  @id @default(cuid())
+  partId      String
+  // Clé "métier" stable utilisée dans les URLs (ex: "l1")
+  key         String
+  title       String
+  type        String // video | text | quiz
+  duration    String
+  body        String?
+  videoLabel  String?
+  // questions de quiz sérialisées en JSON-string
+  questions   String?
+  order       Int     @default(0)
+  createdAt   DateTime @default(now())
+
+  part     CoursePart       @relation(fields: [partId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
+
+  @@index([partId])
+}
+
+// ----- Inscriptions & progression (liées à l'utilisateur) -----
+
+model Enrollment {
+  id             String    @id @default(cuid())
+  userId         String
+  courseId       String
+  progress       Int       @default(0)
+  lastLesson     String?
+  lastAccessedAt DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course         Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonProgress LessonProgress[]
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model LessonProgress {
+  id           String    @id @default(cuid())
+  enrollmentId String
+  lessonId     String
+  isCompleted  Boolean   @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson     Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, lessonId])
+  @@index([enrollmentId])
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  // réponses sérialisées en JSON-string
+  answers     String
+  score       Int
+  maxScore    Int
+  isPassed    Boolean
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([lessonId])
+}
+
+// ----- Création de formation (brouillon + uploads) -----
+
+model CourseDraft {
+  id           String   @id @default(cuid())
+  authorId     String
+  category     String?
+  name         String?
+  description  String?
+  level        String?
+  skills       String?
+  prerequisites String?
+  structure    String?
+  // activités sérialisées en JSON-string
+  activities   String?
+  // URLs des fichiers uploadés (image, vidéo, ressources) en JSON-string
+  uploads      String?
+  status       String   @default("DRAFT") // DRAFT | SUBMITTED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+}
+
+// ----- Abonnements Stripe (page "soutenir") -----
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String
+  // soutien (5€) | mecene (15€) | partenaire (50€)
+  tier                 String
+  stripeSubscriptionId String?   @unique
+  stripePriceId        String?
+  status               String    @default("incomplete") // incomplete | active | past_due | canceled
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
