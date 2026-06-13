@@ -1,15 +1,24 @@
 import { LocaleLink } from "@/i18n/navigation";
 import { siteName } from "@/lib/site";
+import SupportButton from "@/components/support-button";
+import type { SupportTier } from "@/lib/stripe";
 
-const tiers = [
-  { name: "Soutien", price: "5 €", perks: ["Badge de soutien", "Accès anticipé aux nouveautés"] },
+const tiers: Array<{
+  name: string;
+  tier: SupportTier;
+  price: string;
+  featured?: boolean;
+  perks: string[];
+}> = [
+  { name: "Soutien", tier: "soutien", price: "5 €", perks: ["Badge de soutien", "Accès anticipé aux nouveautés"] },
   {
     name: "Mécène",
+    tier: "mecene",
     price: "15 €",
     featured: true,
     perks: ["Tout le palier Soutien", "Sessions live mensuelles", "Vote sur les prochaines formations"],
   },
-  { name: "Partenaire", price: "50 €", perks: ["Tout le palier Mécène", "Logo sur la plateforme", "Accompagnement dédié"] },
+  { name: "Partenaire", tier: "partenaire", price: "50 €", perks: ["Tout le palier Mécène", "Logo sur la plateforme", "Accompagnement dédié"] },
 ];
 
 export default function SupportPage() {
@@ -51,15 +60,7 @@ export default function SupportPage() {
                 </li>
               ))}
             </ul>
-            <button
-              className={`mt-6 rounded-full py-2.5 text-sm font-semibold ${
-                t.featured
-                  ? "bg-primary text-white hover:bg-primary-dark"
-                  : "border border-line hover:bg-surface"
-              }`}
-            >
-              Choisir {t.name}
-            </button>
+            <SupportButton tier={t.tier} label={`Choisir ${t.name}`} featured={t.featured} />
           </div>
         ))}
       </div>
