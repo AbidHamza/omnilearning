@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { studentUser } from "@/lib/data";
+import { isLocale, defaultLocale } from "@/i18n/config";
 import { getCourses } from "@/lib/courses";
-import { getCurrentUser } from "@/lib/dal";
+import { requireRole } from "@/lib/dal";
 import CourseCard from "@/components/course-card";
 import ProgressChart from "@/components/progress-chart";
 import { BoltIcon, ClockIcon, LayersIcon, PencilIcon } from "@/components/icons";
@@ -16,10 +16,16 @@ const strike = [
   { day: "Dim.", on: false },
 ];
 
-export default async function DashboardPage() {
-  // Utilisateur réel si connecté, sinon l'étudiant de démo (mode démo).
-  const session = await getCurrentUser();
-  const currentUser = session?.user ?? studentUser;
+export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
+  const { lang } = await params;
+  const locale = isLocale(lang) ? lang : defaultLocale;
+
+  // Garde serveur : tableau de bord = espace privé d'un utilisateur connecté.
+  const { user: currentUser } = await requireRole(locale, [
+    "etudiant",
+    "formateur",
+    "admin",
+  ]);
   const allCourses = await getCourses();
   const bySlug = new Map(allCourses.map((c) => [c.slug, c]));
 
@@ -51,8 +57,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="container-page py-10">
+      <span className="rule-accent mb-3" />
       <p className="text-sm text-muted">Bienvenue {currentUser.name.split(" ")[0]}</p>
-      <h1 className="mt-1 text-4xl font-extrabold tracking-tight">Dashboard</h1>
+      <h1 className="mt-1 text-4xl font-semibold">
+        Votre <span className="font-accent text-primary">tableau de bord</span>
+      </h1>
 
       {/* Ligne 1 : cours suivis + objectif hebdo */}
       <div className="mt-8 grid gap-6 lg:grid-cols-2">

@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { LocaleLink } from "@/i18n/navigation";
-import { useRequireRole } from "@/lib/session";
 import { moderateDraftAction } from "@/lib/actions/moderation";
 import type { PendingDraft } from "@/lib/dal";
 import type { PlatformUser } from "@/lib/types";
@@ -20,35 +19,27 @@ export default function AdminClient({
   pending,
   stats: platformStats,
   recentUsers,
-  live,
 }: {
   pending: PendingDraft[];
   stats: { online: number; pending: number; instructors: number; learners: number };
   recentUsers: PlatformUser[];
-  // true si les données viennent de la DB (un id réel à modérer), false en démo.
-  live: boolean;
 }) {
-  const allowed = useRequireRole(["admin"]);
   const [queue, setQueue] = useState(pending);
   const [flash, setFlash] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-
-  if (!allowed) return null;
 
   function decide(item: PendingDraft, approved: boolean) {
     // Optimiste : on retire de la file tout de suite.
     setQueue((q) => q.filter((c) => c.id !== item.id));
     setFlash(`« ${item.title} » ${approved ? "approuvée et publiée" : "refusée"}.`);
-    if (live) {
-      startTransition(async () => {
-        const res = await moderateDraftAction(item.id, approved);
-        if (!res.ok) {
-          // Restaure en cas d'échec serveur.
-          setQueue((q) => [item, ...q]);
-          setFlash(res.error);
-        }
-      });
-    }
+    startTransition(async () => {
+      const res = await moderateDraftAction(item.id, approved);
+      if (!res.ok) {
+        // Restaure en cas d'échec serveur.
+        setQueue((q) => [item, ...q]);
+        setFlash(res.error);
+      }
+    });
   }
 
   const stats = [
@@ -69,8 +60,9 @@ export default function AdminClient({
 
   return (
     <div className="container-page py-10">
+      <span className="rule-accent mb-3" />
       <p className="text-sm text-muted">Bienvenue Admin</p>
-      <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Modération</h1>
+      <h1 className="mt-1 text-4xl font-semibold">Modération</h1>
 
       {/* Statistiques plateforme */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

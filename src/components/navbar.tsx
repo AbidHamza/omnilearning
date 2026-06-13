@@ -12,9 +12,9 @@ import {
   XIcon,
 } from "./icons";
 import ThemeToggle from "./theme-toggle";
-import { homeByRole, useSession } from "@/lib/session";
+import { useSession } from "@/lib/session";
 import { logoutAction } from "@/lib/actions/auth";
-import type { Role } from "@/lib/types";
+import type { Role, User } from "@/lib/types";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
 import { useI18n, useT } from "@/i18n/provider";
 import {
@@ -28,16 +28,14 @@ import {
 
 type NavLink = { href: string; label: string };
 
-const switchOrder: Role[] = ["visiteur", "etudiant", "formateur", "admin"];
-
 export default function Navbar() {
   const pathname = usePathname();
   const path = stripLocale(pathname);
   const localeRouter = useLocaleRouter();
   const t = useT();
-  const { role, setRole, user } = useSession();
+  const { role, user } = useSession();
   const [open, setOpen] = useState(false);
-  const [roleMenu, setRoleMenu] = useState(false);
+  const [acctMenu, setAcctMenu] = useState(false);
   const [q, setQ] = useState("");
 
   // Les pages d'authentification affichent un en-tête épuré.
@@ -66,7 +64,7 @@ export default function Navbar() {
     ],
   };
 
-  const labels = {
+  const roleLabels = {
     visiteur: t.roles.visiteur,
     etudiant: t.roles.etudiant,
     formateur: t.roles.formateur,
@@ -81,18 +79,10 @@ export default function Navbar() {
     setOpen(false);
   }
 
-  function switchRole(next: Role) {
-    setRole(next);
-    setRoleMenu(false);
-    setOpen(false);
-    localeRouter.push(homeByRole[next]);
-  }
-
   async function logout() {
-    setRoleMenu(false);
+    setAcctMenu(false);
     setOpen(false);
     await logoutAction();
-    setRole("visiteur");
     localeRouter.push("/");
     localeRouter.refresh();
   }
@@ -149,17 +139,6 @@ export default function Navbar() {
               <ThemeToggle />
               <LanguageSwitcher />
 
-              <RoleSwitcher
-                role={role}
-                labels={labels}
-                open={roleMenu}
-                setOpen={setRoleMenu}
-                onSwitch={switchRole}
-                onLogout={logout}
-                switchLabel={t.roles.switchLabel}
-                switchAria={t.roles.switchAria}
-              />
-
               {user ? (
                 <>
                   <button
@@ -169,15 +148,16 @@ export default function Navbar() {
                     <BellIcon width={19} height={19} />
                     <span className="absolute inset-inline-end-2 top-2 h-2 w-2 rounded-full bg-danger ring-2 ring-bg" />
                   </button>
-                  <LocaleLink
-                    href={role === "admin" ? "/admin" : "/parametres"}
-                    className="hidden items-center gap-2.5 rounded-full py-1 ps-1 pe-3 transition hover:bg-surface md:flex"
-                  >
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-soft text-xs font-bold text-primary-dark">
-                      {user.initials}
-                    </span>
-                    <span className="text-sm font-semibold">{user.name}</span>
-                  </LocaleLink>
+                  <AccountMenu
+                    user={user}
+                    roleLabel={roleLabels[role]}
+                    open={acctMenu}
+                    setOpen={setAcctMenu}
+                    settingsHref={role === "admin" ? "/admin" : "/parametres"}
+                    settingsLabel={t.nav.settings}
+                    logoutLabel={t.auth.logout}
+                    onLogout={logout}
+                  />
                 </>
               ) : (
                 <div className="hidden items-center gap-2 md:flex">
@@ -248,13 +228,21 @@ export default function Navbar() {
               </LocaleLink>
             ))}
             {user ? (
-              <LocaleLink
-                href={role === "admin" ? "/admin" : "/parametres"}
-                onClick={() => setOpen(false)}
-                className="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-surface"
-              >
-                {t.nav.myAccount} · {user.name}
-              </LocaleLink>
+              <>
+                <LocaleLink
+                  href={role === "admin" ? "/admin" : "/parametres"}
+                  onClick={() => setOpen(false)}
+                  className="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-surface"
+                >
+                  {t.nav.myAccount} · {user.name}
+                </LocaleLink>
+                <button
+                  onClick={logout}
+                  className="block w-full rounded-lg px-3 py-2 text-start text-sm font-medium text-danger hover:bg-surface"
+                >
+                  {t.auth.logout}
+                </button>
+              </>
             ) : (
               <div className="flex gap-2 pt-1">
                 <LocaleLink
@@ -333,65 +321,78 @@ function LanguageSwitcher() {
   );
 }
 
-function RoleSwitcher({
-  role,
-  labels,
+// Menu de compte réel : avatar + nom, badge du rôle (lecture seule, vient de la
+// session DB), lien paramètres et déconnexion. Aucun moyen de "changer" de rôle.
+function AccountMenu({
+  user,
+  roleLabel,
   open,
   setOpen,
-  onSwitch,
+  settingsHref,
+  settingsLabel,
+  logoutLabel,
   onLogout,
-  switchLabel,
-  switchAria,
 }: {
-  role: Role;
-  labels: Record<Role, string>;
+  user: User;
+  roleLabel: string;
   open: boolean;
   setOpen: (v: boolean) => void;
-  onSwitch: (r: Role) => void;
+  settingsHref: string;
+  settingsLabel: string;
+  logoutLabel: string;
   onLogout: () => void;
-  switchLabel: string;
-  switchAria: string;
 }) {
   return (
-    <div className="relative">
+    <div className="relative hidden md:block">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-primary hover:text-ink"
-        aria-label={switchAria}
+        className="flex items-center gap-2.5 rounded-full py-1 ps-1 pe-2.5 transition hover:bg-surface"
+        aria-haspopup="menu"
+        aria-expanded={open}
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-        {labels[role]}
-        <ChevronDown width={13} height={13} />
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-soft text-xs font-bold text-primary-dark">
+          {user.initials}
+        </span>
+        <span className="hidden text-sm font-semibold lg:block">{user.name}</span>
+        <ChevronDown width={14} height={14} className="text-muted" />
       </button>
 
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute inset-inline-end-0 z-20 mt-2 w-52 rounded-xl border border-line bg-bg p-1.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.4)]">
-            <p className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-soft">
-              {switchLabel}
-            </p>
-            {switchOrder.map((r) => (
-              <button
-                key={r}
-                onClick={() => onSwitch(r)}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-start text-sm transition ${
-                  r === role
-                    ? "bg-primary-soft font-semibold text-primary-dark"
-                    : "hover:bg-surface"
-                }`}
-              >
-                {labels[r]}
-                {r === role && (
-                  <span className="h-2 w-2 rounded-full bg-primary" />
-                )}
-              </button>
-            ))}
+          <div
+            role="menu"
+            className="absolute inset-inline-end-0 z-20 mt-2 w-60 rounded-xl border border-line bg-bg p-1.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.4)]"
+          >
+            <div className="flex items-center gap-3 px-2.5 py-2.5">
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-sm font-bold text-primary-dark">
+                {user.initials}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">{user.name}</p>
+                <p className="truncate text-xs text-muted">{user.email}</p>
+              </div>
+            </div>
+            <div className="mx-2.5 mb-1.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-bold text-primary-dark">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                {roleLabel}
+              </span>
+            </div>
+            <LocaleLink
+              href={settingsHref}
+              onClick={() => setOpen(false)}
+              className="block rounded-lg px-2.5 py-2 text-sm font-medium transition hover:bg-surface"
+              role="menuitem"
+            >
+              {settingsLabel}
+            </LocaleLink>
             <button
               onClick={onLogout}
-              className="mt-1 flex w-full items-center rounded-lg border-t border-line px-2.5 py-2 text-start text-sm text-danger transition hover:bg-surface"
+              className="mt-1 flex w-full items-center rounded-lg border-t border-line px-2.5 py-2 text-start text-sm font-medium text-danger transition hover:bg-surface"
+              role="menuitem"
             >
-              Se déconnecter
+              {logoutLabel}
             </button>
           </div>
         </>
