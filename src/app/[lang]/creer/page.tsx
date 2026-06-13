@@ -1,9 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { categories } from "@/lib/data";
 import { UploadIcon, PlusIcon, TrashIcon } from "@/components/icons";
+import { useLocaleRouter } from "@/i18n/navigation";
+import { saveDraftAction } from "@/lib/actions/draft";
+
+interface Upload {
+  field: string;
+  url: string;
+  name: string;
+}
 
 const steps = [
   "Présentation de la formation",
@@ -25,7 +32,7 @@ interface Activity {
 let uid = 1;
 
 export default function CreerFormationPage() {
-  const router = useRouter();
+  const router = useLocaleRouter();
   const [step, setStep] = useState(0);
 
   const [category, setCategory] = useState("");
@@ -37,6 +44,16 @@ export default function CreerFormationPage() {
 
   const [structure, setStructure] = useState("");
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [uploads, setUploads] = useState<Upload[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function addUpload(u: Upload) {
+    // Un seul fichier par champ (image/vidéo) ; ressources cumulables.
+    setUploads((arr) =>
+      u.field === "resources" ? [...arr, u] : [...arr.filter((x) => x.field !== u.field), u],
+    );
+  }
 
   function next() {
     setStep((s) => Math.min(s + 1, steps.length - 1));
@@ -45,6 +62,30 @@ export default function CreerFormationPage() {
   function prev() {
     setStep((s) => Math.max(s - 1, 0));
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function submitDraft() {
+    setSubmitting(true);
+    setError(null);
+    const res = await saveDraftAction({
+      category,
+      name,
+      description,
+      level,
+      skills,
+      prerequisites: prereq,
+      structure,
+      activities: activities.map((a) => ({ type: a.type, instruction: a.instruction })),
+      uploads,
+      submit: true,
+    });
+    setSubmitting(false);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    router.push("/tableau-de-bord");
+    router.refresh();
   }
 
   return (
@@ -181,7 +222,12 @@ export default function CreerFormationPage() {
               </div>
               <div>
                 <label className={labelCls}>Ressources à importer</label>
-                <UploadZone hint="Téléchargez les vidéos, PDF, quiz, exercices interactifs, cas pratiques" />
+                <UploadZone
+                  field="resources"
+                  hint="Téléchargez les vidéos, PDF, quiz, exercices interactifs, cas pratiques"
+                  uploads={uploads}
+                  onUploaded={addUpload}
+                />
               </div>
               <div>
                 <label className={labelCls}>Activités interactives</label>
@@ -258,8 +304,11 @@ export default function CreerFormationPage() {
               <div>
                 <label className={labelCls}>Image de couverture / vignette</label>
                 <UploadZone
+                  field="cover"
                   title="Téléchargez l'image"
                   hint="Format accepté : SVG, PNG, JPG/JPEG"
+                  uploads={uploads}
+                  onUploaded={addUpload}
                 />
               </div>
               <div>
@@ -267,8 +316,11 @@ export default function CreerFormationPage() {
                   Vidéo de présentation (optionnel)
                 </label>
                 <UploadZone
+                  field="video"
                   title="Téléchargez la vidéo"
                   hint="Format accepté : MP4, MOV, WEBM"
+                  uploads={uploads}
+                  onUploaded={addUpload}
                 />
               </div>
             </section>
@@ -299,6 +351,7 @@ export default function CreerFormationPage() {
               Votre formation sera soumise à validation par un administrateur
               avant publication.
             </p>
+            {error && <p className="text-sm font-medium text-danger">{error}</p>}
           </div>
         )}
 
@@ -333,8 +386,9 @@ export default function CreerFormationPage() {
           ) : (
             <button
               type="button"
-              onClick={() => router.push("/tableau-de-bord")}
-              className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+              onClick={submitDraft}
+              disabled={submitting}
+              className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
             >
               Envoyer la demande de création
             </button>
@@ -346,21 +400,66 @@ export default function CreerFormationPage() {
 }
 
 function UploadZone({
+  field,
   title = "Glissez vos fichiers ici",
   hint,
+  uploads,
+  onUploaded,
 }: {
+  field: string;
   title?: string;
   hint: string;
+  uploads: Upload[];
+  onUploaded: (u: Upload) => void;
 }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const mine = uploads.filter((u) => u.field === field);
+
+  async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBusy(true);
+    setErr(null);
+    try {
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setErr(data.error ?? "Échec de l'upload.");
+      } else {
+        onUploaded({ field, url: data.url, name: data.name });
+      }
+    } catch {
+      setErr("Échec de l'upload.");
+    } finally {
+      setBusy(false);
+      e.target.value = "";
+    }
+  }
+
   return (
-    <label className="mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line bg-surface/50 px-4 py-8 text-center transition hover:border-primary">
-      <span className="grid h-11 w-11 place-items-center rounded-full bg-brand-soft text-primary-dark">
-        <UploadIcon width={20} height={20} />
-      </span>
-      <span className="text-sm font-semibold">{title}</span>
-      <span className="text-xs text-muted-soft">{hint}</span>
-      <input type="file" className="hidden" />
-    </label>
+    <div className="mt-2">
+      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line bg-surface/50 px-4 py-8 text-center transition hover:border-primary">
+        <span className="grid h-11 w-11 place-items-center rounded-full bg-brand-soft text-primary-dark">
+          <UploadIcon width={20} height={20} />
+        </span>
+        <span className="text-sm font-semibold">{busy ? "Envoi en cours…" : title}</span>
+        <span className="text-xs text-muted-soft">{hint}</span>
+        <input type="file" className="hidden" onChange={onChange} disabled={busy} />
+      </label>
+      {err && <p className="mt-2 text-xs text-danger">{err}</p>}
+      {mine.length > 0 && (
+        <ul className="mt-2 space-y-1 text-xs text-muted">
+          {mine.map((u) => (
+            <li key={u.url} className="truncate">
+              ✓ {u.name}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

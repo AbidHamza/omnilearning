@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { allLessons, courses, getCourse } from "@/lib/data";
+import { courses as seedCourses } from "@/lib/data";
+import { allLessons, getCourse } from "@/lib/courses";
 import { PlayIcon, UserIcon } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale, localePath } from "@/i18n/config";
 
 export function generateStaticParams() {
-  return courses.map((c) => ({ slug: c.slug }));
+  // Slugs canoniques (seed) pour le pré-rendu ; le contenu est lu en DB au build.
+  return seedCourses.map((c) => ({ slug: c.slug }));
 }
 
 export default async function CoursePage(
@@ -16,7 +18,7 @@ export default async function CoursePage(
   if (!isLocale(lang)) notFound();
   const t = await getDictionary(lang);
   const lp = (path: string) => localePath(lang, path);
-  const course = getCourse(slug);
+  const course = await getCourse(slug);
   if (!course) notFound();
 
   const lessons = allLessons(course);

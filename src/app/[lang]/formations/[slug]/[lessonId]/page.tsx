@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { allLessons, courses, getCourse } from "@/lib/data";
+import { courses as seedCourses } from "@/lib/data";
+import { allLessons, getCourse } from "@/lib/courses";
 import Quiz from "@/components/quiz";
 import LessonTypeIcon from "@/components/lesson-type-icon";
+import LessonTracker from "@/components/lesson-tracker";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, PlayIcon } from "@/components/icons";
 import { isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 
 export function generateStaticParams() {
-  return courses.flatMap((c) =>
+  return seedCourses.flatMap((c) =>
     c.parts.flatMap((p) =>
       p.lessons.map((l) => ({ slug: c.slug, lessonId: l.id }))
     )
@@ -23,7 +25,7 @@ export default async function LessonPage(
   const t = await getDictionary(lang);
   const c = t.course;
   const lp = (path: string) => localePath(lang, path);
-  const course = getCourse(slug);
+  const course = await getCourse(slug);
   if (!course) notFound();
 
   const lessons = allLessons(course);
@@ -79,9 +81,18 @@ export default async function LessonPage(
           )}
 
           {lesson.type === "quiz" && lesson.questions && (
-            <Quiz questions={lesson.questions} />
+            <Quiz
+              questions={lesson.questions}
+              courseSlug={course.slug}
+              lessonKey={lesson.id}
+            />
           )}
         </div>
+
+        {/* Marque la leçon (vidéo/texte) comme terminée pour un utilisateur connecté. */}
+        {lesson.type !== "quiz" && (
+          <LessonTracker courseSlug={course.slug} lessonKey={lesson.id} />
+        )}
 
         <div className="mt-10 flex items-center justify-between border-t border-line pt-6">
           {prev ? (
