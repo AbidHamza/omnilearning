@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { defaultLocale, isLocale, locales } from "./i18n/config";
+import { defaultLocale, isLocale, locales, LOCALE_COOKIE } from "./i18n/config";
 
-const COOKIE = "NEXT_LOCALE";
+const COOKIE = LOCALE_COOKIE;
 
 function negotiate(request: NextRequest): string {
   // 1) préférence mémorisée

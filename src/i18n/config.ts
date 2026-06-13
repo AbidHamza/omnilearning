@@ -20,6 +20,21 @@ export function isLocale(value: string): value is Locale {
   return (locales as readonly string[]).includes(value);
 }
 
+/** Nom du cookie lu par le proxy (middleware) pour mémoriser la langue choisie. */
+export const LOCALE_COOKIE = "NEXT_LOCALE";
+
+/**
+ * Persiste la locale choisie dans un cookie (1 an) afin que le proxy serve la
+ * bonne langue aux prochaines visites. Côté client uniquement ; sans effet si
+ * `document` est indisponible. Isolé ici (hors composant) pour ne pas heurter
+ * les règles d'immutabilité du React Compiler sur `document.cookie`.
+ */
+export function setLocaleCookie(locale: Locale): void {
+  if (typeof document === "undefined") return;
+  const oneYear = 60 * 60 * 24 * 365;
+  document.cookie = `${LOCALE_COOKIE}=${locale};path=/;max-age=${oneYear};samesite=lax`;
+}
+
 /**
  * Préfixe un chemin interne par la locale active.
  * Les liens externes, ancres et mailto sont laissés intacts.
