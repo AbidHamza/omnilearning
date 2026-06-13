@@ -15,9 +15,15 @@ export default function CreerComptePage() {
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setPending(true);
     setError(null);
     const fd = new FormData(e.currentTarget);
+    const password = fd.get("password") as string;
+    const confirm = fd.get("confirmPassword") as string;
+    if (password !== confirm) {
+      setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+    setPending(true);
     fd.set("role", role);
     const res = await signupAction(fd);
     setPending(false);
@@ -83,7 +89,14 @@ export default function CreerComptePage() {
           <label className="mt-5 block text-sm font-medium">
             Confirmation du mot de passe
           </label>
-          <input type="password" required placeholder="••••••••" className="field mt-2" />
+          <input
+            type="password"
+            name="confirmPassword"
+            required
+            minLength={8}
+            placeholder="••••••••"
+            className="field mt-2"
+          />
 
           {error && <p className="mt-3 text-sm font-medium text-danger">{error}</p>}
 
