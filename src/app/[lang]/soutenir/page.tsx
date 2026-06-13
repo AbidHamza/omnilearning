@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { LocaleLink } from "@/i18n/navigation";
+import { siteName } from "@/lib/site";
 
 const tiers = [
   { name: "Soutien", price: "5 €", perks: ["Badge de soutien", "Accès anticipé aux nouveautés"] },
@@ -19,7 +20,7 @@ export default function SupportPage() {
           Soutenir la plateforme
         </h1>
         <p className="mt-4 text-lg text-muted">
-          GOT e-learning est gratuit pour tous. Votre soutien finance la création
+          {siteName} est gratuit pour tous. Votre soutien finance la création
           de nouvelles formations et garde le savoir accessible à chacun.
         </p>
       </div>
@@ -65,9 +66,9 @@ export default function SupportPage() {
 
       <p className="mt-10 text-center text-sm text-muted">
         Vous préférez contribuer autrement ?{" "}
-        <Link href="/creer" className="font-medium text-primary hover:underline">
+        <LocaleLink href="/creer" className="font-medium text-primary hover:underline">
           Créez et partagez votre propre formation.
-        </Link>
+        </LocaleLink>
       </p>
     </div>
   );
