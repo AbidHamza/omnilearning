@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/i18n/navigation";
 import {
   pendingValidations,
   platformStats,
@@ -138,13 +138,13 @@ export default function AdminDashboard() {
                           <XIcon width={14} height={14} />
                           Refuser
                         </button>
-                        <Link
-                          href="/formations/cybersecurite"
+                        <LocaleLink
+                          href={`/formations?q=${encodeURIComponent(c.title)}`}
                           className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary"
                         >
                           <EyeIcon width={14} height={14} />
                           Voir
-                        </Link>
+                        </LocaleLink>
                       </div>
                     </td>
                   </tr>
