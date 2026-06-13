@@ -1,50 +1,58 @@
 @import "tailwindcss";
 
 @theme {
-  /* Surfaces */
-  --color-bg: #fbfdfd;
-  --color-surface: #f2f4f4;
-  --color-surface-2: #e9edee;
+  /*
+   * Identité OmniLearn — direction "académie éditoriale" :
+   * fond papier crème chaud (pas de blanc clinique), encre vert-forêt très
+   * sombre, primaire émeraude profonde, accent ocre/ambre. Le tout évite le
+   * bleu corporate générique et donne une marque chaude, lettrée, mémorable.
+   */
 
-  /* Text */
-  --color-ink: #0a151d;
-  --color-muted: #445050;
-  --color-muted-soft: #a1a8a8;
+  /* Surfaces — papier crème */
+  --color-bg: #f7f4ec;
+  --color-surface: #efeadd;
+  --color-surface-2: #e6dfcd;
 
-  /* Lines */
-  --color-line: #dbe8eb;
-  --color-line-soft: #e8e8e8;
+  /* Texte — encre vert-forêt sombre */
+  --color-ink: #11221c;
+  --color-muted: #4f5a52;
+  --color-muted-soft: #97a097;
 
-  /* Brand teal */
-  --color-brand: #75c6cd;
-  --color-brand-soft: #c3dfe8;
-  --color-brand-band: #dbe8eb;
+  /* Lignes */
+  --color-line: #ddd6c4;
+  --color-line-soft: #e6e0d0;
 
-  /* Interactive blue */
-  --color-primary: #3489ca;
-  --color-primary-soft: #e1eef8;
-  --color-primary-dark: #215775;
-  --color-primary-deep: #08234b;
+  /* Brand — émeraude (teinte secondaire / bandeaux) */
+  --color-brand: #1f6f57;
+  --color-brand-soft: #d6e7df;
+  --color-brand-band: #e8e2d3;
 
-  /* Accents */
-  --color-accent: #0ca8d3;
+  /* Primaire interactif — émeraude profonde */
+  --color-primary: #15735a;
+  --color-primary-soft: #d8ebe3;
+  --color-primary-dark: #0c4e3c;
+  --color-primary-deep: #08311f;
+
+  /* Accents — ocre/ambre chaud (CTA secondaires, surlignages) */
+  --color-accent: #c8851f;
+  --color-accent-soft: #f3e4c6;
   --color-violet: #9746ff;
 
   /* States */
-  --color-success: #1f9d6b;
-  --color-success-soft: #e3f6ee;
-  --color-warning: #e8a13a;
-  --color-danger: #d6493a;
-  --color-danger-soft: #fbeceb;
+  --color-success: #1f8f5f;
+  --color-success-soft: #dcefe2;
+  --color-warning: #c8851f;
+  --color-danger: #c0432f;
+  --color-danger-soft: #f6e3df;
 
-  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 16px;
+  --radius-card: 18px;
 
   /* Ombre portée des cartes : variabilisée pour s'adapter au thème sombre. */
-  --shadow-card: 0 18px 40px -18px rgba(10, 21, 29, 0.3);
+  --shadow-card: 0 18px 40px -18px rgba(17, 34, 28, 0.28);
 }
 
 /*
@@ -55,43 +63,44 @@
  * restent foncées : on remonte juste légèrement leur teinte pour le contraste.
  */
 .dark {
-  /* Surfaces */
-  --color-bg: #0b1418;
-  --color-surface: #121e24;
-  --color-surface-2: #1a2930;
+  /* Surfaces — vert-forêt très sombre, légèrement chaud */
+  --color-bg: #0c1512;
+  --color-surface: #14201b;
+  --color-surface-2: #1d2c25;
 
-  /* Text */
-  --color-ink: #eef4f5;
-  --color-muted: #9fb0b3;
-  --color-muted-soft: #6a7b7f;
+  /* Texte — crème désaturé */
+  --color-ink: #f1ede1;
+  --color-muted: #a7b0a4;
+  --color-muted-soft: #6e786d;
 
-  /* Lines */
-  --color-line: #213038;
-  --color-line-soft: #1c2a31;
+  /* Lignes */
+  --color-line: #25342c;
+  --color-line-soft: #1e2b24;
 
-  /* Brand teal — éclairci pour rester lisible sur fond sombre */
-  --color-brand: #6fd0d8;
-  --color-brand-soft: #1d3a42;
-  --color-brand-band: #101e24;
+  /* Brand émeraude — éclairci pour rester lisible sur fond sombre */
+  --color-brand: #5fc79d;
+  --color-brand-soft: #163026;
+  --color-brand-band: #101a15;
 
-  /* Interactive blue — éclairci pour le contraste AA sur fond sombre */
-  --color-primary: #5aa9e6;
-  --color-primary-soft: #16303f;
-  --color-primary-dark: #9ecdf0;
-  --color-primary-deep: #c4e2f6;
+  /* Primaire — éclairci pour le contraste AA sur fond sombre */
+  --color-primary: #4fc295;
+  --color-primary-soft: #14302440;
+  --color-primary-dark: #93dcbd;
+  --color-primary-deep: #c2eed8;
 
-  /* Accents */
-  --color-accent: #38c4e6;
+  /* Accent ambre — éclairci */
+  --color-accent: #e0a93f;
+  --color-accent-soft: #2e2412;
 
   /* States */
-  --color-success: #46c08c;
-  --color-success-soft: #133227;
-  --color-warning: #f0b65a;
-  --color-danger: #ef6a5c;
-  --color-danger-soft: #361a18;
+  --color-success: #4fc295;
+  --color-success-soft: #142c20;
+  --color-warning: #e0a93f;
+  --color-danger: #ef7a64;
+  --color-danger-soft: #341a14;
 
   /* Sections déjà foncées (bg-ink) : remontées d'un cran pour s'en détacher */
-  --color-ink-section: #0f1c22;
+  --color-ink-section: #0f1b16;
 
   --shadow-card: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
 }
@@ -103,7 +112,7 @@
  * reste blanc dans les deux thèmes, d'où ce jeton fixe.
  */
 .section-dark {
-  background-color: #0a151d;
+  background-color: #11221c;
 }
 .dark .section-dark {
   background-color: var(--color-ink-section);
@@ -125,7 +134,7 @@
   }
 }
 
-/* Arabe : police dédiée + suppression du letter-spacing négatif (illisible en arabe). */
+/* Arabe : police dédiée pour TOUT (corps + titres), la serif latine ne couvre pas l'arabe. */
 [dir="rtl"] body,
 [dir="rtl"] h1,
 [dir="rtl"] h2,
@@ -133,6 +142,7 @@
 [dir="rtl"] .font-display {
   font-family: var(--font-arabic);
   letter-spacing: normal;
+  font-style: normal;
 }
 
 html {
@@ -146,12 +156,29 @@ body {
   font-family: var(--font-sans);
 }
 
+/*
+ * Titres — Fraunces (serif éditoriale). Pas de tracking négatif sur une serif :
+ * on garde un léger -0.005em seulement, on monte l'axe optique pour les grands
+ * titres et on active les ligatures. Italique réservé aux accents (.font-accent).
+ */
 h1,
 h2,
 h3,
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  font-feature-settings: "liga" 1, "calt" 1;
+  line-height: 1.08;
+}
+
+/* Accent éditorial : Fraunces en italique, pour un mot/segment mis en valeur. */
+.font-accent {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-variation-settings: "opsz" 144, "SOFT" 80;
 }
 
 .container-page {
@@ -226,13 +253,44 @@ textarea.field {
   }
 }
 
-/* Mesh de fond pour le hero : nappes radiales teal/bleu sur fond clair. */
+/* Mesh de fond pour le hero : nappes radiales émeraude + ambre sur papier. */
 .hero-mesh {
   background-color: var(--color-bg);
   background-image:
-    radial-gradient(48rem 32rem at 78% -8%, color-mix(in srgb, var(--color-brand) 38%, transparent), transparent 60%),
-    radial-gradient(40rem 28rem at 8% 0%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 55%),
-    radial-gradient(36rem 30rem at 92% 88%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 60%);
+    radial-gradient(46rem 30rem at 82% -10%, color-mix(in srgb, var(--color-brand) 26%, transparent), transparent 58%),
+    radial-gradient(40rem 28rem at 4% 4%, color-mix(in srgb, var(--color-accent) 22%, transparent), transparent 52%),
+    radial-gradient(34rem 28rem at 96% 96%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 60%);
+}
+
+/*
+ * Grain papier discret, posé en overlay fixe sur tout le document : casse le
+ * côté "plat / généré" des aplats. SVG inline (feTurbulence) = zéro requête.
+ */
+.paper-grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dark .paper-grain::before {
+  mix-blend-mode: screen;
+  opacity: 0.05;
+}
+
+/*
+ * Motif d'accent éditorial : petit filet ocre sous un titre de section.
+ * Utiliser <span className="rule-accent" /> ou la classe sur un élément.
+ */
+.rule-accent {
+  display: inline-block;
+  width: 2.75rem;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--color-accent);
 }
 
 /* Grille fine en surimpression, masquée vers les bords. */

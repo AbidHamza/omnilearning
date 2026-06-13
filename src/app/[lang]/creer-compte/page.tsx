@@ -1,15 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
-import { useSession } from "@/lib/session";
 import { signupAction } from "@/lib/actions/auth";
+import { GraduationIcon, CheckIcon } from "@/components/icons";
 
 export default function CreerComptePage() {
   const router = useLocaleRouter();
-  const { setRole: setSessionRole } = useSession();
-  const [role, setRole] = useState<"apprenant" | "formateur">("apprenant");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -24,15 +21,15 @@ export default function CreerComptePage() {
       return;
     }
     setPending(true);
-    fd.set("role", role);
+    // Tout nouveau compte est créé en tant qu'étudiant (USER). Le statut
+    // formateur/admin est attribué en base par un administrateur, jamais ici.
     const res = await signupAction(fd);
     setPending(false);
     if (!res.ok) {
       setError(res.error);
       return;
     }
-    setSessionRole(res.role);
-    router.push(res.role === "formateur" ? "/parametres" : "/tableau-de-bord");
+    router.push("/tableau-de-bord");
     router.refresh();
   }
 
@@ -40,29 +37,16 @@ export default function CreerComptePage() {
     <div className="grid min-h-[calc(100vh-68px)] lg:grid-cols-2">
       <div className="flex items-center justify-center px-6 py-12">
         <form onSubmit={submit} className="w-full max-w-sm">
-          <h1 className="text-3xl font-extrabold tracking-tight">
+          <span className="rule-accent mb-4" />
+          <h1 className="text-[2.4rem] font-semibold leading-tight">
             Créer votre compte
           </h1>
+          <p className="mt-2 text-sm text-muted">
+            Vous rejoignez OmniLearn en tant qu&apos;apprenant. Pour devenir
+            formateur, contactez l&apos;équipe une fois inscrit.
+          </p>
 
-          <p className="mt-6 text-sm font-medium">Vous êtes</p>
-          <div className="mt-2 grid grid-cols-2 gap-1 rounded-full bg-surface p-1">
-            {(["apprenant", "formateur"] as const).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRole(r)}
-                className={`rounded-full py-2 text-sm font-semibold capitalize transition ${
-                  role === r
-                    ? "bg-bg text-ink shadow-sm"
-                    : "text-muted hover:text-ink"
-                }`}
-              >
-                {r === "apprenant" ? "Apprenant" : "Formateur"}
-              </button>
-            ))}
-          </div>
-
-          <label className="mt-5 block text-sm font-medium">Mail</label>
+          <label className="mt-6 block text-sm font-medium">Mail</label>
           <input type="email" name="email" required placeholder="vous@email.com" className="field mt-2" />
 
           <div className="mt-5 grid grid-cols-2 gap-3">
@@ -117,16 +101,45 @@ export default function CreerComptePage() {
         </form>
       </div>
 
-      <div className="relative hidden lg:block">
-        <Image
-          src="https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?w=1200&q=80"
-          alt="Rejoindre la plateforme"
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
+      {/* Panneau de marque éditorial : ce que l'on gagne en rejoignant OmniLearn. */}
+      <div className="section-dark relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-14">
+        <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
+        <div className="pointer-events-none absolute -top-24 start-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 end-0 h-72 w-72 rounded-full bg-brand/25 blur-3xl" />
+
+        <div className="relative flex items-center gap-2.5 text-white">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-brand">
+            <GraduationIcon width={19} height={19} />
+          </span>
+          <span className="font-display text-lg font-semibold">
+            Omni<span className="font-accent text-brand">Learn</span>
+          </span>
+        </div>
+
+        <div className="relative">
+          <p className="font-display text-3xl font-medium leading-tight text-white">
+            Rejoignez des milliers d&apos;apprenants{" "}
+            <span className="font-accent text-accent">curieux</span>.
+          </p>
+          <ul className="mt-7 space-y-3.5">
+            {[
+              "Accès illimité au catalogue, gratuitement",
+              "Suivi de progression et certificats",
+              "Apprenez à votre rythme, en fr / en / ar",
+            ].map((item) => (
+              <li key={item} className="flex items-center gap-3 text-sm text-white/75">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand/20 text-brand">
+                  <CheckIcon width={13} height={13} />
+                </span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="relative text-xs uppercase tracking-[0.18em] text-white/40">
+          Apprenez. Pratiquez. Progressez.
+        </p>
       </div>
     </div>
   );

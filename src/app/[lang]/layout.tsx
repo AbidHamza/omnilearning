@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Bricolage_Grotesque, DM_Sans, Cairo } from "next/font/google";
+import { Fraunces, DM_Sans, Cairo } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -11,10 +11,17 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localeDir, locales, type Locale } from "@/i18n/config";
 import { siteName, siteUrl } from "@/lib/site";
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+// Display = Fraunces : une serif éditoriale à "soft" optical sizing, chaleureuse
+// et caractérielle — choix volontairement distinctif (anti-look "sans IA par
+// défaut"). On force l'axe optique (opsz) au max pour les grands titres.
+// Fraunces est une police VARIABLE : on ne fixe pas de poids (axe "wght" continu,
+// donc 400→900 tous disponibles, y compris font-extrabold). On expose en plus les
+// axes optique (opsz) et adoucissement (SOFT), réglés via font-variation-settings.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  axes: ["opsz", "SOFT"],
   display: "swap",
 });
 
@@ -105,7 +112,7 @@ export default async function RootLayout({
       lang={lang}
       dir={dir}
       suppressHydrationWarning
-      className={`${bricolage.variable} ${dmSans.variable} ${cairo.variable} h-full`}
+      className={`${fraunces.variable} ${dmSans.variable} ${cairo.variable} h-full`}
     >
       <head>
         {/* Applique le thème avant la première peinture pour éviter le flash clair en mode sombre. */}
@@ -115,7 +122,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col">
+      <body className="paper-grain flex min-h-full flex-col">
         <I18nProvider locale={lang} dict={dict} dir={dir}>
           <SessionProvider serverRole={session?.role} serverUser={session?.user}>
             <Navbar />

@@ -32,8 +32,6 @@ const en: Dict = {
     etudiant: "Learner",
     formateur: "Instructor",
     admin: "Administrator",
-    switchLabel: "View the platform as",
-    switchAria: "Switch role (demo)",
   },
   footer: {
     tagline:
@@ -243,8 +241,7 @@ const en: Dict = {
     noAccount: "Don't have an account yet?",
     orContinue: "Or continue with",
     invalid: "Incorrect username or password.",
-    demoTitle: "Demo accounts",
-    demoHint: "Click to pre-fill, then sign in.",
+    logout: "Sign out",
     loginImageAlt: "Learner signed in to the platform",
   },
   notFound: {

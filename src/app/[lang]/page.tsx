@@ -53,15 +53,28 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <div className="container-page relative grid items-center gap-12 py-16 lg:grid-cols-[1.05fr_1fr] lg:py-24">
           {/* Colonne texte */}
           <div className="rise">
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand/40 bg-bg/70 px-3.5 py-1.5 text-xs font-semibold text-primary-dark backdrop-blur">
-              <SparkleIcon width={14} height={14} className="text-brand" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-bg/70 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-dark backdrop-blur">
+              <SparkleIcon width={14} height={14} className="text-accent" />
               {t.home.heroBadge}
             </span>
-            <h1 className="mt-6 text-4xl font-extrabold leading-[1.04] tracking-tight text-ink sm:text-5xl lg:text-[3.4rem]">
+            <h1 className="mt-6 text-[2.6rem] font-semibold leading-[1.05] text-ink sm:text-5xl lg:text-[3.6rem]">
               {t.home.heroTitle}{" "}
-              <span className="relative whitespace-nowrap text-brand">
-                {t.home.heroHighlight}
-                <span className="absolute inset-x-0 -bottom-1 h-2.5 rounded-full bg-brand/25" />
+              <span className="relative whitespace-nowrap">
+                <span className="font-accent text-primary">{t.home.heroHighlight}</span>
+                <svg
+                  className="absolute -bottom-2 start-0 w-full text-accent"
+                  viewBox="0 0 300 14"
+                  fill="none"
+                  preserveAspectRatio="none"
+                  aria-hidden
+                >
+                  <path
+                    d="M3 9C61 4 147 3 297 7"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </span>
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
@@ -201,7 +214,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <div className="container-page py-16">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+              <span className="rule-accent mb-4" />
+              <h2 className="text-3xl font-semibold text-ink sm:text-4xl">
                 {t.home.popularTitle}
               </h2>
               <p className="mt-2 max-w-xl text-sm text-muted sm:text-base">
@@ -233,7 +247,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ── Thèmes ─────────────────────────────────────────────────── */}
       <section className="container-page py-16">
         <div className="max-w-xl">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <span className="rule-accent mb-4" />
+          <h2 className="text-3xl font-semibold sm:text-4xl">
             {t.home.themesTitle}
           </h2>
           <p className="mt-2 text-sm text-muted sm:text-base">
@@ -262,7 +277,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <section className="border-t border-line bg-surface">
         <div className="container-page py-16">
           <div className="max-w-xl">
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            <span className="rule-accent mb-4" />
+            <h2 className="text-3xl font-semibold sm:text-4xl">
               {t.home.whyTitle}
             </h2>
             <p className="mt-2 text-sm text-muted sm:text-base">
@@ -298,7 +314,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ── Témoignages ────────────────────────────────────────────── */}
       <section className="container-page py-16">
         <div className="max-w-xl">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <span className="rule-accent mb-4" />
+          <h2 className="text-3xl font-semibold sm:text-4xl">
             {t.home.testimonialsTitle}
           </h2>
           <p className="mt-2 text-sm text-muted sm:text-base">
@@ -333,7 +350,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <section className="border-t border-line bg-surface">
         <div className="container-page py-16">
           <div className="mx-auto max-w-xl text-center">
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            <span className="rule-accent mb-4" />
+            <h2 className="text-3xl font-semibold sm:text-4xl">
               {t.home.pricingTitle}
             </h2>
             <p className="mt-2 text-sm text-muted sm:text-base">
@@ -389,7 +407,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <section className="container-page py-16">
         <div className="mx-auto max-w-2xl">
           <div className="text-center">
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            <span className="rule-accent mb-4" />
+            <h2 className="text-3xl font-semibold sm:text-4xl">
               {t.home.faqTitle}
             </h2>
             <p className="mt-2 text-sm text-muted sm:text-base">
@@ -427,7 +446,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             <div className="absolute -bottom-20 end-1/4 h-56 w-56 rounded-full bg-primary/30 blur-3xl" />
           </div>
           <div className="relative mx-auto max-w-xl">
-            <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+            <h2 className="text-3xl font-semibold text-white sm:text-4xl">
               {t.home.ctaTitle}
             </h2>
             <p className="mt-3 text-sm text-white/65 sm:text-base">
