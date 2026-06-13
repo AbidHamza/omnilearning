@@ -40,20 +40,23 @@ export async function loginAction(formData: FormData): Promise<AuthResult> {
   return { ok: true, role: toUiRole(user?.role) };
 }
 
-/** Création de compte puis connexion automatique. */
+/**
+ * Création de compte puis connexion automatique. Tout compte créé via ce
+ * formulaire est un ÉTUDIANT (USER) : on n'accepte AUCUN champ "role" depuis le
+ * client. Le statut formateur/admin est octroyé en base par un administrateur.
+ */
 export async function signupAction(formData: FormData): Promise<AuthResult> {
   const parsed = signUpSchema.safeParse({
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
     email: formData.get("email"),
     password: formData.get("password"),
-    role: formData.get("role"),
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides." };
   }
 
-  const { firstName, lastName, email, password, role } = parsed.data;
+  const { firstName, lastName, email, password } = parsed.data;
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -66,7 +69,7 @@ export async function signupAction(formData: FormData): Promise<AuthResult> {
       email,
       name: `${firstName} ${lastName}`.trim(),
       password: hashed,
-      role: role === "formateur" ? "INSTRUCTOR" : "USER",
+      role: "USER", // toujours étudiant à l'inscription
     },
   });
 
@@ -74,10 +77,10 @@ export async function signupAction(formData: FormData): Promise<AuthResult> {
     await signIn("credentials", { email, password, redirect: false });
   } catch {
     // Compte créé mais auto-login échoué : l'utilisateur pourra se connecter.
-    return { ok: true, role: role === "formateur" ? "formateur" : "etudiant" };
+    return { ok: true, role: "etudiant" };
   }
 
-  return { ok: true, role: role === "formateur" ? "formateur" : "etudiant" };
+  return { ok: true, role: "etudiant" };
 }
 
 /** Déconnexion. */

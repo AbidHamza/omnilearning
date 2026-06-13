@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRequireRole } from "@/lib/session";
 import type { CourseStatus, Role, User } from "@/lib/types";
 import BillingPortalButton from "@/components/billing-portal-button";
 import {
@@ -44,8 +43,6 @@ export default function ParametresClient({
   courseTitles: Record<string, string>;
   billing: BillingState;
 }) {
-  const allowed = useRequireRole(["etudiant", "formateur", "admin"]);
-
   const tabs =
     role === "formateur"
       ? ["Informations personnelles", "Formations créés", "Statistiques des formations"]
@@ -55,11 +52,12 @@ export default function ParametresClient({
 
   const [tab, setTab] = useState(tabs[0]);
 
-  if (!allowed || !user) return null;
+  if (!user) return null;
 
   return (
     <div className="container-page py-10">
-      <h1 className="text-3xl font-extrabold tracking-tight">Paramètres</h1>
+      <span className="rule-accent mb-3" />
+      <h1 className="text-4xl font-semibold">Paramètres</h1>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[240px_1fr]">
         <nav className="flex gap-2 overflow-x-auto border-line lg:flex-col lg:overflow-visible lg:border-r lg:pr-6">

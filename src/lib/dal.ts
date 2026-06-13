@@ -1,8 +1,11 @@
 import "server-only";
 import { cache } from "react";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { toUiRole } from "@/lib/roles";
+import { homeByRole } from "@/lib/routes";
+import { localePath, type Locale } from "@/i18n/config";
 import type {
   CreatedCourse,
   CourseStatus,
@@ -55,6 +58,30 @@ export const getCurrentUser = cache(
     return { role, user };
   },
 );
+
+/**
+ * Garde SERVEUR autoritaire pour une page réservée. Vérifie le rôle RÉEL de la
+ * session (DB via JWT). Comportement :
+ *  - non connecté            -> redirect /<locale>/connexion
+ *  - connecté mais mauvais rôle -> redirect vers SON espace (homeByRole)
+ *  - autorisé                -> renvoie { role, user } (jamais null)
+ *
+ * Aucune donnée de démo n'est jamais rendue à un visiteur : la seule façon
+ * d'accéder à /admin est d'être ADMIN en base, etc.
+ */
+export async function requireRole(
+  locale: Locale,
+  allowed: Role[],
+): Promise<{ role: Role; user: User }> {
+  const session = await getCurrentUser();
+  if (!session) {
+    redirect(localePath(locale, "/connexion"));
+  }
+  if (!allowed.includes(session.role)) {
+    redirect(localePath(locale, homeByRole[session.role]));
+  }
+  return session;
+}
 
 function fmtDate(d: Date): string {
   return d.toLocaleDateString("fr-FR", {

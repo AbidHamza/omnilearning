@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRequireRole } from "@/lib/session";
 import type { CreatedCourse, CourseStatus, InstructorStats } from "@/lib/types";
 import { ClockIcon, LayersIcon, StarIcon } from "@/components/icons";
 import ProgressChart from "@/components/progress-chart";
@@ -22,17 +21,18 @@ export default function FormateurClient({
   created: CreatedCourse[];
   stats: InstructorStats;
 }) {
-  const allowed = useRequireRole(["formateur", "admin"]);
   const router = useRouter();
-  if (!allowed) return null;
 
   const firstName = name.split(" ")[0];
   const actions = created.filter((c) => c.status !== "online");
 
   return (
     <div className="container-page py-10">
+      <span className="rule-accent mb-3" />
       <p className="text-sm text-muted">Bienvenue {firstName}</p>
-      <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Dashboard</h1>
+      <h1 className="mt-1 text-4xl font-semibold">
+        Espace <span className="font-accent text-primary">formateur</span>
+      </h1>
 
       {/* Vos actions en cours */}
       <section className="mt-8 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">

@@ -10,7 +10,8 @@ export const signUpSchema = z.object({
   lastName: z.string().trim().min(1, "Nom requis."),
   email: z.string().trim().toLowerCase().pipe(z.email("Adresse e-mail invalide.")),
   password: z.string().min(8, "Au moins 8 caractères."),
-  role: z.enum(["apprenant", "formateur"]),
+  // Pas de champ "role" : un compte créé via le formulaire public est TOUJOURS un
+  // étudiant (USER). Formateur/admin sont attribués en base par un administrateur.
 });
 
 export type SignUpInput = z.infer<typeof signUpSchema>;

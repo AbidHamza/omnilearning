@@ -63,10 +63,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id as string;
-        token.role = (user.role ?? "USER") as AppRole;
+    async jwt({ token, user, trigger }) {
+      // Première connexion (credentials ou OAuth) : on capte l'id.
+      if (user?.id) token.id = user.id as string;
+
+      // Le rôle est TOUJOURS lu depuis la DB (source de vérité), pas depuis le
+      // client : impossible d'usurper un rôle via le JWT. On (re)lit à la
+      // connexion et aux rafraîchissements de session (update()).
+      if (token.id && (user || trigger === "update" || !token.role)) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { role: true },
+        });
+        token.role = (dbUser?.role ?? "USER") as AppRole;
       }
       return token;
     },
