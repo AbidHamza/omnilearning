@@ -12,7 +12,7 @@ import {
   XIcon,
 } from "./icons";
 import ThemeToggle from "./theme-toggle";
-import { homeByRole, roleLabels, useSession } from "@/lib/session";
+import { homeByRole, useSession } from "@/lib/session";
 import type { Role } from "@/lib/types";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
 import { useI18n, useT } from "@/i18n/provider";
@@ -20,6 +20,7 @@ import {
   locales,
   localeNames,
   localePath,
+  setLocaleCookie,
   stripLocale,
   type Locale,
 } from "@/i18n/config";
@@ -278,7 +279,7 @@ function LanguageSwitcher() {
   function choose(next: Locale) {
     setOpen(false);
     if (next === locale) return;
-    document.cookie = `NEXT_LOCALE=${next};path=/;max-age=${60 * 60 * 24 * 365}`;
+    setLocaleCookie(next);
     router.push(localePath(next, stripLocale(pathname)));
   }
 

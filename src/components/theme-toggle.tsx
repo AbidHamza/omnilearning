@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { MoonIcon, SunIcon } from "./icons";
 import { useT } from "@/i18n/provider";
 
@@ -11,41 +11,68 @@ type Theme = "light" | "dark";
  *
  * Le thème réel est porté par la classe `dark` sur <html>, posée AVANT le
  * premier rendu par un petit script inline (cf. note dans layout). Ce composant
- * se contente de lire l'état réel au montage puis de le faire basculer, ce qui
- * évite tout flash : le serveur ne décide pas du thème, c'est le DOM déjà peint.
+ * lit cet état réel comme un store externe (le DOM) via useSyncExternalStore,
+ * ce qui évite tout setState dans un effet et tout flash : le serveur ne décide
+ * pas du thème, c'est le DOM déjà peint qui fait foi.
  */
+
+// Notifie React quand la classe `dark` de <html> change (depuis ce composant
+// ou un autre onglet via l'event `storage`).
+const listeners = new Set<() => void>();
+
+function notify() {
+  listeners.forEach((cb) => cb());
+}
+
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    listeners.delete(callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+/**
+ * Lit le thème réellement appliqué. Si le script inline du layout a déjà posé
+ * la classe `dark`, on la lit telle quelle. Sinon (cas limite), on la
+ * reconstitue depuis localStorage / prefers-color-scheme et on la pose, pour
+ * que le DOM et l'état React restent cohérents dès le premier accès.
+ */
+function readTheme(): Theme {
+  const root = document.documentElement;
+  if (root.classList.contains("dark")) return "dark";
+  // La classe n'est pas posée : soit le thème est clair, soit le script inline
+  // n'a pas tourné. On départage avec la préférence stockée / système.
+  let stored: string | null = null;
+  try {
+    stored = localStorage.getItem("theme");
+  } catch {
+    stored = null;
+  }
+  const prefersDark =
+    window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+  const resolved: Theme =
+    stored === "dark" || (stored === null && prefersDark) ? "dark" : "light";
+  // Réaligne le DOM si besoin (idempotent).
+  root.classList.toggle("dark", resolved === "dark");
+  return resolved;
+}
+
 export default function ThemeToggle() {
   const t = useT();
-  const [theme, setTheme] = useState<Theme | null>(null);
-
-  // Synchronise l'état React avec le thème réel.
-  // Si le script inline du layout a déjà posé la classe, on la lit telle quelle.
-  // Sinon (layout non encore patché), on la reconstitue depuis localStorage /
-  // prefers-color-scheme — au prix d'un éventuel flash au tout premier rendu.
-  useEffect(() => {
-    const root = document.documentElement;
-    let resolved: Theme;
-    if (root.classList.contains("dark")) {
-      resolved = "dark";
-    } else {
-      let stored: string | null = null;
-      try {
-        stored = localStorage.getItem("theme");
-      } catch {
-        stored = null;
-      }
-      const prefersDark =
-        window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
-      resolved = stored === "dark" || (stored === null && prefersDark) ? "dark" : "light";
-      root.classList.toggle("dark", resolved === "dark");
-    }
-    setTheme(resolved);
-  }, []);
+  // Côté serveur et avant hydratation : `null` → on réserve la place sans
+  // décider du thème (évite tout mismatch d'hydratation et tout flash).
+  const theme = useSyncExternalStore<Theme | null>(
+    subscribe,
+    readTheme,
+    () => null,
+  );
 
   function toggle() {
     const next: Theme = theme === "dark" ? "light" : "dark";
     const root = document.documentElement;
-    // Active les transitions de couleur le temps du switch (puis on les laisse).
+    // Active les transitions de couleur le temps du switch.
     root.classList.add("theme-transition");
     root.classList.toggle("dark", next === "dark");
     try {
@@ -53,7 +80,7 @@ export default function ThemeToggle() {
     } catch {
       // Mode privé / stockage indisponible : on bascule quand même visuellement.
     }
-    setTheme(next);
+    notify();
   }
 
   const isDark = theme === "dark";
@@ -67,8 +94,8 @@ export default function ThemeToggle() {
       title={label}
       className="grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted transition hover:border-primary hover:text-ink"
     >
-      {/* Avant l'hydratation, theme === null : on affiche les deux icônes
-          masquées pour réserver la place et éviter tout saut de mise en page. */}
+      {/* Avant l'hydratation, theme === null : on réserve la place pour éviter
+          tout saut de mise en page. */}
       {theme === null ? (
         <span className="h-[18px] w-[18px]" aria-hidden="true" />
       ) : isDark ? (
