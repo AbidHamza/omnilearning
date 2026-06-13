@@ -13,6 +13,7 @@ import {
 } from "./icons";
 import ThemeToggle from "./theme-toggle";
 import { homeByRole, useSession } from "@/lib/session";
+import { logoutAction } from "@/lib/actions/auth";
 import type { Role } from "@/lib/types";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
 import { useI18n, useT } from "@/i18n/provider";
@@ -87,6 +88,15 @@ export default function Navbar() {
     localeRouter.push(homeByRole[next]);
   }
 
+  async function logout() {
+    setRoleMenu(false);
+    setOpen(false);
+    await logoutAction();
+    setRole("visiteur");
+    localeRouter.push("/");
+    localeRouter.refresh();
+  }
+
   const isActive = (href: string) =>
     path === href || path.startsWith(href + "/");
 
@@ -145,6 +155,7 @@ export default function Navbar() {
                 open={roleMenu}
                 setOpen={setRoleMenu}
                 onSwitch={switchRole}
+                onLogout={logout}
                 switchLabel={t.roles.switchLabel}
                 switchAria={t.roles.switchAria}
               />
@@ -328,6 +339,7 @@ function RoleSwitcher({
   open,
   setOpen,
   onSwitch,
+  onLogout,
   switchLabel,
   switchAria,
 }: {
@@ -336,6 +348,7 @@ function RoleSwitcher({
   open: boolean;
   setOpen: (v: boolean) => void;
   onSwitch: (r: Role) => void;
+  onLogout: () => void;
   switchLabel: string;
   switchAria: string;
 }) {
@@ -374,6 +387,12 @@ function RoleSwitcher({
                 )}
               </button>
             ))}
+            <button
+              onClick={onLogout}
+              className="mt-1 flex w-full items-center rounded-lg border-t border-line px-2.5 py-2 text-start text-sm text-danger transition hover:bg-surface"
+            >
+              Se déconnecter
+            </button>
           </div>
         </>
       )}

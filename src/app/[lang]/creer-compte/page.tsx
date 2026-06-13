@@ -1,17 +1,33 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
+import { useSession } from "@/lib/session";
+import { signupAction } from "@/lib/actions/auth";
 
 export default function CreerComptePage() {
-  const router = useRouter();
+  const router = useLocaleRouter();
+  const { setRole: setSessionRole } = useSession();
   const [role, setRole] = useState<"apprenant" | "formateur">("apprenant");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    router.push(role === "formateur" ? "/parametres" : "/tableau-de-bord");
+    setPending(true);
+    setError(null);
+    const fd = new FormData(e.currentTarget);
+    fd.set("role", role);
+    const res = await signupAction(fd);
+    setPending(false);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setSessionRole(res.role);
+    router.push(res.role === "formateur" ? "/parametres" : "/tableau-de-bord");
+    router.refresh();
   }
 
   return (
@@ -41,39 +57,49 @@ export default function CreerComptePage() {
           </div>
 
           <label className="mt-5 block text-sm font-medium">Mail</label>
-          <input type="email" required placeholder="vous@email.com" className="field mt-2" />
+          <input type="email" name="email" required placeholder="vous@email.com" className="field mt-2" />
 
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium">Prénom</label>
-              <input type="text" required className="field mt-2" />
+              <input type="text" name="firstName" required className="field mt-2" />
             </div>
             <div>
               <label className="block text-sm font-medium">Nom</label>
-              <input type="text" required className="field mt-2" />
+              <input type="text" name="lastName" required className="field mt-2" />
             </div>
           </div>
 
           <label className="mt-5 block text-sm font-medium">Mot de passe</label>
-          <input type="password" required placeholder="••••••••" className="field mt-2" />
+          <input
+            type="password"
+            name="password"
+            required
+            minLength={8}
+            placeholder="••••••••"
+            className="field mt-2"
+          />
 
           <label className="mt-5 block text-sm font-medium">
             Confirmation du mot de passe
           </label>
           <input type="password" required placeholder="••••••••" className="field mt-2" />
 
+          {error && <p className="mt-3 text-sm font-medium text-danger">{error}</p>}
+
           <button
             type="submit"
-            className="mt-7 w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            disabled={pending}
+            className="mt-7 w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
           >
             Créer mon compte
           </button>
 
           <p className="mt-4 text-sm text-muted">
             Vous avez déjà un compte ?{" "}
-            <Link href="/connexion" className="font-semibold text-primary-dark hover:underline">
+            <LocaleLink href="/connexion" className="font-semibold text-primary-dark hover:underline">
               Se connecter
-            </Link>
+            </LocaleLink>
           </p>
         </form>
       </div>
