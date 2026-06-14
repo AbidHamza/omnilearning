@@ -138,7 +138,7 @@ function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
       <div className="mt-7 flex items-center gap-3">
         <button
           type="submit"
-          className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+          className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
         >
           Changer mot de passe
         </button>
@@ -325,7 +325,7 @@ function RappelsTab() {
 
       <button
         type="submit"
-        className="mt-7 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+        className="mt-7 rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
       >
         Enregistrer
       </button>
@@ -420,7 +420,7 @@ function SuiviTab({
                 <span className="text-sm text-muted">{e.progress}%</span>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${e.progress}%` }} />
+                <div className="h-full rounded-[3px] bg-primary" style={{ width: `${e.progress}%` }} />
               </div>
               <p className="mt-2 text-sm text-muted">Dernière leçon : {e.lastLesson}</p>
             </div>
@@ -438,7 +438,7 @@ function CertifsTab({ user }: { user: User }) {
       <div className="mt-5 space-y-4">
         {user.certificates.map((c) => (
           <div key={c.course} className="flex items-center gap-4 rounded-xl border border-line p-4">
-            <span className="grid h-11 w-11 place-items-center rounded-full bg-success-soft text-success">
+            <span className="grid h-11 w-11 place-items-center rounded-[3px] bg-success-soft text-success">
               <AwardIcon />
             </span>
             <div className="flex-1">

@@ -109,7 +109,7 @@ export default async function LessonPage(
           {next ? (
             <Link
               href={lp(`/formations/${course.slug}/${next.id}`)}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep"
             >
               {c.nextLesson}
               <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
@@ -117,7 +117,7 @@ export default async function LessonPage(
           ) : (
             <Link
               href={lp("/tableau-de-bord")}
-              className="inline-flex items-center gap-2 rounded-full bg-success px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-[3px] bg-success px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:opacity-90"
             >
               {c.finish}
               <CheckIcon width={16} height={16} />

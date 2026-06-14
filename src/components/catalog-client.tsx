@@ -96,7 +96,7 @@ export default function CatalogClient({
             onChange={(e) => setQ(e.target.value)}
             placeholder={tc.searchPlaceholder}
             aria-label={tc.searchPlaceholder}
-            className="h-11 w-full rounded-full border border-line bg-surface ps-11 pe-4 text-sm outline-none focus:border-primary focus:bg-bg"
+            className="h-11 w-full rounded-[3px] border border-line bg-surface ps-11 pe-4 text-sm outline-none focus:border-primary focus:bg-bg"
           />
         </div>
 
@@ -136,14 +136,16 @@ export default function CatalogClient({
 
       {/* Results */}
       <div>
-        <span className="rule-accent mb-3" />
-        <h1 className="text-3xl font-semibold sm:text-[2.1rem]">
+        <p className="mb-2 font-mono text-xs text-muted-soft">
+          <span className="text-primary">$</span> omnilearn ls -la ./formations
+        </p>
+        <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-[2.1rem]">
           {filtered.length} {tc.resultsFor}{" "}
-          <span className="font-accent text-primary">«&nbsp;{label}&nbsp;»</span>
+          <span className="text-primary">«&nbsp;{label}&nbsp;»</span>
         </h1>
 
         {filtered.length === 0 ? (
-          <div className="mt-10 rounded-2xl border border-dashed border-line p-12 text-center text-muted">
+          <div className="mt-10 rounded-[6px] border border-dashed border-line p-12 text-center font-mono text-muted">
             {tc.empty}
           </div>
         ) : (
@@ -201,12 +203,12 @@ function Check({
         onChange={onChange}
         className="peer sr-only"
       />
-      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md border border-line bg-bg transition peer-checked:border-primary peer-checked:bg-primary">
+      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[3px] border border-line bg-bg transition peer-checked:border-primary peer-checked:bg-primary">
         {checked && (
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
             <path
               d="M20 6 9 17l-5-5"
-              stroke="white"
+              stroke="#04130a"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"

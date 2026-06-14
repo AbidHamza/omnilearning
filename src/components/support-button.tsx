@@ -35,7 +35,7 @@ export default function SupportButton({
         disabled={pending}
         className={`w-full rounded-full py-2.5 text-sm font-semibold disabled:opacity-60 ${
           featured
-            ? "bg-primary text-white hover:bg-primary-dark"
+            ? "bg-primary text-[#04130a] hover:bg-primary-deep"
             : "border border-line hover:bg-surface"
         }`}
       >

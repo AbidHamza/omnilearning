@@ -43,7 +43,7 @@ export default function MotDePasseOubliePage() {
 
             <button
               type="submit"
-              className="mt-6 w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+              className="mt-6 w-full rounded-[3px] bg-primary py-3 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
             >
               Envoyer un mail
             </button>
@@ -57,7 +57,7 @@ export default function MotDePasseOubliePage() {
           </form>
         ) : (
           <div>
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-success-soft text-success">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-[3px] bg-success-soft text-success">
               <MailIcon width={26} height={26} />
             </span>
             <h1 className="mt-5 text-2xl font-extrabold tracking-tight">

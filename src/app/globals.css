@@ -1,121 +1,127 @@
 @import "tailwindcss";
 
+/*
+ * ============================================================================
+ * OmniLearn — Design System "TERMINAL / DEV-STUDIO" (direction B)
+ * Monospace-first. Fond quasi-noir « void ». UN seul accent : vert phosphore.
+ * Atmosphère : grille scanline + bloom accent + grain fin. Premium, pas cheesy.
+ * Tokens canoniques : Desktop/omnilearn-corporate/DESIGN-SYSTEM.md.
+ *
+ * Stratégie : on conserve les JETONS SÉMANTIQUES existants (bg/surface/ink/
+ * muted/line/brand/primary/accent…) consommés par toute l'UI, on les RECIBLE
+ * sur la palette terminal. Toute la fonctionnalité (auth, rôles, Stripe, i18n,
+ * dark mode) reste intacte — seul le rendu change.
+ *
+ * Thème : SOMBRE par défaut (terminal = dark-first). Le mode clair « paper »
+ * est opt-in via la classe `.light` sur <html> (cf. layout + theme-toggle).
+ * ============================================================================
+ */
+
+/*
+ * Fonts: JetBrains Mono (la VOIX) + IBM Plex Sans (prose longue).
+ * Auto-hébergées par next/font (cf. layout.tsx) → pas d'@import Google ici
+ * (évite le double chargement et le warning « @import must precede »).
+ */
+
 @theme {
-  /*
-   * Identité OmniLearn — direction "académie éditoriale" :
-   * fond papier crème chaud (pas de blanc clinique), encre vert-forêt très
-   * sombre, primaire émeraude profonde, accent ocre/ambre. Le tout évite le
-   * bleu corporate générique et donne une marque chaude, lettrée, mémorable.
-   */
+  /* ── Canvas / surfaces — near-black to charcoal ── */
+  --color-bg: #07090c; /* page void */
+  --color-surface: #0b0e13; /* raised surface, barres */
+  --color-surface-2: #161b24; /* hover / inset */
 
-  /* Surfaces — papier crème */
-  --color-bg: #f7f4ec;
-  --color-surface: #efeadd;
-  --color-surface-2: #e6dfcd;
+  /* ── Texte — encre froide ── */
+  --color-ink: #e8edf2; /* primaire */
+  --color-muted: #9aa6b2; /* secondaire */
+  --color-muted-soft: #5c6773; /* muted / commentaires */
 
-  /* Texte — encre vert-forêt sombre */
-  --color-ink: #11221c;
-  --color-muted: #4f5a52;
-  --color-muted-soft: #97a097;
+  /* ── Lignes ── */
+  --color-line: #1f2630; /* hairline */
+  --color-line-soft: #161b24; /* hairline atténuée */
 
-  /* Lignes */
-  --color-line: #ddd6c4;
-  --color-line-soft: #e6e0d0;
+  /* ── Brand = vert phosphore (teinte secondaire / bandeaux) ── */
+  --color-brand: #4ef08a;
+  --color-brand-soft: #0f3d24; /* remplissage teinté accent */
+  --color-brand-band: #0b0e13; /* bandeau */
 
-  /* Brand — émeraude (teinte secondaire / bandeaux) */
-  --color-brand: #1f6f57;
-  --color-brand-soft: #d6e7df;
-  --color-brand-band: #e8e2d3;
+  /* ── Primaire interactif = vert phosphore (THE accent) ── */
+  --color-primary: #4ef08a;
+  --color-primary-soft: #0f3d24;
+  --color-primary-dark: #4ef08a; /* sur sombre, l'accent reste lumineux */
+  --color-primary-deep: #2fae62;
 
-  /* Primaire interactif — émeraude profonde */
-  --color-primary: #15735a;
-  --color-primary-soft: #d8ebe3;
-  --color-primary-dark: #0c4e3c;
-  --color-primary-deep: #08311f;
+  /* ── Accent secondaire = ambre (signal rare : strings/badges) ── */
+  --color-accent: #f5c451;
+  --color-accent-soft: #2e2412;
+  --color-violet: #57c7ff; /* cyan : keywords/liens dans code (rare) */
 
-  /* Accents — ocre/ambre chaud (CTA secondaires, surlignages) */
-  --color-accent: #c8851f;
-  --color-accent-soft: #f3e4c6;
-  --color-violet: #9746ff;
+  /* ── States ── */
+  --color-success: #4ef08a;
+  --color-success-soft: #0f3d24;
+  --color-warning: #f5c451;
+  --color-danger: #ff6b81;
+  --color-danger-soft: #341a1f;
 
-  /* States */
-  --color-success: #1f8f5f;
-  --color-success-soft: #dcefe2;
-  --color-warning: #c8851f;
-  --color-danger: #c0432f;
-  --color-danger-soft: #f6e3df;
-
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  /* ── Typo : mono pour la VOIX, sans pour la prose ── */
+  --font-display: var(--font-jetbrains), ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --font-sans: var(--font-plex-sans), "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
   --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 18px;
+  /* Terminal = tranchant : rayons minimes. */
+  --radius-card: 6px;
 
-  /* Ombre portée des cartes : variabilisée pour s'adapter au thème sombre. */
-  --shadow-card: 0 18px 40px -18px rgba(17, 34, 28, 0.28);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.02), 0 18px 50px -22px rgba(0, 0, 0, 0.8);
 }
 
 /*
- * Thème sombre : on réassigne les mêmes jetons sémantiques que le thème clair.
- * Comme toute l'UI s'appuie sur bg/surface/ink/muted/line/brand…, le passage
- * en sombre se propage automatiquement à l'ensemble des composants.
- * Les sections volontairement foncées (bandeau stats, footer, CTA en bg-ink)
- * restent foncées : on remonte juste légèrement leur teinte pour le contraste.
+ * Mode clair « paper » — opt-in via la classe `.light` sur <html>.
+ * On réassigne les MÊMES jetons sémantiques : le passage clair se propage
+ * automatiquement à toute l'UI. High-contrast, toujours mono.
  */
-.dark {
-  /* Surfaces — vert-forêt très sombre, légèrement chaud */
-  --color-bg: #0c1512;
-  --color-surface: #14201b;
-  --color-surface-2: #1d2c25;
+.light {
+  --color-bg: #f4f2ec;
+  --color-surface: #ece9e0;
+  --color-surface-2: #e6e2d8;
 
-  /* Texte — crème désaturé */
-  --color-ink: #f1ede1;
-  --color-muted: #a7b0a4;
-  --color-muted-soft: #6e786d;
+  --color-ink: #15181c;
+  --color-muted: #454c54;
+  --color-muted-soft: #6e7681;
 
-  /* Lignes */
-  --color-line: #25342c;
-  --color-line-soft: #1e2b24;
+  --color-line: #d8d3c6;
+  --color-line-soft: #e6e2d8;
 
-  /* Brand émeraude — éclairci pour rester lisible sur fond sombre */
-  --color-brand: #5fc79d;
-  --color-brand-soft: #163026;
-  --color-brand-band: #101a15;
+  --color-brand: #0f8f48;
+  --color-brand-soft: #dbf0e2;
+  --color-brand-band: #ece9e0;
 
-  /* Primaire — éclairci pour le contraste AA sur fond sombre */
-  --color-primary: #4fc295;
-  --color-primary-soft: #14302440;
-  --color-primary-dark: #93dcbd;
-  --color-primary-deep: #c2eed8;
+  --color-primary: #0f8f48;
+  --color-primary-soft: #dbf0e2;
+  --color-primary-dark: #0a6e37;
+  --color-primary-deep: #0a6e37;
 
-  /* Accent ambre — éclairci */
-  --color-accent: #e0a93f;
-  --color-accent-soft: #2e2412;
+  --color-accent: #9a6b00;
+  --color-accent-soft: #f3e4c6;
+  --color-violet: #0a6ca8;
 
-  /* States */
-  --color-success: #4fc295;
-  --color-success-soft: #142c20;
-  --color-warning: #e0a93f;
-  --color-danger: #ef7a64;
-  --color-danger-soft: #341a14;
+  --color-success: #0f8f48;
+  --color-success-soft: #dbf0e2;
+  --color-warning: #9a6b00;
+  --color-danger: #c0394f;
+  --color-danger-soft: #f6e3df;
 
-  /* Sections déjà foncées (bg-ink) : remontées d'un cran pour s'en détacher */
-  --color-ink-section: #0f1b16;
-
-  --shadow-card: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.02), 0 18px 50px -28px rgba(40, 30, 10, 0.35);
 }
 
 /*
- * Sections volontairement foncées (bandeau stats, footer, CTA).
- * En clair elles s'appuient sur l'encre (#0a151d) ; en sombre, comme l'encre
- * devient claire, on bascule sur une teinte foncée dédiée. Le texte interne
- * reste blanc dans les deux thèmes, d'où ce jeton fixe.
+ * Sections volontairement « surélevées » (bandeau stats, footer, CTA).
+ * En terminal, ce sont des surfaces console légèrement plus claires que le void,
+ * cernées d'une hairline. En clair, surface papier surélevée.
  */
 .section-dark {
-  background-color: #11221c;
+  background-color: #0b0e13;
 }
-.dark .section-dark {
-  background-color: var(--color-ink-section);
+.light .section-dark {
+  background-color: #ece9e0;
 }
 
 /* Évite tout flash de transition au tout premier rendu / au switch de thème. */
@@ -134,7 +140,7 @@
   }
 }
 
-/* Arabe : police dédiée pour TOUT (corps + titres), la serif latine ne couvre pas l'arabe. */
+/* Arabe : police dédiée pour TOUT (la mono latine ne couvre pas l'arabe). */
 [dir="rtl"] body,
 [dir="rtl"] h1,
 [dir="rtl"] h2,
@@ -148,61 +154,106 @@
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-ink);
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: #05140b;
+}
+.light ::selection {
+  color: #f4f2ec;
+}
+
+/* Scrollbar terminal */
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border: 3px solid var(--color-bg);
+  border-radius: 8px;
 }
 
 /*
- * Titres — Fraunces (serif éditoriale). Pas de tracking négatif sur une serif :
- * on garde un léger -0.005em seulement, on monte l'axe optique pour les grands
- * titres et on active les ligatures. Italique réservé aux accents (.font-accent).
+ * Titres / libellés UI = JetBrains Mono (la VOIX). Tracking serré, gras franc.
+ * Règle DS : un titre / un libellé / un nombre = mono ; une phrase à lire = sans.
  */
 h1,
 h2,
 h3,
 .font-display {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  font-variation-settings: "opsz" 144, "SOFT" 30;
-  font-feature-settings: "liga" 1, "calt" 1;
+  font-weight: 800;
+  letter-spacing: -0.035em;
   line-height: 1.08;
 }
 
-/* Accent éditorial : Fraunces en italique, pour un mot/segment mis en valeur. */
+/*
+ * « font-accent » : conservé pour compat (utilisé sur des mots mis en valeur).
+ * En terminal, l'emphase = la couleur accent + la mono, pas l'italique serif.
+ */
 .font-accent {
   font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 500;
-  font-variation-settings: "opsz" 144, "SOFT" 80;
+  font-style: normal;
+  font-weight: 800;
+  color: var(--color-primary);
 }
 
 .container-page {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1180px;
   margin-inline: auto;
   padding-inline: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 640px) {
+  .container-page {
+    padding-inline: 1rem;
+  }
 }
 
-/* Pill input shared across forms (matches wireframe rounded fields) */
+/*
+ * Champs de formulaire — registre terminal : tranchant (pas de pilule),
+ * bordure hairline, focus accent + glow phosphore. mono.
+ */
 .field {
   height: 3rem;
   width: 100%;
-  border-radius: 9999px;
+  border-radius: 3px;
   border: 1px solid var(--color-line);
-  background: var(--color-bg);
-  padding-inline: 1.25rem;
-  font-size: 0.95rem;
+  background: var(--color-surface);
+  padding-inline: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .field:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 22%, transparent);
 }
 .field::placeholder {
   color: var(--color-muted-soft);
@@ -210,8 +261,8 @@ h3,
 
 textarea.field {
   height: auto;
-  border-radius: 18px;
-  padding: 0.85rem 1.1rem;
+  border-radius: 6px;
+  padding: 0.85rem 0.9rem;
   resize: vertical;
 }
 
@@ -234,12 +285,11 @@ textarea.field {
   }
 }
 .rise {
-  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Entrée échelonnée pour les listes/sections au chargement. */
 .rise-stagger > * {
-  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .rise-stagger > *:nth-child(1) { animation-delay: 0.05s; }
 .rise-stagger > *:nth-child(2) { animation-delay: 0.12s; }
@@ -253,18 +303,21 @@ textarea.field {
   }
 }
 
-/* Mesh de fond pour le hero : nappes radiales émeraude + ambre sur papier. */
+/*
+ * Atmosphère hero : bloom accent radial (haut-droite) + vignette.
+ * (Remplace l'ancien mesh émeraude/ocre par le bloom phosphore du DS.)
+ */
 .hero-mesh {
   background-color: var(--color-bg);
   background-image:
-    radial-gradient(46rem 30rem at 82% -10%, color-mix(in srgb, var(--color-brand) 26%, transparent), transparent 58%),
-    radial-gradient(40rem 28rem at 4% 4%, color-mix(in srgb, var(--color-accent) 22%, transparent), transparent 52%),
-    radial-gradient(34rem 28rem at 96% 96%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 60%);
+    radial-gradient(120% 80% at 78% -8%, var(--color-brand-soft), transparent 60%),
+    radial-gradient(46rem 30rem at 4% 4%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 55%),
+    radial-gradient(140% 100% at 50% 0%, transparent 55%, color-mix(in srgb, var(--color-bg) 92%, #000) 100%);
 }
 
 /*
- * Grain papier discret, posé en overlay fixe sur tout le document : casse le
- * côté "plat / généré" des aplats. SVG inline (feTurbulence) = zéro requête.
+ * Grain fin posé en overlay fixe sur tout le document (feTurbulence inline,
+ * zéro requête). Casse le côté « plat / généré » des aplats.
  */
 .paper-grain::before {
   content: "";
@@ -273,56 +326,50 @@ textarea.field {
   z-index: 9999;
   pointer-events: none;
   opacity: 0.035;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.dark .paper-grain::before {
-  mix-blend-mode: screen;
+.light .paper-grain::before {
   opacity: 0.05;
 }
 
 /*
- * Motif d'accent éditorial : petit filet ocre sous un titre de section.
- * Utiliser <span className="rule-accent" /> ou la classe sur un élément.
+ * Filet d'accent sous un titre de section — en terminal, c'est un préfixe de
+ * commande accent (barre courte vert phosphore).
  */
 .rule-accent {
   display: inline-block;
   width: 2.75rem;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--color-accent);
-}
-
-/* Grille fine en surimpression, masquée vers les bords. */
-.hero-grid {
-  background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--color-ink) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--color-ink) 5%, transparent) 1px, transparent 1px);
-  background-size: 44px 44px;
-  -webkit-mask-image: radial-gradient(60% 60% at 50% 35%, #000 30%, transparent 100%);
-  mask-image: radial-gradient(60% 60% at 50% 35%, #000 30%, transparent 100%);
-}
-
-/* Carte verre dépoli réutilisée dans le mockup produit. */
-.glass-card {
-  background: color-mix(in srgb, var(--color-bg) 86%, transparent);
-  backdrop-filter: blur(12px);
-  box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
-    0 30px 60px -28px rgba(10, 21, 29, 0.4),
-    0 12px 24px -16px rgba(10, 21, 29, 0.25);
-}
-.dark .glass-card {
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
-  box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
-    0 30px 60px -28px rgba(0, 0, 0, 0.7),
-    0 12px 24px -16px rgba(0, 0, 0, 0.5);
+  height: 2px;
+  border-radius: 0;
+  background: var(--color-primary);
+  box-shadow: 0 0 12px var(--color-brand-soft);
 }
 
 /*
- * Anneau de focus clavier homogène sur tout élément interactif.
- * On ne l'affiche qu'au focus clavier (focus-visible), pas au clic souris.
+ * Grille scanline en surimpression (lignes horizontales tous les 32px),
+ * masquée vers les bords. Motif console du DS.
+ */
+.hero-grid {
+  background-image:
+    linear-gradient(transparent, transparent 31px, color-mix(in srgb, var(--color-line) 60%, transparent) 32px);
+  background-size: 100% 32px;
+  -webkit-mask-image: radial-gradient(70% 70% at 50% 35%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(70% 70% at 50% 35%, #000 30%, transparent 100%);
+}
+
+/* Carte « terminal » (remplace l'ancien glass-card). */
+.glass-card {
+  background: linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+.light .glass-card {
+  background: linear-gradient(180deg, #fbfaf6, var(--color-surface));
+}
+
+/*
+ * Anneau de focus clavier homogène (focus-visible uniquement).
  */
 a:focus-visible,
 button:focus-visible,
@@ -333,9 +380,8 @@ select:focus-visible,
 textarea:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 3px;
 }
-/* Les champs en pilule gèrent déjà leur focus via .field ; pas de double anneau. */
 .field:focus-visible {
   outline: none;
 }
@@ -353,3 +399,81 @@ details > summary {
 details > summary::-webkit-details-marker {
   display: none;
 }
+
+/* ============================================================================
+ * Primitives de VOIX terminal (réutilisables dans les composants).
+ * ========================================================================= */
+
+/* Curseur bloc clignotant accent. */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.term-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-inline-start: 0.15em;
+  vertical-align: -0.15em;
+  background: var(--color-primary);
+  animation: blink 1s steps(2, start) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .term-cursor { animation: none; }
+}
+
+/* Point « session active » qui respire. */
+@keyframes term-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--color-brand-soft); }
+  50% { opacity: 0.6; box-shadow: 0 0 0 4px transparent; }
+}
+.term-live {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  animation: term-pulse 2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .term-live { animation: none; }
+}
+
+/* Préfixe prompt « $ » accent (sur libellés/commandes). */
+.term-prompt::before {
+  content: "$ ";
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+}
+/* Préfixe commentaire « # » muted. */
+.term-comment::before {
+  content: "# ";
+  color: var(--color-muted-soft);
+  font-family: var(--font-mono);
+}
+/* Préfixe titre de colonne « // » faible. */
+.term-slashes::before {
+  content: "// ";
+  color: var(--color-muted-soft);
+  font-family: var(--font-mono);
+}
+
+/* Barre de fenêtre terminal : 3 points. */
+.term-dots {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.term-dots i {
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: #42454d;
+}
+
+/* Tokens de coloration syntaxique (réservés aux blocs « code »). */
+.tok-flag { color: var(--color-accent); }
+.tok-str { color: var(--color-accent); }
+.tok-kw { color: var(--color-violet); }
+.tok-num { color: var(--color-primary); }
+.tok-cmt { color: var(--color-muted-soft); }

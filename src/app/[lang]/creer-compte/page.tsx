@@ -87,39 +87,40 @@ export default function CreerComptePage() {
           <button
             type="submit"
             disabled={pending}
-            className="mt-7 w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
+            className="mt-7 inline-flex w-full items-center justify-center gap-1.5 rounded-[3px] border border-primary/40 bg-brand-soft py-3 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a] disabled:opacity-60"
           >
+            <span className="opacity-70">$</span>
             Créer mon compte
           </button>
 
           <p className="mt-4 text-sm text-muted">
             Vous avez déjà un compte ?{" "}
-            <LocaleLink href="/connexion" className="font-semibold text-primary-dark hover:underline">
+            <LocaleLink href="/connexion" className="font-semibold text-primary hover:underline">
               Se connecter
             </LocaleLink>
           </p>
         </form>
       </div>
 
-      {/* Panneau de marque éditorial : ce que l'on gagne en rejoignant OmniLearn. */}
-      <div className="section-dark relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-14">
-        <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
-        <div className="pointer-events-none absolute -top-24 start-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 end-0 h-72 w-72 rounded-full bg-brand/25 blur-3xl" />
+      {/* Panneau de marque terminal : ce que l'on gagne en rejoignant OmniLearn. */}
+      <div className="section-dark relative hidden overflow-hidden border-s border-line lg:flex lg:flex-col lg:justify-between lg:p-14">
+        <div className="pointer-events-none absolute inset-0 hero-grid opacity-60" />
+        <div className="pointer-events-none absolute -bottom-24 end-0 h-72 w-72 rounded-full bg-brand-soft blur-3xl" />
 
-        <div className="relative flex items-center gap-2.5 text-white">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-brand">
-            <GraduationIcon width={19} height={19} />
+        <div className="relative flex items-center gap-2.5 text-ink">
+          <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-bg text-primary">
+            <GraduationIcon width={18} height={18} />
           </span>
-          <span className="font-display text-lg font-semibold">
-            Omni<span className="font-accent text-brand">Learn</span>
+          <span className="font-display text-base font-extrabold tracking-tight">
+            <span className="text-primary">$</span> omni<span className="text-primary">learn</span>
           </span>
         </div>
 
         <div className="relative">
-          <p className="font-display text-3xl font-medium leading-tight text-white">
+          <p className="font-mono text-xs text-muted-soft"># useradd --role student</p>
+          <p className="mt-3 font-display text-3xl font-extrabold leading-tight tracking-tight text-ink">
             Rejoignez des milliers d&apos;apprenants{" "}
-            <span className="font-accent text-accent">curieux</span>.
+            <span className="text-primary">curieux</span>.
           </p>
           <ul className="mt-7 space-y-3.5">
             {[
@@ -127,8 +128,8 @@ export default function CreerComptePage() {
               "Suivi de progression et certificats",
               "Apprenez à votre rythme, en fr / en / ar",
             ].map((item) => (
-              <li key={item} className="flex items-center gap-3 text-sm text-white/75">
-                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand/20 text-brand">
+              <li key={item} className="flex items-center gap-3 font-sans text-sm text-muted">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-[3px] bg-brand-soft text-primary">
                   <CheckIcon width={13} height={13} />
                 </span>
                 {item}
@@ -137,7 +138,7 @@ export default function CreerComptePage() {
           </ul>
         </div>
 
-        <p className="relative text-xs uppercase tracking-[0.18em] text-white/40">
+        <p className="relative font-mono text-xs uppercase tracking-[0.14em] text-muted-soft">
           Apprenez. Pratiquez. Progressez.
         </p>
       </div>

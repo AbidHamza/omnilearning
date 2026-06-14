@@ -34,16 +34,22 @@ export default async function CoursePage(
 
   return (
     <div className="container-page py-12">
-      <Link href={lp("/formations")} className="text-sm text-muted hover:text-ink">
+      <Link
+        href={lp("/formations")}
+        className="font-mono text-sm text-muted transition hover:text-primary"
+      >
         ← {c.backToAll}
       </Link>
 
-      <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight sm:text-[2.75rem]">
+      <p className="mt-4 font-mono text-xs text-muted-soft">
+        <span className="text-primary">$</span> cat ./formations/{course.slug}
+      </p>
+      <h1 className="mt-2 max-w-3xl font-display text-4xl font-extrabold leading-tight tracking-tight sm:text-[2.6rem]">
         {course.title}
       </h1>
 
       {/* Méta */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted">
+      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-sm text-muted">
         {meta.map((m) => (
           <span key={m}>{m}</span>
         ))}
@@ -56,7 +62,7 @@ export default async function CoursePage(
           {course.prerequisites.map((p) => (
             <span
               key={p}
-              className="rounded-full border border-line px-3 py-1 text-sm"
+              className="rounded-[3px] border border-line bg-surface px-2.5 py-1 font-mono text-xs text-muted"
             >
               {p}
             </span>
@@ -173,7 +179,7 @@ export default async function CoursePage(
         <div className="mt-14 flex justify-center">
           <Link
             href={lp(`/formations/${course.slug}/${firstLesson.id}`)}
-            className="rounded-full bg-primary px-10 py-3.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
           >
             {c.start}
           </Link>

@@ -14,7 +14,6 @@ import {
   PlayIcon,
   QuizIcon,
   QuoteIcon,
-  SparkleIcon,
   StarIcon,
   UsersIcon,
 } from "@/components/icons";
@@ -53,16 +52,16 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <div className="container-page relative grid items-center gap-12 py-16 lg:grid-cols-[1.05fr_1fr] lg:py-24">
           {/* Colonne texte */}
           <div className="rise">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-bg/70 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-dark backdrop-blur">
-              <SparkleIcon width={14} height={14} className="text-accent" />
+            <span className="inline-flex items-center gap-2 rounded-[3px] border border-primary/30 bg-brand-soft px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+              <span className="term-live" aria-hidden />
               {t.home.heroBadge}
             </span>
-            <h1 className="mt-6 text-[2.6rem] font-semibold leading-[1.05] text-ink sm:text-5xl lg:text-[3.6rem]">
+            <h1 className="mt-6 font-display text-[2.4rem] font-extrabold leading-[1.04] tracking-[-0.035em] text-ink sm:text-5xl lg:text-[3.4rem]">
               {t.home.heroTitle}{" "}
               <span className="relative whitespace-nowrap">
-                <span className="font-accent text-primary">{t.home.heroHighlight}</span>
+                <span className="text-primary">{t.home.heroHighlight}</span>
                 <svg
-                  className="absolute -bottom-2 start-0 w-full text-accent"
+                  className="absolute -bottom-1.5 start-0 w-full text-primary"
                   viewBox="0 0 300 14"
                   fill="none"
                   preserveAspectRatio="none"
@@ -71,112 +70,128 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                   <path
                     d="M3 9C61 4 147 3 297 7"
                     stroke="currentColor"
-                    strokeWidth="4"
+                    strokeWidth="3"
                     strokeLinecap="round"
                   />
                 </svg>
               </span>
+              <span className="term-cursor" aria-hidden />
             </h1>
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
+            <p className="mt-5 max-w-lg font-sans text-base leading-relaxed text-muted sm:text-lg">
               {t.home.heroSubtitle}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href={lp("/creer-compte")}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-12px_rgba(52,137,202,0.7)] transition hover:bg-primary-dark hover:shadow-[0_18px_34px_-12px_rgba(52,137,202,0.8)]"
+                className="inline-flex items-center gap-2 rounded-[3px] border border-primary/40 bg-brand-soft px-5 py-3 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a] hover:shadow-[0_0_22px_-2px_var(--color-brand-soft)]"
               >
+                <span className="opacity-70">$</span>
                 {t.home.heroCtaPrimary}
                 <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
               </Link>
               <Link
                 href={lp("/formations")}
-                className="inline-flex items-center gap-2 rounded-full border border-line bg-bg px-6 py-3.5 text-sm font-semibold text-ink transition hover:border-brand hover:bg-brand-soft/40"
+                className="inline-flex items-center gap-2 rounded-[3px] border border-line bg-surface px-5 py-3 font-mono text-sm font-semibold text-ink transition hover:border-primary hover:text-primary"
               >
                 {t.home.heroCtaSecondary}
               </Link>
             </div>
-            <p className="mt-5 flex items-center gap-2 text-sm text-muted">
+            <p className="mt-5 flex items-center gap-2 font-mono text-sm text-muted">
               <CheckIcon width={16} height={16} className="text-success" />
               {t.home.heroReassurance}
             </p>
           </div>
 
-          {/* Colonne mockup produit */}
+          {/* Colonne mockup produit — fenêtre terminal */}
           <div className="rise relative mx-auto w-full max-w-md lg:mx-0">
-            {/* Carte secondaire en arrière-plan, donne de la profondeur */}
-            <div className="absolute -inset-x-3 -top-5 bottom-8 rounded-[28px] bg-gradient-to-br from-brand/25 to-primary/10 blur-xl" />
-            <div className="glass-card relative rounded-[26px] border border-bg/60 p-5">
+            {/* Bloom accent en arrière-plan, donne de la profondeur */}
+            <div className="absolute -inset-x-3 -top-5 bottom-8 rounded-[10px] bg-gradient-to-br from-brand-soft to-transparent blur-2xl" />
+            <div className="glass-card relative overflow-hidden rounded-[10px] border border-line-soft">
+              {/* Barre de fenêtre terminal */}
+              <div className="flex items-center gap-3 border-b border-line bg-bg/60 px-4 py-2.5">
+                <span className="term-dots" aria-hidden>
+                  <i /><i /><i />
+                </span>
+                <span className="truncate font-mono text-[11px] text-muted-soft">
+                  omnilearn run ./formation
+                </span>
+                <span className="ms-auto inline-flex items-center gap-1.5 font-mono text-[10px] text-primary">
+                  <span className="term-live" aria-hidden /> session active
+                </span>
+              </div>
               {/* En-tête de la carte cours */}
-              <div className="flex items-center gap-3">
-                <span className="section-dark grid h-11 w-11 place-items-center rounded-2xl text-brand">
+              <div className="flex items-center gap-3 px-5 pt-5">
+                <span className="grid h-11 w-11 place-items-center rounded-[3px] border border-line bg-bg text-primary">
                   <PlayIcon width={20} height={20} />
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate font-display text-[15px] font-bold text-ink">
+                  <p className="truncate font-display text-[14px] font-bold text-ink">
                     {t.home.mockTitle}
                   </p>
-                  <p className="truncate text-xs text-muted">
+                  <p className="truncate font-mono text-xs text-muted">
                     {t.home.mockSubtitle}
                   </p>
                 </div>
-                <span className="ms-auto rounded-full bg-success-soft px-2.5 py-1 text-[11px] font-bold text-success">
+                <span className="ms-auto rounded-[3px] border border-primary/30 bg-brand-soft px-2 py-1 font-mono text-[10px] font-bold uppercase text-primary">
                   {t.common.free}
                 </span>
               </div>
 
-              {/* Barre de progression */}
-              <div className="mt-5">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-muted">
-                  <span>{t.home.mockProgressLabel}</span>
-                  <span className="text-primary-dark">62%</span>
+              <div className="px-5 pb-5">
+                {/* Barre de progression */}
+                <div className="mt-5">
+                  <div className="flex items-center justify-between font-mono text-[11px] font-semibold text-muted">
+                    <span>{t.home.mockProgressLabel}</span>
+                    <span className="text-primary">62%</span>
+                  </div>
+                  <div className="mt-1.5 h-2 overflow-hidden rounded-[2px] bg-surface-2">
+                    <div className="h-full w-[62%] rounded-[2px] bg-primary" />
+                  </div>
                 </div>
-                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-surface-2">
-                  <div className="h-full w-[62%] rounded-full bg-gradient-to-r from-brand to-primary" />
+
+                {/* Liste des leçons */}
+                <ul className="mt-5 space-y-2.5">
+                  <MockLesson
+                    icon={<PlayIcon width={16} height={16} />}
+                    label={t.home.mockLessonVideo}
+                    done
+                  />
+                  <MockLesson
+                    icon={<DocIcon width={16} height={16} />}
+                    label={t.home.mockLessonText}
+                    done
+                  />
+                  <MockLesson
+                    icon={<QuizIcon width={16} height={16} />}
+                    label={t.home.mockLessonQuiz}
+                    active
+                  />
+                </ul>
+
+                {/* Pied : meta */}
+                <div className="mt-5 flex items-center gap-4 border-t border-line pt-4 font-mono text-xs text-muted">
+                  <span className="inline-flex items-center gap-1.5">
+                    <ClockIcon width={14} height={14} />
+                    {t.home.mockDuration}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <LayersIcon width={14} height={14} />
+                    {t.home.mockLevel}
+                  </span>
                 </div>
-              </div>
-
-              {/* Liste des leçons */}
-              <ul className="mt-5 space-y-2.5">
-                <MockLesson
-                  icon={<PlayIcon width={16} height={16} />}
-                  label={t.home.mockLessonVideo}
-                  done
-                />
-                <MockLesson
-                  icon={<DocIcon width={16} height={16} />}
-                  label={t.home.mockLessonText}
-                  done
-                />
-                <MockLesson
-                  icon={<QuizIcon width={16} height={16} />}
-                  label={t.home.mockLessonQuiz}
-                  active
-                />
-              </ul>
-
-              {/* Pied : meta */}
-              <div className="mt-5 flex items-center gap-4 border-t border-line pt-4 text-xs text-muted">
-                <span className="inline-flex items-center gap-1.5">
-                  <ClockIcon width={14} height={14} />
-                  {t.home.mockDuration}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <LayersIcon width={14} height={14} />
-                  {t.home.mockLevel}
-                </span>
               </div>
             </div>
 
             {/* Pastille flottante : certificat */}
-            <div className="absolute -bottom-5 end-2 flex items-center gap-2 rounded-2xl border border-line bg-bg px-3.5 py-2.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.45)]">
-              <span className="grid h-8 w-8 place-items-center rounded-xl bg-brand-soft text-primary-dark">
+            <div className="absolute -bottom-5 end-2 flex items-center gap-2 rounded-[6px] border border-line bg-surface px-3.5 py-2.5 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.7)]">
+              <span className="grid h-8 w-8 place-items-center rounded-[3px] border border-primary/30 bg-brand-soft text-primary">
                 <AwardIcon width={16} height={16} />
               </span>
               <div className="text-start">
-                <p className="text-[11px] font-bold leading-tight text-ink">
+                <p className="font-display text-[11px] font-bold leading-tight text-ink">
                   {t.home.featureTitles[3]}
                 </p>
-                <p className="text-[10px] leading-tight text-muted">
+                <p className="font-mono text-[10px] leading-tight text-muted">
                   {t.home.mockProgressLabel} · 96%
                 </p>
               </div>
@@ -193,13 +208,13 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               const Icon = statIcons[i];
               return (
                 <div key={s.label} className="flex flex-col gap-2 text-center">
-                  <span className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-white/10 text-brand">
+                  <span className="mx-auto grid h-10 w-10 place-items-center rounded-[3px] border border-line bg-bg text-primary">
                     <Icon width={18} height={18} />
                   </span>
-                  <span className="font-display text-3xl font-extrabold text-white">
+                  <span className="font-display text-3xl font-extrabold tracking-tight text-primary">
                     {s.value}
                   </span>
-                  <span className="text-xs font-medium text-white/55">
+                  <span className="font-mono text-xs font-medium text-muted">
                     {s.label}
                   </span>
                 </div>
@@ -360,17 +375,17 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </div>
 
           <div className="relative mx-auto mt-10 max-w-lg">
-            <div className="absolute -inset-2 rounded-[30px] bg-gradient-to-br from-brand/30 to-primary/15 blur-lg" />
-            <div className="relative overflow-hidden rounded-[26px] border border-brand/40 bg-bg p-8 shadow-[0_30px_70px_-40px_rgba(10,21,29,0.5)]">
-              <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-primary-dark">
-                <SparkleIcon width={13} height={13} className="text-brand" />
+            <div className="absolute -inset-2 rounded-[12px] bg-gradient-to-br from-brand-soft to-transparent blur-xl" />
+            <div className="relative overflow-hidden rounded-[10px] border border-primary/30 bg-surface p-8 shadow-card">
+              <span className="inline-flex items-center gap-2 rounded-[3px] border border-primary/30 bg-brand-soft px-3 py-1 font-mono text-xs font-bold uppercase tracking-[0.06em] text-primary">
+                <span className="opacity-70">$</span>
                 {t.home.pricingPlan}
               </span>
               <div className="mt-5 flex items-end gap-2">
                 <span className="font-display text-5xl font-extrabold tracking-tight text-ink">
                   {t.home.pricingPrice}
                 </span>
-                <span className="pb-1.5 text-sm font-medium text-muted">
+                <span className="pb-1.5 font-mono text-sm font-medium text-muted">
                   {t.home.pricingPeriod}
                 </span>
               </div>
@@ -378,10 +393,10 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               <ul className="mt-7 space-y-3">
                 {t.home.pricingIncludes.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-success-soft text-success">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-[3px] bg-brand-soft text-primary">
                       <CheckIcon width={13} height={13} />
                     </span>
-                    <span className="text-sm leading-relaxed text-ink">
+                    <span className="font-sans text-sm leading-relaxed text-ink">
                       {item}
                     </span>
                   </li>
@@ -390,12 +405,13 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
 
               <Link
                 href={lp("/creer-compte")}
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-[3px] border border-primary/40 bg-brand-soft px-6 py-3.5 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a]"
               >
+                <span className="opacity-70">$</span>
                 {t.home.pricingCta}
                 <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
               </Link>
-              <p className="mt-3 text-center text-xs text-muted">
+              <p className="mt-3 text-center font-mono text-xs text-muted">
                 {t.home.pricingNote}
               </p>
             </div>
@@ -438,24 +454,28 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
-      {/* ── CTA final ──────────────────────────────────────────────── */}
+      {/* ── CTA final — invocation terminal ────────────────────────── */}
       <section className="container-page pb-20">
-        <div className="section-dark relative overflow-hidden rounded-[28px] px-8 py-14 text-center sm:px-12">
-          <div className="pointer-events-none absolute inset-0 opacity-90">
-            <div className="absolute -top-16 start-1/4 h-56 w-56 rounded-full bg-brand/30 blur-3xl" />
-            <div className="absolute -bottom-20 end-1/4 h-56 w-56 rounded-full bg-primary/30 blur-3xl" />
+        <div className="section-dark relative overflow-hidden rounded-[10px] border border-line px-8 py-14 text-center sm:px-12">
+          <div className="pointer-events-none absolute inset-0 opacity-80">
+            <div className="absolute -top-16 start-1/4 h-56 w-56 rounded-full bg-brand-soft blur-3xl" />
+            <div className="absolute -bottom-20 end-1/4 h-56 w-56 rounded-full bg-brand-soft blur-3xl" />
           </div>
           <div className="relative mx-auto max-w-xl">
-            <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+            <p className="mb-3 term-comment font-mono text-xs text-muted-soft">
+              omnilearn --start
+            </p>
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
               {t.home.ctaTitle}
             </h2>
-            <p className="mt-3 text-sm text-white/65 sm:text-base">
+            <p className="mt-3 font-sans text-sm text-muted sm:text-base">
               {t.home.ctaSubtitle}
             </p>
             <Link
               href={lp("/creer-compte")}
-              className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-semibold text-ink transition hover:bg-white"
+              className="mt-7 inline-flex items-center gap-2 rounded-[3px] border border-primary/40 bg-brand-soft px-6 py-3.5 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a] hover:shadow-[0_0_24px_-2px_var(--color-brand-soft)]"
             >
+              <span className="opacity-70">$</span>
               {t.home.ctaButton}
               <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
             </Link>
@@ -480,22 +500,22 @@ function MockLesson({
 }) {
   return (
     <li
-      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${
-        active ? "bg-brand-soft/50 ring-1 ring-brand/40" : "bg-surface/60"
+      className={`flex items-center gap-3 rounded-[3px] px-3 py-2.5 ${
+        active ? "bg-brand-soft ring-1 ring-primary/40" : "bg-bg/40"
       }`}
     >
       <span
-        className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${
-          active ? "bg-brand text-ink" : "bg-bg text-primary-dark"
+        className={`grid h-7 w-7 shrink-0 place-items-center rounded-[3px] ${
+          active ? "bg-primary text-[#04130a]" : "border border-line bg-bg text-primary"
         }`}
       >
         {icon}
       </span>
-      <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">
+      <span className="min-w-0 flex-1 truncate font-mono text-[13px] font-medium text-ink">
         {label}
       </span>
       {done && (
-        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-success-soft text-success">
+        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[3px] bg-brand-soft text-primary">
           <CheckIcon width={12} height={12} />
         </span>
       )}

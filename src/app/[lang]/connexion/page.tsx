@@ -92,8 +92,9 @@ export default function ConnexionPage() {
           <button
             type="submit"
             disabled={pending}
-            className="mt-6 w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
+            className="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-[3px] border border-primary/40 bg-brand-soft py-3 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a] disabled:opacity-60"
           >
+            <span className="opacity-70">$</span>
             {t.auth.loginTitle}
           </button>
 
@@ -120,7 +121,7 @@ export default function ConnexionPage() {
               type="button"
               onClick={() => oauthSignIn("google", "/tableau-de-bord")}
               aria-label="Google"
-              className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg text-ink transition hover:border-primary hover:bg-surface"
+              className="grid h-12 flex-1 place-items-center rounded-[3px] border border-line bg-surface text-ink transition hover:border-primary hover:bg-surface-2"
             >
               <GoogleIcon width={22} height={22} />
             </button>
@@ -128,14 +129,14 @@ export default function ConnexionPage() {
               type="button"
               onClick={() => oauthSignIn("github", "/tableau-de-bord")}
               aria-label="GitHub"
-              className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg text-ink transition hover:border-primary hover:bg-surface"
+              className="grid h-12 flex-1 place-items-center rounded-[3px] border border-line bg-surface text-ink transition hover:border-primary hover:bg-surface-2"
             >
               <GithubIcon width={22} height={22} />
             </button>
             <button
               type="button"
               aria-label="Apple"
-              className="grid h-12 flex-1 place-items-center rounded-xl border border-line bg-bg text-ink transition hover:border-primary hover:bg-surface"
+              className="grid h-12 flex-1 place-items-center rounded-[3px] border border-line bg-surface text-ink transition hover:border-primary hover:bg-surface-2"
             >
               <AppleIcon width={22} height={22} />
             </button>
@@ -143,32 +144,33 @@ export default function ConnexionPage() {
         </form>
       </div>
 
-      {/* Panneau de marque éditorial (pas de photo stock générique). */}
-      <div className="section-dark relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-14">
-        <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
-        <div className="pointer-events-none absolute -top-24 end-0 h-72 w-72 rounded-full bg-brand/25 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 start-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+      {/* Panneau de marque terminal (pas de photo stock générique). */}
+      <div className="section-dark relative hidden overflow-hidden border-s border-line lg:flex lg:flex-col lg:justify-between lg:p-14">
+        <div className="pointer-events-none absolute inset-0 hero-grid opacity-60" />
+        <div className="pointer-events-none absolute -top-24 end-0 h-72 w-72 rounded-full bg-brand-soft blur-3xl" />
 
-        <div className="relative flex items-center gap-2.5 text-white">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-brand">
-            <GraduationIcon width={19} height={19} />
+        <div className="relative flex items-center gap-2.5 text-ink">
+          <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-bg text-primary">
+            <GraduationIcon width={18} height={18} />
           </span>
-          <span className="font-display text-lg font-semibold">
-            Omni<span className="font-accent text-brand">Learn</span>
+          <span className="font-display text-base font-extrabold tracking-tight">
+            <span className="text-primary">$</span> omni<span className="text-primary">learn</span>
           </span>
         </div>
 
         <div className="relative">
-          <p className="font-display text-3xl font-medium leading-tight text-white">
-            « Apprendre ne devrait jamais avoir de{" "}
-            <span className="font-accent text-accent">prix</span>. »
+          <p className="font-mono text-xs text-muted-soft"># apprendre.sh</p>
+          <p className="mt-3 font-display text-3xl font-extrabold leading-tight tracking-tight text-ink">
+            Apprendre ne devrait jamais avoir de{" "}
+            <span className="text-primary">prix</span>.
+            <span className="term-cursor" aria-hidden />
           </p>
-          <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/60">
+          <p className="mt-5 max-w-sm font-sans text-sm leading-relaxed text-muted">
             {t.home.heroSubtitle}
           </p>
         </div>
 
-        <p className="relative text-xs uppercase tracking-[0.18em] text-white/40">
+        <p className="relative font-mono text-xs uppercase tracking-[0.14em] text-muted-soft">
           {t.footer.motto}
         </p>
       </div>
