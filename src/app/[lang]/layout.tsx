@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Fraunces, DM_Sans, Cairo } from "next/font/google";
+import { JetBrains_Mono, IBM_Plex_Sans, Cairo } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -11,24 +11,22 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localeDir, locales, type Locale } from "@/i18n/config";
 import { siteName, siteUrl } from "@/lib/site";
 
-// Display = Fraunces : une serif éditoriale à "soft" optical sizing, chaleureuse
-// et caractérielle — choix volontairement distinctif (anti-look "sans IA par
-// défaut"). On force l'axe optique (opsz) au max pour les grands titres.
-// Fraunces est une police VARIABLE : on ne fixe pas de poids (axe "wght" continu,
-// donc 400→900 tous disponibles, y compris font-extrabold). On expose en plus les
-// axes optique (opsz) et adoucissement (SOFT), réglés via font-variation-settings.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Design system « TERMINAL / DEV-STUDIO » :
+// - JetBrains Mono = LA VOIX (titres, nav, boutons, libellés UI, chiffres, code).
+// - IBM Plex Sans = prose longue UNIQUEMENT (paragraphes, leads, descriptions).
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
+  weight: ["400", "500", "700", "800"],
   style: ["normal", "italic"],
-  axes: ["opsz", "SOFT"],
   display: "swap",
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -112,13 +110,15 @@ export default async function RootLayout({
       lang={lang}
       dir={dir}
       suppressHydrationWarning
-      className={`${fraunces.variable} ${dmSans.variable} ${cairo.variable} h-full`}
+      className={`${jetbrainsMono.variable} ${plexSans.variable} ${cairo.variable} h-full`}
     >
       <head>
-        {/* Applique le thème avant la première peinture pour éviter le flash clair en mode sombre. */}
+        {/* Terminal = dark-first : sombre par défaut. La classe `.light` (mode
+            « paper ») n'est posée que si l'utilisateur a EXPLICITEMENT choisi
+            clair. Appliqué avant la première peinture pour éviter tout flash. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(t===null&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}})();`,
+            __html: `(function(){try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');}catch(e){}})();`,
           }}
         />
       </head>

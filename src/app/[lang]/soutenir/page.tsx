@@ -43,7 +43,7 @@ export default function SupportPage() {
             }`}
           >
             {t.featured && (
-              <span className="mb-3 w-fit rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
+              <span className="mb-3 w-fit rounded-[3px] bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
                 Le plus populaire
               </span>
             )}

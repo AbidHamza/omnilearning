@@ -28,10 +28,11 @@ export default function FormateurClient({
 
   return (
     <div className="container-page py-10">
-      <span className="rule-accent mb-3" />
-      <p className="text-sm text-muted">Bienvenue {firstName}</p>
-      <h1 className="mt-1 text-4xl font-semibold">
-        Espace <span className="font-accent text-primary">formateur</span>
+      <p className="font-mono text-xs text-muted-soft">
+        <span className="text-primary">$</span> sudo -u {firstName} omnilearn
+      </p>
+      <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight">
+        Espace <span className="text-primary">formateur</span>
       </h1>
 
       {/* Vos actions en cours */}
@@ -52,7 +53,7 @@ export default function FormateurClient({
                 {c.status === "draft" ? (
                   <Link
                     href="/creer"
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                    className="rounded-[3px] bg-primary px-4 py-2 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
                   >
                     Continuer à créer votre formation
                   </Link>
@@ -134,7 +135,7 @@ export default function FormateurClient({
         <div className="mt-6 flex justify-center">
           <button
             onClick={() => router.push("/creer")}
-            className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
           >
             Créer une nouvelle formation
           </button>

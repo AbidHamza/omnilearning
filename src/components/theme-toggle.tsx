@@ -7,13 +7,14 @@ import { useT } from "@/i18n/provider";
 type Theme = "light" | "dark";
 
 /**
- * Bascule clair / sombre.
+ * Bascule sombre / clair.
  *
- * Le thème réel est porté par la classe `dark` sur <html>, posée AVANT le
- * premier rendu par un petit script inline (cf. note dans layout). Ce composant
- * lit cet état réel comme un store externe (le DOM) via useSyncExternalStore,
- * ce qui évite tout setState dans un effet et tout flash : le serveur ne décide
- * pas du thème, c'est le DOM déjà peint qui fait foi.
+ * Design system « terminal » = SOMBRE par défaut. L'état réel est porté par la
+ * classe `light` sur <html> (mode « paper »), posée AVANT le premier rendu par
+ * un petit script inline (cf. note dans layout) uniquement si l'utilisateur a
+ * choisi clair. Ce composant lit cet état réel comme un store externe (le DOM)
+ * via useSyncExternalStore : pas de setState dans un effet, pas de flash, le
+ * serveur ne décide pas du thème — c'est le DOM déjà peint qui fait foi.
  */
 
 // Notifie React quand la classe `dark` de <html> change (depuis ce composant
@@ -34,28 +35,22 @@ function subscribe(callback: () => void) {
 }
 
 /**
- * Lit le thème réellement appliqué. Si le script inline du layout a déjà posé
- * la classe `dark`, on la lit telle quelle. Sinon (cas limite), on la
- * reconstitue depuis localStorage / prefers-color-scheme et on la pose, pour
- * que le DOM et l'état React restent cohérents dès le premier accès.
+ * Lit le thème réellement appliqué. Sombre par défaut : on a le mode clair
+ * « paper » si et seulement si la classe `light` est présente sur <html>.
+ * On réaligne le DOM depuis la préférence stockée si besoin (idempotent).
  */
 function readTheme(): Theme {
   const root = document.documentElement;
-  if (root.classList.contains("dark")) return "dark";
-  // La classe n'est pas posée : soit le thème est clair, soit le script inline
-  // n'a pas tourné. On départage avec la préférence stockée / système.
+  if (root.classList.contains("light")) return "light";
   let stored: string | null = null;
   try {
     stored = localStorage.getItem("theme");
   } catch {
     stored = null;
   }
-  const prefersDark =
-    window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
-  const resolved: Theme =
-    stored === "dark" || (stored === null && prefersDark) ? "dark" : "light";
-  // Réaligne le DOM si besoin (idempotent).
-  root.classList.toggle("dark", resolved === "dark");
+  // Tout sauf "light" => sombre (défaut terminal). Réaligne le DOM si besoin.
+  const resolved: Theme = stored === "light" ? "light" : "dark";
+  root.classList.toggle("light", resolved === "light");
   return resolved;
 }
 
@@ -74,7 +69,7 @@ export default function ThemeToggle() {
     const root = document.documentElement;
     // Active les transitions de couleur le temps du switch.
     root.classList.add("theme-transition");
-    root.classList.toggle("dark", next === "dark");
+    root.classList.toggle("light", next === "light");
     try {
       localStorage.setItem("theme", next);
     } catch {
@@ -92,7 +87,7 @@ export default function ThemeToggle() {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className="grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted transition hover:border-primary hover:text-ink"
+      className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-surface text-muted transition hover:border-primary hover:text-ink"
     >
       {/* Avant l'hydratation, theme === null : on réserve la place pour éviter
           tout saut de mise en page. */}

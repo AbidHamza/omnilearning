@@ -27,7 +27,7 @@ export default function CourseCard({
     return (
       <Link
         href={href}
-        className={`group flex flex-col overflow-hidden rounded-2xl bg-bg ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-12px_rgba(10,21,29,0.25)] ${className}`}
+        className={`group flex flex-col overflow-hidden rounded-[6px] bg-surface ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-primary/50 ${className}`}
       >
         <div className="relative aspect-[16/10] overflow-hidden">
           <Image
@@ -39,10 +39,10 @@ export default function CourseCard({
           />
         </div>
         <div className="flex flex-1 flex-col p-3.5">
-          <h3 className="font-display text-sm font-bold leading-snug">
+          <h3 className="font-display text-sm font-bold leading-snug tracking-tight transition-colors group-hover:text-primary">
             {course.title}
           </h3>
-          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
+          <p className="mt-1 line-clamp-2 font-sans text-xs leading-relaxed text-muted">
             {course.tagline}
           </p>
         </div>
@@ -59,10 +59,10 @@ export default function CourseCard({
   return (
     <Link
       href={href}
-      className={`group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] bg-bg ring-1 ring-line transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_-24px_rgba(17,34,28,0.4)] ${className}`}
+      className={`group relative flex flex-col overflow-hidden rounded-[8px] bg-surface ring-1 ring-line transition duration-300 hover:-translate-y-1 hover:ring-primary/50 hover:shadow-card ${className}`}
     >
-      {/* Filet d'accent ocre qui se révèle au survol, en haut de la carte. */}
-      <span className="absolute inset-x-0 top-0 z-10 h-1 origin-left scale-x-0 bg-accent transition-transform duration-300 group-hover:scale-x-100" />
+      {/* Filet d'accent phosphore qui se révèle au survol, en haut de la carte. */}
+      <span className="absolute inset-x-0 top-0 z-10 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
       <div className="relative aspect-[16/9] overflow-hidden">
         <Image
           src={course.image}
@@ -71,18 +71,18 @@ export default function CourseCard({
           sizes="(min-width:1024px) 360px, 100vw"
           className="object-cover transition duration-500 group-hover:scale-[1.07]"
         />
-        <span className="absolute start-3 top-3 rounded-full bg-bg/95 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-dark shadow-sm backdrop-blur">
+        <span className="absolute start-3 top-3 rounded-[3px] border border-line bg-bg/90 px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wide text-primary backdrop-blur">
           {course.category}
         </span>
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-display text-xl font-semibold leading-tight transition-colors group-hover:text-primary">
+        <h3 className="font-display text-lg font-bold leading-tight tracking-tight transition-colors group-hover:text-primary">
           {course.title}
         </h3>
-        <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted">
+        <p className="mt-1.5 line-clamp-2 font-sans text-sm leading-relaxed text-muted">
           {course.tagline}
         </p>
-        <div className="mt-4 flex items-center gap-3 text-xs text-muted">
+        <div className="mt-4 flex items-center gap-3 font-mono text-xs text-muted">
           <span>
             {cardLabels.levelPrefix} {course.level}
           </span>
@@ -91,7 +91,8 @@ export default function CourseCard({
             {course.hours} {cardLabels.hoursUnit}
           </span>
         </div>
-        <span className="mt-5 inline-flex items-center justify-center rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-ink transition group-hover:border-primary group-hover:bg-primary group-hover:text-white">
+        <span className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-[3px] border border-line bg-bg px-4 py-2 font-mono text-sm font-semibold text-ink transition group-hover:border-primary group-hover:bg-primary group-hover:text-[#04130a]">
+          <span className="text-primary opacity-70 group-hover:text-[#04130a]">$</span>
           {cardLabels.access}
         </span>
       </div>

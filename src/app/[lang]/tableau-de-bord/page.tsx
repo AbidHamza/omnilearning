@@ -57,10 +57,11 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
 
   return (
     <div className="container-page py-10">
-      <span className="rule-accent mb-3" />
-      <p className="text-sm text-muted">Bienvenue {currentUser.name.split(" ")[0]}</p>
-      <h1 className="mt-1 text-4xl font-semibold">
-        Votre <span className="font-accent text-primary">tableau de bord</span>
+      <p className="font-mono text-xs text-muted-soft">
+        <span className="text-primary">$</span> whoami — {currentUser.name.split(" ")[0]}
+      </p>
+      <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight">
+        Votre <span className="text-primary">tableau de bord</span>
       </h1>
 
       {/* Ligne 1 : cours suivis + objectif hebdo */}
@@ -80,7 +81,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
                   <div className="mt-2 flex items-center gap-3">
                     <div className="h-2 flex-1 overflow-hidden rounded-full bg-bg">
                       <div
-                        className="h-full rounded-full bg-primary"
+                        className="h-full rounded-[3px] bg-primary"
                         style={{ width: `${e.progress}%` }}
                       />
                     </div>

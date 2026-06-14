@@ -168,7 +168,7 @@ export default function Quiz({
                   />
                 )}
                 {checked && isCorrect && !isSelected && (
-                  <span className="h-2.5 w-2.5 rounded-full bg-success" />
+                  <span className="h-2.5 w-2.5 rounded-[3px] bg-success" />
                 )}
               </span>
               <span className="flex-1">{opt}</span>
@@ -188,14 +188,14 @@ export default function Quiz({
           <button
             onClick={check}
             disabled={selected === null}
-            className="rounded-full bg-primary px-10 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t.quiz.validate}
           </button>
         ) : (
           <button
             onClick={next}
-            className="rounded-full bg-primary px-10 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
           >
             {isLast ? t.quiz.showResult : t.quiz.next}
           </button>

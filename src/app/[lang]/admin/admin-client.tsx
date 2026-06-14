@@ -78,7 +78,7 @@ export default function AdminClient({
             <span
               className={`grid h-10 w-10 place-items-center rounded-xl ${
                 s.highlight
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-[#04130a]"
                   : "bg-brand-soft text-primary-dark"
               }`}
             >
@@ -140,7 +140,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decide(c, true)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-success px-3.5 py-1.5 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[3px] bg-success px-3.5 py-1.5 text-xs font-semibold text-[#04130a] transition hover:opacity-90 disabled:opacity-50"
                         >
                           <CheckIcon width={14} height={14} />
                           Approuver

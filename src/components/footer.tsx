@@ -37,30 +37,32 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="section-dark mt-24 text-white">
+    <footer className="section-dark mt-24 border-t border-line text-ink">
       <div className="container-page grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand text-ink">
-              <GraduationIcon width={19} height={19} />
+            <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-bg text-primary">
+              <GraduationIcon width={18} height={18} />
             </span>
-            <span className="font-display text-[17px] font-extrabold">
-              Omni<span className="font-medium text-brand">Learn</span>
+            <span className="font-display text-[16px] font-extrabold tracking-tight">
+              <span className="text-primary">$</span> omni<span className="text-primary">learn</span>
             </span>
           </div>
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/55">
+          <p className="mt-4 max-w-xs font-sans text-sm leading-relaxed text-muted">
             {t.footer.tagline}
           </p>
         </div>
         {cols.map((c) => (
           <div key={c.title}>
-            <h4 className="text-sm font-semibold text-brand">{c.title}</h4>
+            <h4 className="term-slashes text-xs font-semibold uppercase tracking-[0.06em] text-muted-soft">
+              {c.title}
+            </h4>
             <ul className="mt-4 space-y-2.5">
               {c.items.map((it) => (
                 <li key={it.label}>
                   <LocaleLink
                     href={it.href}
-                    className="text-sm text-white/60 transition hover:text-white"
+                    className="text-sm text-muted transition hover:text-primary"
                   >
                     {it.label}
                   </LocaleLink>
@@ -70,9 +72,10 @@ export default function Footer() {
           </div>
         ))}
       </div>
-      <div className="border-t border-white/10">
-        <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-white/45 sm:flex-row">
+      <div className="border-t border-line">
+        <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-muted-soft sm:flex-row">
           <span>{t.footer.rights}</span>
+          <span className="font-mono">EIN · Wyoming, USA</span>
           <span>{t.footer.motto}</span>
         </div>
       </div>

@@ -101,7 +101,7 @@ export default function CreerFormationClient() {
                 <span
                   className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-bold transition ${
                     active
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-[#04130a]"
                       : done
                         ? "bg-brand text-ink"
                         : "bg-surface text-muted"
@@ -379,7 +379,7 @@ export default function CreerFormationClient() {
             <button
               type="button"
               onClick={next}
-              className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+              className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
             >
               Étape suivante
             </button>
@@ -388,7 +388,7 @@ export default function CreerFormationClient() {
               type="button"
               onClick={submitDraft}
               disabled={submitting}
-              className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
+              className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:opacity-60"
             >
               Envoyer la demande de création
             </button>

@@ -93,12 +93,12 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
       <div className="container-page flex h-[68px] items-center gap-4">
-        <LocaleLink href="/" className="flex shrink-0 items-center gap-2.5">
-          <span className="section-dark grid h-9 w-9 place-items-center rounded-xl text-brand">
-            <GraduationIcon width={19} height={19} />
+        <LocaleLink href="/" className="group flex shrink-0 items-center gap-2.5">
+          <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-surface text-primary transition group-hover:border-primary">
+            <GraduationIcon width={18} height={18} />
           </span>
-          <span className="hidden font-display text-[17px] font-extrabold tracking-tight sm:block">
-            Omni<span className="text-primary">Learn</span>
+          <span className="hidden font-display text-[16px] font-extrabold tracking-tight sm:block">
+            <span className="text-primary">$</span> omni<span className="text-primary">learn</span>
           </span>
         </LocaleLink>
 
@@ -117,7 +117,7 @@ export default function Navbar() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t.common.search}
-                className="h-10 w-full rounded-full border border-line bg-surface ps-11 pe-4 text-sm outline-none transition placeholder:text-muted-soft focus:border-primary focus:bg-bg"
+                className="h-10 w-full rounded-[3px] border border-line bg-surface ps-11 pe-4 text-sm outline-none transition placeholder:text-muted-soft focus:border-primary focus:bg-bg"
               />
             </form>
 
@@ -126,10 +126,18 @@ export default function Navbar() {
                 <LocaleLink
                   key={l.href}
                   href={l.href}
-                  className={`text-sm transition-colors hover:text-ink ${
+                  className={`group flex items-center gap-1 text-sm transition-colors hover:text-ink ${
                     isActive(l.href) ? "font-semibold text-ink" : "text-muted"
                   }`}
                 >
+                  <span
+                    className={`text-primary transition-opacity ${
+                      isActive(l.href) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                    }`}
+                    aria-hidden
+                  >
+                    &gt;
+                  </span>
                   {l.label}
                 </LocaleLink>
               ))}
@@ -163,13 +171,13 @@ export default function Navbar() {
                 <div className="hidden items-center gap-2 md:flex">
                   <LocaleLink
                     href="/connexion"
-                    className="rounded-full px-4 py-2 text-sm font-semibold text-primary-dark transition hover:bg-surface"
+                    className="rounded-[3px] border border-transparent px-3.5 py-2 text-sm font-medium text-muted transition hover:border-line hover:text-ink"
                   >
                     {t.common.signIn}
                   </LocaleLink>
                   <LocaleLink
                     href="/creer-compte"
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                    className="rounded-[3px] border border-primary/40 bg-brand-soft px-3.5 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a]"
                   >
                     {t.common.signUp}
                   </LocaleLink>
@@ -214,7 +222,7 @@ export default function Navbar() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t.common.search}
-                className="h-10 w-full rounded-full border border-line bg-surface ps-11 pe-4 text-sm outline-none focus:border-primary"
+                className="h-10 w-full rounded-[3px] border border-line bg-surface ps-11 pe-4 text-sm outline-none focus:border-primary"
               />
             </form>
             {links.map((l) => (
@@ -248,14 +256,14 @@ export default function Navbar() {
                 <LocaleLink
                   href="/connexion"
                   onClick={() => setOpen(false)}
-                  className="flex-1 rounded-full border border-line py-2 text-center text-sm font-semibold"
+                  className="flex-1 rounded-[3px] border border-line py-2 text-center text-sm font-semibold"
                 >
                   {t.common.signIn}
                 </LocaleLink>
                 <LocaleLink
                   href="/creer-compte"
                   onClick={() => setOpen(false)}
-                  className="flex-1 rounded-full bg-primary py-2 text-center text-sm font-semibold text-white"
+                  className="flex-1 rounded-[3px] border border-primary/40 bg-brand-soft py-2 text-center text-sm font-semibold text-primary"
                 >
                   {t.common.signUp}
                 </LocaleLink>
@@ -286,7 +294,7 @@ function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-primary hover:text-ink"
+        className="flex items-center gap-1.5 rounded-[3px] border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-primary hover:text-ink"
         aria-label={t.nav.language}
       >
         <GlobeIcon width={15} height={15} />
@@ -310,7 +318,7 @@ function LanguageSwitcher() {
               >
                 {localeNames[l]}
                 {l === locale && (
-                  <span className="h-2 w-2 rounded-full bg-primary" />
+                  <span className="h-2 w-2 rounded-[3px] bg-primary" />
                 )}
               </button>
             ))}
@@ -374,8 +382,8 @@ function AccountMenu({
               </div>
             </div>
             <div className="mx-2.5 mb-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-bold text-primary-dark">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              <span className="inline-flex items-center gap-1.5 rounded-[3px] bg-primary-soft px-2.5 py-1 text-[11px] font-bold text-primary-dark">
+                <span className="h-1.5 w-1.5 rounded-[3px] bg-primary" />
                 {roleLabel}
               </span>
             </div>
