@@ -1,25 +1,52 @@
 /**
- * Seed — alimente la DB avec les données de démo existantes (rien de visuel perdu).
- * - Catégories + 6 formations (importées telles quelles depuis src/lib/data.ts)
- * - 3 comptes de démo (mêmes identifiants que l'ancien accounts.ts), mots de passe
- *   hashés en bcrypt.
- * - Quelques inscriptions/progressions pour l'étudiant de démo.
+ * Seed — reconstruit une base réaliste et cohérente pour la démo.
+ *  - Catégories (data.ts) + 8 formations réelles (src/lib/content/*)
+ *  - 3 comptes de démo (étudiant / formateur / admin), mots de passe bcrypt
+ *  - Badges déclaratifs (condition en JSON)
+ *  - Avis fictifs multilingues par cours (assumés pour la démo)
+ *  - Apprenants « fantômes » pour peupler le classement
+ *  - État de gamification riche pour l'étudiant de démo (XP, série, badges),
+ *    adossé à de vraies inscriptions + leçons terminées + tentatives de quiz.
  *
- * Idempotent : utilise upsert sur les clés stables (slug/email/key).
+ * Idempotent : upsert sur les clés stables, et purge ciblée de ce qui est
+ * régénéré (parties/leçons, avis, activité de l'étudiant de démo).
  */
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import bcrypt from "bcryptjs";
-import { categories, courses, studentUser } from "../src/lib/data";
+import { categories } from "../src/lib/data";
+import { contentCourses } from "../src/lib/content";
+import {
+  badges,
+  ghostLearners,
+  namePool,
+  snippetPool,
+  initialsOf,
+  hashString,
+  makePrng,
+} from "./seed-data";
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL ?? "file:./dev.db",
 });
 const prisma = new PrismaClient({ adapter });
 
+// Barème XP — doit rester aligné sur src/lib/gamification.ts
+const XP = { lesson_complete: 20, quiz_passed: 30, course_completed: 120 } as const;
+function xpToReachLevel(level: number) {
+  return 50 * (level - 1) * level;
+}
+function levelForXp(xp: number) {
+  let level = 1;
+  while (xpToReachLevel(level + 1) <= xp) level++;
+  return level;
+}
+
 function j(value: unknown): string | null {
   return value == null ? null : JSON.stringify(value);
 }
+
+const DAY = 86_400_000;
 
 async function main() {
   console.log("Seeding…");
@@ -34,7 +61,7 @@ async function main() {
   }
   console.log(`  ${categories.length} catégories`);
 
-  // --- Comptes de démo (mots de passe hashés) ---
+  // --- Comptes de démo ---
   const demoPassword = await bcrypt.hash("omni1234", 10);
   const demoAccounts = [
     { email: "etudiant@omnilearn.tech", name: "Laura Durand", role: "USER" },
@@ -53,9 +80,12 @@ async function main() {
   const instructor = await prisma.user.findUnique({
     where: { email: "formateur@omnilearn.tech" },
   });
+  const student = await prisma.user.findUnique({
+    where: { email: "etudiant@omnilearn.tech" },
+  });
 
   // --- Formations + parties + leçons ---
-  for (const course of courses) {
+  for (const course of contentCourses) {
     const created = await prisma.course.upsert({
       where: { slug: course.slug },
       update: {
@@ -107,7 +137,6 @@ async function main() {
       },
     });
 
-    // Reconstruit parties/leçons (delete-then-create pour rester idempotent)
     await prisma.coursePart.deleteMany({ where: { courseId: created.id } });
     for (const [pi, part] of course.parts.entries()) {
       const createdPart = await prisma.coursePart.create({
@@ -124,35 +153,293 @@ async function main() {
             body: lesson.body ?? null,
             videoLabel: lesson.videoLabel ?? null,
             questions: j(lesson.questions),
+            xp: lesson.type === "quiz" ? XP.quiz_passed : XP.lesson_complete,
             order: li,
           },
         });
       }
     }
   }
-  console.log(`  ${courses.length} formations`);
 
-  // --- Inscriptions + progression de l'étudiant de démo ---
-  const student = await prisma.user.findUnique({
-    where: { email: "etudiant@omnilearn.tech" },
+  // Purge des cours obsolètes (anciens seeds) qui ne font plus partie du
+  // catalogue réel — cascade sur parties/leçons/avis/inscriptions.
+  const keepSlugs = contentCourses.map((c) => c.slug);
+  const removed = await prisma.course.deleteMany({
+    where: { slug: { notIn: keepSlugs } },
   });
-  if (student) {
-    for (const e of studentUser.enrolled) {
-      const course = await prisma.course.findUnique({ where: { slug: e.slug } });
-      if (!course) continue;
-      await prisma.enrollment.upsert({
-        where: { userId_courseId: { userId: student.id, courseId: course.id } },
-        update: { progress: e.progress, lastLesson: e.lastLesson, lastAccessedAt: new Date() },
-        create: {
-          userId: student.id,
-          courseId: course.id,
-          progress: e.progress,
-          lastLesson: e.lastLesson,
-          lastAccessedAt: new Date(),
+  if (removed.count > 0) console.log(`  ${removed.count} cours obsolètes retirés`);
+  console.log(`  ${contentCourses.length} formations`);
+
+  // --- Badges ---
+  for (const b of badges) {
+    await prisma.badge.upsert({
+      where: { slug: b.slug },
+      update: {
+        label: b.label,
+        description: b.description,
+        icon: b.icon,
+        tier: b.tier,
+        condition: JSON.stringify(b.condition),
+      },
+      create: {
+        slug: b.slug,
+        label: b.label,
+        description: b.description,
+        icon: b.icon,
+        tier: b.tier,
+        condition: JSON.stringify(b.condition),
+      },
+    });
+  }
+  console.log(`  ${badges.length} badges`);
+
+  // --- Avis fictifs par cours (déterministes) ---
+  const localeWeights: [string, number][] = [
+    ["fr", 0.55],
+    ["en", 0.3],
+    ["ar", 0.15],
+  ];
+  function pickLocale(r: number): string {
+    let acc = 0;
+    for (const [loc, w] of localeWeights) {
+      acc += w;
+      if (r < acc) return loc;
+    }
+    return "fr";
+  }
+
+  const nowMs = Date.now();
+  let reviewTotal = 0;
+  const dbCourses = await prisma.course.findMany({ select: { id: true, slug: true } });
+  for (const c of dbCourses) {
+    await prisma.review.deleteMany({ where: { courseId: c.id } });
+    const rand = makePrng(hashString(c.slug));
+    const count = 9 + Math.floor(rand() * 11); // 9..19 avis
+    const cursor: Record<string, number> = { fr: 0, en: 0, ar: 0 };
+    let featuredLeft = 2;
+
+    for (let i = 0; i < count; i++) {
+      const locale = pickLocale(rand());
+      const snippets = snippetPool(locale);
+      const names = namePool(locale);
+      const s = snippets[(cursor[locale] + Math.floor(rand() * snippets.length)) % snippets.length];
+      cursor[locale]++;
+      const name = names[Math.floor(rand() * names.length)];
+      const featured = featuredLeft > 0 && s.rating === 5;
+      if (featured) featuredLeft--;
+      const daysAgo = 3 + Math.floor(rand() * 150);
+
+      await prisma.review.create({
+        data: {
+          courseId: c.id,
+          authorName: name,
+          authorInitials: initialsOf(name),
+          rating: s.rating,
+          title: s.title,
+          body: s.body,
+          locale,
+          featured,
+          createdAt: new Date(nowMs - daysAgo * DAY),
         },
       });
+      reviewTotal++;
     }
-    console.log(`  ${studentUser.enrolled.length} inscriptions de démo`);
+  }
+  console.log(`  ${reviewTotal} avis fictifs`);
+
+  // --- Apprenants fantômes (classement) ---
+  for (const [i, g] of ghostLearners.entries()) {
+    const email = `apprenant-${i + 1}@learners.omnilearn.tech`;
+    const u = await prisma.user.upsert({
+      where: { email },
+      update: { name: g.name, role: "USER" },
+      create: { email, name: g.name, role: "USER" },
+    });
+    await prisma.userStats.upsert({
+      where: { userId: u.id },
+      update: { xp: g.xp, level: levelForXp(g.xp) },
+      create: {
+        userId: u.id,
+        xp: g.xp,
+        level: levelForXp(g.xp),
+        currentStreak: 1 + (g.xp % 9),
+        longestStreak: 3 + (g.xp % 21),
+        lastActiveDate: new Date(nowMs - (g.xp % 5) * DAY),
+      },
+    });
+  }
+  console.log(`  ${ghostLearners.length} apprenants fantômes`);
+
+  // --- État riche de l'étudiant de démo ---
+  if (student) {
+    // Purge de l'activité régénérée pour rester idempotent.
+    const prevEnrollments = await prisma.enrollment.findMany({
+      where: { userId: student.id },
+      select: { id: true },
+    });
+    const prevIds = prevEnrollments.map((e) => e.id);
+    await prisma.lessonProgress.deleteMany({
+      where: { enrollmentId: { in: prevIds } },
+    });
+    await prisma.quizAttempt.deleteMany({ where: { userId: student.id } });
+    await prisma.xpEvent.deleteMany({ where: { userId: student.id } });
+    await prisma.userBadge.deleteMany({ where: { userId: student.id } });
+    await prisma.enrollment.deleteMany({ where: { userId: student.id } });
+
+    // Trois cours : un bouclé, un bien avancé, un entamé.
+    const plan: { slug: string; ratio: number }[] = [
+      { slug: "commencer-le-html", ratio: 1 },
+      { slug: "javascript-cours-expert", ratio: 0.45 },
+      { slug: "figma-avance", ratio: 0.2 },
+    ];
+
+    for (const p of plan) {
+      const course = await prisma.course.findUnique({
+        where: { slug: p.slug },
+        include: {
+          parts: {
+            orderBy: { order: "asc" },
+            include: { lessons: { orderBy: { order: "asc" } } },
+          },
+        },
+      });
+      if (!course) continue;
+
+      const lessons = course.parts.flatMap((pt) => pt.lessons);
+      const toComplete = Math.max(1, Math.round(lessons.length * p.ratio));
+      const done = lessons.slice(0, toComplete);
+      const lastDone = done[done.length - 1];
+
+      const progress = Math.round((done.length / lessons.length) * 100);
+      const completed = progress >= 100;
+
+      const enrollment = await prisma.enrollment.create({
+        data: {
+          userId: student.id,
+          courseId: course.id,
+          progress,
+          lastLesson: lastDone?.title ?? null,
+          lastAccessedAt: new Date(nowMs - DAY),
+          completedAt: completed ? new Date(nowMs - DAY) : null,
+        },
+      });
+
+      for (const [idx, lesson] of done.entries()) {
+        // Étale les complétions sur les jours passés (crédibilité de la série).
+        const when = new Date(nowMs - (done.length - idx) * (DAY / 2));
+        await prisma.lessonProgress.create({
+          data: {
+            enrollmentId: enrollment.id,
+            lessonId: lesson.id,
+            isCompleted: true,
+            completedAt: when,
+          },
+        });
+        if (lesson.type === "quiz") {
+          await prisma.quizAttempt.create({
+            data: {
+              userId: student.id,
+              lessonId: lesson.id,
+              answers: "[]",
+              score: 4,
+              maxScore: 4,
+              isPassed: true,
+            },
+          });
+          await prisma.xpEvent.create({
+            data: {
+              userId: student.id,
+              amount: XP.quiz_passed,
+              reason: "quiz_passed",
+              refId: lesson.id,
+              createdAt: when,
+            },
+          });
+        } else {
+          await prisma.xpEvent.create({
+            data: {
+              userId: student.id,
+              amount: XP.lesson_complete,
+              reason: "lesson_complete",
+              refId: lesson.id,
+              createdAt: when,
+            },
+          });
+        }
+      }
+
+      if (completed) {
+        await prisma.xpEvent.create({
+          data: {
+            userId: student.id,
+            amount: XP.course_completed,
+            reason: "course_completed",
+            refId: course.id,
+            createdAt: new Date(nowMs - DAY),
+          },
+        });
+      }
+    }
+
+    // Stats dérivées + série crédible.
+    const agg = await prisma.xpEvent.aggregate({
+      where: { userId: student.id },
+      _sum: { amount: true },
+    });
+    const xp = agg._sum.amount ?? 0;
+    await prisma.userStats.upsert({
+      where: { userId: student.id },
+      update: {
+        xp,
+        level: levelForXp(xp),
+        currentStreak: 4,
+        longestStreak: 9,
+        lastActiveDate: new Date(),
+      },
+      create: {
+        userId: student.id,
+        xp,
+        level: levelForXp(xp),
+        currentStreak: 4,
+        longestStreak: 9,
+        lastActiveDate: new Date(),
+      },
+    });
+
+    // Attribution des badges gagnés d'après les compteurs réels.
+    const [byReason, coursesCompleted] = await Promise.all([
+      prisma.xpEvent.groupBy({
+        by: ["reason"],
+        where: { userId: student.id },
+        _count: { _all: true },
+      }),
+      prisma.enrollment.count({
+        where: { userId: student.id, completedAt: { not: null } },
+      }),
+    ]);
+    const cnt = (r: string) =>
+      byReason.find((b) => b.reason === r)?._count._all ?? 0;
+    const counters: Record<string, number> = {
+      xp,
+      streak: 9,
+      courses_completed: coursesCompleted,
+      quizzes_passed: cnt("quiz_passed"),
+      lessons_completed: cnt("lesson_complete"),
+    };
+    const allBadges = await prisma.badge.findMany();
+    let earned = 0;
+    for (const b of allBadges) {
+      const cond = JSON.parse(b.condition) as { type: string; threshold: number };
+      if ((counters[cond.type] ?? 0) >= cond.threshold) {
+        await prisma.userBadge.create({
+          data: { userId: student.id, badgeId: b.id },
+        });
+        earned++;
+      }
+    }
+    console.log(
+      `  étudiant de démo : ${plan.length} cours, ${xp} XP, ${earned} badges`,
+    );
   }
 
   console.log("Seed terminé.");

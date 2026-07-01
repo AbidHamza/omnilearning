@@ -2,19 +2,12 @@ import Link from "next/link";
 import { isLocale, defaultLocale } from "@/i18n/config";
 import { getCourses } from "@/lib/courses";
 import { requireRole } from "@/lib/dal";
+import { auth } from "@/lib/auth";
+import { getGamification } from "@/lib/gamification";
 import CourseCard from "@/components/course-card";
+import GamificationPanel from "@/components/gamification-panel";
 import ProgressChart from "@/components/progress-chart";
-import { BoltIcon, ClockIcon, LayersIcon, PencilIcon } from "@/components/icons";
-
-const strike = [
-  { day: "Lun.", on: false },
-  { day: "Mar.", on: true },
-  { day: "Mer.", on: true },
-  { day: "Jeu.", on: true },
-  { day: "Ven.", on: false },
-  { day: "Sam.", on: true },
-  { day: "Dim.", on: false },
-];
+import { BoltIcon, ClockIcon, LayersIcon } from "@/components/icons";
 
 export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
@@ -26,6 +19,9 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
     "formateur",
     "admin",
   ]);
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
+  const gamification = userId ? await getGamification(userId) : null;
   const allCourses = await getCourses();
   const bySlug = new Map(allCourses.map((c) => [c.slug, c]));
 
@@ -103,35 +99,19 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
           </div>
         </section>
 
-        <section className="rounded-[var(--radius-card)] bg-surface p-6">
-          <h2 className="text-sm text-muted">Objectif hebdomadaire</h2>
-          <p className="mt-2 font-display font-bold">1 jour de strike</p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {strike.map((s) => (
-              <div
-                key={s.day}
-                className={`flex h-14 w-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] ${
-                  s.on
-                    ? "bg-brand-soft text-primary-dark ring-1 ring-brand"
-                    : "bg-bg text-muted-soft"
-                }`}
-              >
-                <BoltIcon
-                  width={16}
-                  height={16}
-                  className={s.on ? "text-primary" : "text-muted-soft"}
-                />
-                {s.day}
-              </div>
-            ))}
-          </div>
-          <div className="mt-5 flex justify-end">
-            <button className="inline-flex items-center gap-1.5 rounded-full border border-line bg-bg px-4 py-1.5 text-sm font-semibold transition hover:border-primary">
-              <PencilIcon width={14} height={14} />
-              Modifier
-            </button>
-          </div>
-        </section>
+        {gamification ? (
+          <GamificationPanel
+            data={gamification}
+            leaderboardHref={`/${locale}/classement`}
+          />
+        ) : (
+          <section className="rounded-[var(--radius-card)] bg-surface p-6">
+            <h2 className="text-sm text-muted">Votre progression</h2>
+            <p className="mt-2 text-sm text-muted">
+              Connectez-vous pour suivre votre XP, votre série et vos badges.
+            </p>
+          </section>
+        )}
       </div>
 
       {/* Progression */}
