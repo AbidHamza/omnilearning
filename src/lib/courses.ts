@@ -96,6 +96,75 @@ export const getCategories = cache(async (): Promise<Category[]> => {
   return rows.map((c) => ({ id: c.slug, label: c.label, icon: c.icon }));
 });
 
+export interface CourseReview {
+  id: string;
+  authorName: string;
+  authorInitials: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  createdAt: Date;
+}
+
+export interface ReviewSummary {
+  count: number;
+  average: number; // arrondi au dixième
+  distribution: Record<number, number>; // note (1..5) -> nombre d'avis
+  reviews: CourseReview[]; // sélection à afficher
+}
+
+/**
+ * Avis d'un cours : l'agrégat (moyenne, répartition) est calculé sur TOUS les
+ * avis ; la liste affichée privilégie la langue courante et retombe sur le pool
+ * complet s'il y a trop peu d'avis traduits.
+ */
+export const getReviews = cache(
+  async (slug: string, locale: string): Promise<ReviewSummary> => {
+    const empty: ReviewSummary = {
+      count: 0,
+      average: 0,
+      distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      reviews: [],
+    };
+    const course = await prisma.course.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    if (!course) return empty;
+
+    const all = await prisma.review.findMany({
+      where: { courseId: course.id },
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    });
+    if (all.length === 0) return empty;
+
+    const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let sum = 0;
+    for (const r of all) {
+      distribution[r.rating] = (distribution[r.rating] ?? 0) + 1;
+      sum += r.rating;
+    }
+
+    const localized = all.filter((r) => r.locale === locale);
+    const display = (localized.length >= 3 ? localized : all).slice(0, 8);
+
+    return {
+      count: all.length,
+      average: Math.round((sum / all.length) * 10) / 10,
+      distribution,
+      reviews: display.map((r) => ({
+        id: r.id,
+        authorName: r.authorName,
+        authorInitials: r.authorInitials,
+        rating: r.rating,
+        title: r.title,
+        body: r.body,
+        createdAt: r.createdAt,
+      })),
+    };
+  },
+);
+
 /** Liste plate des leçons d'un cours, avec le titre de la partie (compat data.ts). */
 export function allLessons(course: Course) {
   return course.parts.flatMap((p) =>
@@ -105,9 +174,9 @@ export function allLessons(course: Course) {
 
 export const popularSlugs = [
   "commencer-le-html",
-  "figma-avance",
   "javascript-cours-expert",
-  "debuter-en-cpp",
+  "figma-avance",
+  "prompt-engineering-ia",
   "cybersecurite",
   "devenir-product-owner",
 ];

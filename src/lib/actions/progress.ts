@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { awardXp } from "@/lib/gamification";
 
 // Persiste la progression (inscriptions, leçons terminées, tentatives de quiz)
 // liée à l'utilisateur connecté. No-op silencieux si non connecté (mode démo).
@@ -81,7 +82,18 @@ export async function markLessonCompleteAction(courseSlug: string, lessonKey: st
   });
 
   const progress = await recomputeProgress(enrollment.id, course.id);
-  return { ok: true as const, progress };
+
+  // Gamification : XP pour la leçon (les quiz sont crédités par leur propre
+  // action, on évite le double). Bonus si le cours vient d'être bouclé.
+  let reward = null;
+  if (lesson.type !== "quiz") {
+    reward = await awardXp(userId, "lesson_complete", lesson.id);
+  }
+  if (progress >= 100) {
+    await awardXp(userId, "course_completed", course.id);
+  }
+
+  return { ok: true as const, progress, reward };
 }
 
 /** Enregistre une tentative de quiz et marque la leçon terminée si réussie. */
@@ -115,8 +127,10 @@ export async function recordQuizAttemptAction(input: {
     },
   });
 
+  let reward = null;
   if (isPassed) {
     await markLessonCompleteAction(input.courseSlug, input.lessonKey);
+    reward = await awardXp(userId, "quiz_passed", lesson.id);
   }
-  return { ok: true as const, isPassed };
+  return { ok: true as const, isPassed, reward };
 }

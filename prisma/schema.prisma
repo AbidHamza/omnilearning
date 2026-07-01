@@ -35,6 +35,10 @@ model User {
   drafts        CourseDraft[]
   quizAttempts  QuizAttempt[]
   subscriptions Subscription[]
+  xpEvents      XpEvent[]
+  stats         UserStats?
+  userBadges    UserBadge[]
+  reviews       Review[]
 
   // ID client Stripe (pour le portail + abonnements)
   stripeCustomerId String? @unique
@@ -117,6 +121,8 @@ model Course {
   objectives       String?
   skills           String?
   contentTypes     String?
+  // Traductions (en, ar) sérialisées en JSON-string : { en: {title,tagline,...}, ar: {...} }
+  i18n             String?
   status           String  @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED
   // Liens optionnels vers les entités relationnelles
   instructorId     String?
@@ -128,6 +134,7 @@ model Course {
   categoryRel  Category?     @relation(fields: [categoryId], references: [id])
   parts        CoursePart[]
   enrollments  Enrollment[]
+  reviews      Review[]
 
   @@index([slug])
   @@index([status])
@@ -158,6 +165,10 @@ model Lesson {
   videoLabel  String?
   // questions de quiz sérialisées en JSON-string
   questions   String?
+  // Traductions (en, ar) : { en: {title, body, videoLabel, questions:[...]}, ar: {...} }
+  i18n        String?
+  // XP attribuée à la complétion de cette leçon (défaut appliqué côté logique si 0)
+  xp          Int     @default(0)
   order       Int     @default(0)
   createdAt   DateTime @default(now())
 
@@ -265,4 +276,90 @@ model Subscription {
 
   @@index([userId])
   @@index([status])
+}
+
+// ----- Gamification (couche sobre, façon Brilliant : sert l'apprentissage) -----
+
+// Journal append-only : le total d'XP se dérive par somme (jamais de compteur muté à la main).
+model XpEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  // lesson_complete | quiz_passed | course_completed | streak_bonus | badge_earned
+  reason    String
+  // référence libre (lessonId, courseId…) pour tracer / éviter les doublons
+  refId     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, reason, refId])
+}
+
+// Cache dérivé (recalculé après chaque gain) : niveau, série, dernier jour actif.
+model UserStats {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  xp             Int       @default(0)
+  level          Int       @default(1)
+  currentStreak  Int       @default(0)
+  longestStreak  Int       @default(0)
+  lastActiveDate DateTime?
+  updatedAt      DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([xp])
+}
+
+model Badge {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  label       String
+  description String
+  icon        String  // clé d'icône UI (ex: "flame", "trophy")
+  // condition déclarative : { type: "xp"|"streak"|"courses_completed"|"quizzes_passed", threshold: n }
+  condition   String
+  tier        String  @default("bronze") // bronze | argent | or
+  i18n        String?
+
+  userBadges UserBadge[]
+
+  @@index([slug])
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+}
+
+// ----- Avis apprenants (multilingues) -----
+
+model Review {
+  id         String   @id @default(cuid())
+  courseId   String
+  userId     String?  // null pour les avis d'amorçage (apprenants fictifs vérifiés à la main)
+  authorName String
+  authorInitials String
+  rating     Int      // 1..5
+  title      String?
+  body       String
+  locale     String   @default("fr") // fr | en | ar
+  featured   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([courseId])
+  @@index([courseId, locale])
 }

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { courses as seedCourses } from "@/lib/data";
-import { allLessons, getCourse } from "@/lib/courses";
+import { contentCourses as seedCourses } from "@/lib/content";
+import { allLessons, getCourse, getReviews } from "@/lib/courses";
+import CourseReviews from "@/components/course-reviews";
 import { PlayIcon, UserIcon } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale, localePath } from "@/i18n/config";
@@ -23,6 +24,9 @@ export default async function CoursePage(
 
   const lessons = allLessons(course);
   const firstLesson = lessons[0];
+  const reviews = await getReviews(course.slug, lang);
+  const reviewsTitle =
+    lang === "en" ? "Reviews" : lang === "ar" ? "التقييمات" : "Avis des apprenants";
 
   const c = t.course;
   const meta = [
@@ -173,6 +177,9 @@ export default async function CoursePage(
           </div>
         </div>
       </section>
+
+      {/* Avis */}
+      <CourseReviews summary={reviews} title={reviewsTitle} />
 
       {/* CTA */}
       {firstLesson && (

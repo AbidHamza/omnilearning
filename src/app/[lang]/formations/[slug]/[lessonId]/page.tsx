@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { courses as seedCourses } from "@/lib/data";
+import { contentCourses as seedCourses } from "@/lib/content";
 import { allLessons, getCourse } from "@/lib/courses";
 import Quiz from "@/components/quiz";
+import Markdown from "@/components/markdown";
 import LessonTypeIcon from "@/components/lesson-type-icon";
 import LessonTracker from "@/components/lesson-tracker";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, PlayIcon } from "@/components/icons";
@@ -69,15 +70,13 @@ export default async function LessonPage(
                 </span>
               </div>
               {lesson.body && (
-                <p className="leading-relaxed text-muted">{lesson.body}</p>
+                <Markdown source={lesson.body} className="max-w-2xl text-ink/90" />
               )}
             </div>
           )}
 
-          {lesson.type === "text" && (
-            <article className="max-w-2xl leading-relaxed text-ink/90">
-              <p>{lesson.body}</p>
-            </article>
+          {lesson.type === "text" && lesson.body && (
+            <Markdown source={lesson.body} className="max-w-2xl text-ink/90" />
           )}
 
           {lesson.type === "quiz" && lesson.questions && (
