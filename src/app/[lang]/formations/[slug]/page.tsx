@@ -83,7 +83,13 @@ export default async function CoursePage(
           "@type": "CourseInstance",
           courseMode: "Online",
           courseWorkload: `PT${course.hours}H`,
-          instructor: { "@type": "Person", name: course.instructor },
+          // `instructor` n'est émis que si une personne réelle signe le cours.
+          // Les cours produits par la LLC n'en portent pas : `provider` dit
+          // déjà qui les publie, et déclarer une Person inexistante à Google
+          // est une affirmation fausse pour un champ facultatif.
+          ...(course.instructor
+            ? { instructor: { "@type": "Person", name: course.instructor } }
+            : {}),
         },
         ...(reviews.count > 0
           ? {
@@ -254,23 +260,25 @@ export default async function CoursePage(
         </section>
       )}
 
-      {/* Formateur */}
-      <section className="mt-12">
-        <h2 className="text-xl font-bold">{c.instructorTitle}</h2>
-        <div className="mt-5 flex gap-4">
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-brand-soft text-primary-dark">
-            <UserIcon width={26} height={26} />
-          </span>
-          <div>
-            <div className="font-display font-bold">{course.instructor}</div>
-            {course.instructorBio && (
-              <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted">
-                {course.instructorBio}
-              </p>
-            )}
+      {/* Formateur : affiché seulement quand une personne signe le cours. */}
+      {course.instructor && (
+        <section className="mt-12">
+          <h2 className="text-xl font-bold">{c.instructorTitle}</h2>
+          <div className="mt-5 flex gap-4">
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-brand-soft text-primary-dark">
+              <UserIcon width={26} height={26} />
+            </span>
+            <div>
+              <div className="font-display font-bold">{course.instructor}</div>
+              {course.instructorBio && (
+                <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted">
+                  {course.instructorBio}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Avis */}
       <CourseReviews
