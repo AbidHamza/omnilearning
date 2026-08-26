@@ -14,7 +14,7 @@ type Theme = "light" | "dark";
  * un petit script inline (cf. note dans layout) uniquement si l'utilisateur a
  * choisi clair. Ce composant lit cet état réel comme un store externe (le DOM)
  * via useSyncExternalStore : pas de setState dans un effet, pas de flash, le
- * serveur ne décide pas du thème — c'est le DOM déjà peint qui fait foi.
+ * serveur ne décide pas du thème : c'est le DOM déjà peint qui fait foi.
  */
 
 // Notifie React quand la classe `dark` de <html> change (depuis ce composant

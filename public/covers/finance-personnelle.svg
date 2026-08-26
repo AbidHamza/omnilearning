@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="Finance personnelle : budget, épargne et investir sans se faire avoir">
+  <defs>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0 H0 V64" fill="none" stroke="#0f766e" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="4" height="6" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" opacity="0.02"/>
+    </pattern>
+    <radialGradient id="glow" cx="78%" cy="28%" r="60%">
+      <stop offset="0%" stop-color="#0f766e" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#0f766e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="800" fill="#0b0f0d"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+
+  
+    <g transform="translate(930 110)">
+      <g fill="#0f766e">
+        <rect x="0" y="170" width="44" height="90" opacity="0.35"/>
+        <rect x="64" y="130" width="44" height="130" opacity="0.5"/>
+        <rect x="128" y="80" width="44" height="180" opacity="0.7"/>
+        <rect x="192" y="30" width="44" height="230" opacity="0.9"/>
+      </g>
+      <path d="M10 150 L86 105 L150 55 L214 5" stroke="#0f766e" fill="none" stroke-width="3" opacity="0.55"/>
+      <circle cx="214" cy="5" r="7" fill="#0f766e"/>
+    </g>
+
+  <!-- prompt -->
+  <text x="84" y="128" font-size="30" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#0f766e">$ <tspan fill="#9fb4a8">finance-personnelle</tspan><tspan fill="#0f766e"> ▍</tspan></text>
+
+  <!-- titre -->
+  <text x="84" y="450" font-size="50" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">Finance personnelle : budget,</text>
+  <text x="84" y="514" font-size="50" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">épargne et investir sans se faire</text>
+  <text x="84" y="578" font-size="50" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">avoir</text>
+  <rect x="84" y="604" width="120" height="6" fill="#0f766e"/>
+
+  <!-- pied -->
+  <text x="84" y="736" font-size="22" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#5c6f64">omnilearn<tspan fill="#0f766e">.</tspan>formations</text>
+
+  <rect width="1280" height="800" fill="url(#scan)"/>
+  <rect x="1.5" y="1.5" width="1277" height="797" fill="none" stroke="#0f766e" stroke-opacity="0.28" stroke-width="3"/>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="Automatiser son business avec l'IA et n8n">
+  <defs>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0 H0 V64" fill="none" stroke="#ea4b71" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="4" height="6" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" opacity="0.02"/>
+    </pattern>
+    <radialGradient id="glow" cx="78%" cy="28%" r="60%">
+      <stop offset="0%" stop-color="#ea4b71" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#ea4b71" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="800" fill="#0b0f0d"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+
+  
+    <g transform="translate(900 120)" stroke="#ea4b71" fill="none" stroke-width="3">
+      <rect x="0" y="70" width="76" height="56" rx="8" opacity="0.8"/>
+      <rect x="130" y="0" width="76" height="56" rx="8" opacity="0.55"/>
+      <rect x="130" y="140" width="76" height="56" rx="8" opacity="0.55"/>
+      <rect x="260" y="70" width="76" height="56" rx="8" opacity="0.9"/>
+      <path d="M76 92 C110 80 110 30 130 28" opacity="0.5"/>
+      <path d="M76 104 C110 116 110 166 130 168" opacity="0.5"/>
+      <path d="M206 28 C240 30 240 80 260 92" opacity="0.5"/>
+      <path d="M206 168 C240 166 240 116 260 104" opacity="0.5"/>
+      <circle cx="298" cy="98" r="7" fill="#ea4b71" stroke="none"/>
+    </g>
+
+  <!-- prompt -->
+  <text x="84" y="128" font-size="30" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#ea4b71">$ <tspan fill="#9fb4a8">automatiser-avec-ia</tspan><tspan fill="#ea4b71"> ▍</tspan></text>
+
+  <!-- titre -->
+  <text x="84" y="479" font-size="60" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">Automatiser son business avec</text>
+  <text x="84" y="556" font-size="60" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">l'IA et n8n</text>
+  <rect x="84" y="582" width="120" height="6" fill="#ea4b71"/>
+
+  <!-- pied -->
+  <text x="84" y="736" font-size="22" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#5c6f64">omnilearn<tspan fill="#ea4b71">.</tspan>formations</text>
+
+  <rect width="1280" height="800" fill="url(#scan)"/>
+  <rect x="1.5" y="1.5" width="1277" height="797" fill="none" stroke="#ea4b71" stroke-opacity="0.28" stroke-width="3"/>
+</svg>

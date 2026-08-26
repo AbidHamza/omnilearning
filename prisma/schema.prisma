@@ -1,5 +1,5 @@
-// Schéma Prisma — OmniLearning (Option C, fondation backend)
-// Adapté de l'ancienne codebase (Next.js 14) — voir prisma/schema.sqlite.prisma d'origine.
+// Schéma Prisma OmniLearning (Option C, fondation backend)
+// Adapté de l'ancienne codebase (Next.js 14), voir prisma/schema.sqlite.prisma d'origine.
 // Provider SQLite en dev (zéro setup), Postgres en prod via DATABASE_URL.
 // SQLite ne supporte ni enums, ni Json natif, ni String[] : on stocke en String/JSON-string.
 
@@ -163,12 +163,26 @@ model Lesson {
   duration    String
   body        String?
   videoLabel  String?
+  // --- Vidéo (leçons type="video") ---
+  // Source jouable : MP4 progressif ou manifeste HLS. Vide = la leçon affiche
+  // son texte et une pastille "vidéo en préparation" au lieu d'un lecteur mort.
+  videoUrl    String?
+  // Image d'attente (16:9). Sans elle, le navigateur montre un carré noir.
+  videoPoster String?
+  // Durée réelle en secondes. `duration` reste l'étiquette lisible ("12 min") ;
+  // celle-ci sert au lecteur et aux données structurées VideoObject.
+  videoDurationSec Int?
+  // Sous-titres : JSON { "fr": "/videos/x.fr.vtt", "en": "...", "ar": "..." }.
+  // La plateforme est trilingue : une vidéo sans sous-titres n'est pas publiable.
+  captions    String?
   // questions de quiz sérialisées en JSON-string
   questions   String?
   // Traductions (en, ar) : { en: {title, body, videoLabel, questions:[...]}, ar: {...} }
   i18n        String?
   // XP attribuée à la complétion de cette leçon (défaut appliqué côté logique si 0)
   xp          Int     @default(0)
+  // Accès libre sans compte (les 2 premières leçons de chaque cours au seed)
+  isFree      Boolean @default(false)
   order       Int     @default(0)
   createdAt   DateTime @default(now())
 

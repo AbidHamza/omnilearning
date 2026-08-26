@@ -1,9 +1,9 @@
 /**
- * Seed — reconstruit une base réaliste et cohérente pour la démo.
+ * Seed : reconstruit une base réaliste et cohérente pour la démo.
  *  - Catégories (data.ts) + 8 formations réelles (src/lib/content/*)
  *  - 3 comptes de démo (étudiant / formateur / admin), mots de passe bcrypt
  *  - Badges déclaratifs (condition en JSON)
- *  - Avis fictifs multilingues par cours (assumés pour la démo)
+ *  - Purge des avis d'amorçage (aucun avis n'est plus fabriqué ici)
  *  - Apprenants « fantômes » pour peupler le classement
  *  - État de gamification riche pour l'étudiant de démo (XP, série, badges),
  *    adossé à de vraies inscriptions + leçons terminées + tentatives de quiz.
@@ -16,22 +16,14 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import bcrypt from "bcryptjs";
 import { categories } from "../src/lib/data";
 import { contentCourses } from "../src/lib/content";
-import {
-  badges,
-  ghostLearners,
-  namePool,
-  snippetPool,
-  initialsOf,
-  hashString,
-  makePrng,
-} from "./seed-data";
+import { badges, ghostLearners } from "./seed-data";
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL ?? "file:./dev.db",
 });
 const prisma = new PrismaClient({ adapter });
 
-// Barème XP — doit rester aligné sur src/lib/gamification.ts
+// Barème XP : doit rester aligné sur src/lib/gamification.ts
 const XP = { lesson_complete: 20, quiz_passed: 30, course_completed: 120 } as const;
 function xpToReachLevel(level: number) {
   return 50 * (level - 1) * level;
@@ -138,6 +130,9 @@ async function main() {
     });
 
     await prisma.coursePart.deleteMany({ where: { courseId: created.id } });
+    // Freemium : les 2 premières leçons du cours (ordre global, parties
+    // confondues) restent consultables sans compte.
+    let lessonRank = 0;
     for (const [pi, part] of course.parts.entries()) {
       const createdPart = await prisma.coursePart.create({
         data: { courseId: created.id, title: part.title, order: pi },
@@ -155,14 +150,16 @@ async function main() {
             questions: j(lesson.questions),
             xp: lesson.type === "quiz" ? XP.quiz_passed : XP.lesson_complete,
             order: li,
+            isFree: lessonRank < 2,
           },
         });
+        lessonRank++;
       }
     }
   }
 
   // Purge des cours obsolètes (anciens seeds) qui ne font plus partie du
-  // catalogue réel — cascade sur parties/leçons/avis/inscriptions.
+  // catalogue réel, cascade sur parties/leçons/avis/inscriptions.
   const keepSlugs = contentCourses.map((c) => c.slug);
   const removed = await prisma.course.deleteMany({
     where: { slug: { notIn: keepSlugs } },
@@ -193,59 +190,15 @@ async function main() {
   }
   console.log(`  ${badges.length} badges`);
 
-  // --- Avis fictifs par cours (déterministes) ---
-  const localeWeights: [string, number][] = [
-    ["fr", 0.55],
-    ["en", 0.3],
-    ["ar", 0.15],
-  ];
-  function pickLocale(r: number): string {
-    let acc = 0;
-    for (const [loc, w] of localeWeights) {
-      acc += w;
-      if (r < acc) return loc;
-    }
-    return "fr";
-  }
-
+  // --- Avis ---
+  // Le seed n'écrit plus d'avis. Ceux qu'il produisait n'étaient rattachés à
+  // aucun compte : ils nourrissaient la note affichée sur la fiche et
+  // l'aggregateRating du JSON-LD, soit une note fabriquée servie à Google.
+  // getReviews() ne retient désormais que les avis signés par un compte ; la
+  // purge ci-dessous efface ce qu'un ancien seed a laissé derrière lui.
   const nowMs = Date.now();
-  let reviewTotal = 0;
-  const dbCourses = await prisma.course.findMany({ select: { id: true, slug: true } });
-  for (const c of dbCourses) {
-    await prisma.review.deleteMany({ where: { courseId: c.id } });
-    const rand = makePrng(hashString(c.slug));
-    const count = 9 + Math.floor(rand() * 11); // 9..19 avis
-    const cursor: Record<string, number> = { fr: 0, en: 0, ar: 0 };
-    let featuredLeft = 2;
-
-    for (let i = 0; i < count; i++) {
-      const locale = pickLocale(rand());
-      const snippets = snippetPool(locale);
-      const names = namePool(locale);
-      const s = snippets[(cursor[locale] + Math.floor(rand() * snippets.length)) % snippets.length];
-      cursor[locale]++;
-      const name = names[Math.floor(rand() * names.length)];
-      const featured = featuredLeft > 0 && s.rating === 5;
-      if (featured) featuredLeft--;
-      const daysAgo = 3 + Math.floor(rand() * 150);
-
-      await prisma.review.create({
-        data: {
-          courseId: c.id,
-          authorName: name,
-          authorInitials: initialsOf(name),
-          rating: s.rating,
-          title: s.title,
-          body: s.body,
-          locale,
-          featured,
-          createdAt: new Date(nowMs - daysAgo * DAY),
-        },
-      });
-      reviewTotal++;
-    }
-  }
-  console.log(`  ${reviewTotal} avis fictifs`);
+  const purgedReviews = await prisma.review.deleteMany({ where: { userId: null } });
+  console.log(`  ${purgedReviews.count} avis d'amorçage purgés`);
 
   // --- Apprenants fantômes (classement) ---
   for (const [i, g] of ghostLearners.entries()) {
@@ -318,7 +271,7 @@ async function main() {
           userId: student.id,
           courseId: course.id,
           progress,
-          lastLesson: lastDone?.title ?? null,
+          lastLesson: lastDone?.key ?? null,
           lastAccessedAt: new Date(nowMs - DAY),
           completedAt: completed ? new Date(nowMs - DAY) : null,
         },

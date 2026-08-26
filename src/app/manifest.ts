@@ -3,7 +3,7 @@ import { siteName } from "@/lib/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${siteName} — Formations tech gratuites`,
+    name: `${siteName} · Formations tech gratuites`,
     short_name: siteName,
     description:
       "Des formations tech gratuites et de qualité : développement, cybersécurité, data, design et plus.",

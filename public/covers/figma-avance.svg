@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="Figma avancé : composants, variables et design system">
+  <defs>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0 H0 V64" fill="none" stroke="#7B61FF" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="4" height="6" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" opacity="0.02"/>
+    </pattern>
+    <radialGradient id="glow" cx="78%" cy="28%" r="60%">
+      <stop offset="0%" stop-color="#7B61FF" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#7B61FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="800" fill="#0b0f0d"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+
+  
+    <g transform="translate(930 110)" stroke="#7B61FF" fill="none" stroke-width="3">
+      <rect x="0" y="0" width="170" height="170" rx="6" opacity="0.45"/>
+      <rect x="55" y="55" width="170" height="170" rx="6" opacity="0.85"/>
+      <circle cx="140" cy="140" r="34" opacity="0.7"/>
+      <circle cx="0" cy="0" r="6" fill="#7B61FF" stroke="none" opacity="0.8"/>
+      <circle cx="225" cy="55" r="6" fill="#7B61FF" stroke="none" opacity="0.5"/>
+      <circle cx="55" cy="225" r="6" fill="#7B61FF" stroke="none" opacity="0.5"/>
+    </g>
+
+  <!-- prompt -->
+  <text x="84" y="128" font-size="30" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#7B61FF">$ <tspan fill="#9fb4a8">figma-avance</tspan><tspan fill="#7B61FF"> ▍</tspan></text>
+
+  <!-- titre -->
+  <text x="84" y="482" font-size="50" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">Figma avancé : composants,</text>
+  <text x="84" y="546" font-size="50" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">variables et design system</text>
+  <rect x="84" y="572" width="120" height="6" fill="#7B61FF"/>
+
+  <!-- pied -->
+  <text x="84" y="736" font-size="22" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#5c6f64">omnilearn<tspan fill="#7B61FF">.</tspan>formations</text>
+
+  <rect width="1280" height="800" fill="url(#scan)"/>
+  <rect x="1.5" y="1.5" width="1277" height="797" fill="none" stroke="#7B61FF" stroke-opacity="0.28" stroke-width="3"/>
+</svg>

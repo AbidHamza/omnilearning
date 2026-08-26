@@ -6,18 +6,17 @@ const course: Course = {
   tagline:
     "Du fichier vide au site en ligne : écris du vrai HTML, mets-le en forme avec CSS et publie-le gratuitement.",
   description:
-    "Un parcours pas à pas pour débuter le web sans rien connaître au départ. Tu comprends d'abord comment un navigateur récupère une page, puis tu écris ton propre HTML sémantique, tu le stylises avec CSS (box model, Flexbox, Grid), tu le rends responsive, et tu le mets en ligne sur Netlify ou GitHub Pages. Beaucoup d'exemples courts que tu peux copier, coller et modifier immédiatement.",
+    "Un parcours pas à pas pour débuter le web sans rien connaître au départ. Tu comprends d'abord comment un navigateur récupère une page, puis tu écris ton propre HTML sémantique, tu le stylises avec CSS (box model, Flexbox, Grid), tu le rends responsive, et tu le mets en ligne sur Netlify ou GitHub Pages. Beaucoup d'exemples courts à copier, coller et modifier, des schémas pour visualiser ce qui se passe sous le capot, et un exercice corrigé à chaque étape.",
   category: "Développement Web",
   level: "Débutant",
   instructor: "Camille Ferrand",
   instructorBio:
     "Camille Ferrand est développeuse front-end et formatrice depuis huit ans. Elle a accompagné des reconversions en bootcamp et garde une obsession : que chaque débutant ait un site en ligne dès la première semaine.",
-  hours: 6,
+  hours: 7,
   rating: 4.8,
   learners: 1840,
   accent: "#e34c26",
-  image:
-    "https://images.unsplash.com/photo-1487014679447-9f8336841d58?w=800&q=80",
+  image: "/covers/commencer-le-html.svg",
   language: "Français",
   software: "Un éditeur de code (VS Code) et un navigateur",
   prerequisites: [
@@ -50,8 +49,9 @@ const course: Course = {
     "Déploiement statique (Netlify, GitHub Pages)",
   ],
   contentTypes: [
-    "Leçons écrites",
+    "Leçons écrites illustrées de schémas",
     "Exemples de code commentés",
+    "Exercices corrigés",
     "Quiz interactifs",
     "Transcript de démonstration",
   ],
@@ -64,37 +64,57 @@ const course: Course = {
           id: "l1",
           title: "Client, serveur : qui parle à qui",
           type: "text",
-          duration: "14 min",
+          duration: "19 min",
           body:
             "## Le web tient en un aller-retour\n\n" +
             "Quand tu ouvres une page, deux ordinateurs se parlent. Le tien, avec son navigateur, s'appelle le **client**. En face, une machine allumée en permanence quelque part dans un centre de données stocke les fichiers du site : c'est le **serveur**. Le client demande, le serveur répond. Tout le web repose sur cette conversation.\n\n" +
             "Concrètement, tu tapes une adresse, le navigateur envoie une demande (\"donne-moi la page d'accueil\"), et le serveur renvoie un fichier texte. Ce texte, c'est du HTML. Le navigateur le lit et le transforme en la page que tu vois. Rien de magique : un fichier part d'un côté, s'affiche de l'autre.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Un aller-retour : le client demande un fichier, le serveur le renvoie\"}\n" +
+            "<svg viewBox=\"0 0 640 280\" role=\"img\"><title>Le client demande, le serveur répond</title><rect x=\"30\" y=\"90\" width=\"185\" height=\"104\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"122\" y=\"132\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\">Navigateur</text><text x=\"122\" y=\"156\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.6\">le client : il demande</text><rect x=\"425\" y=\"90\" width=\"185\" height=\"104\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"517\" y=\"132\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\">Serveur</text><text x=\"517\" y=\"156\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.6\">il stocke les fichiers</text><path d=\"M220 116 H406\" stroke=\"currentColor\" stroke-width=\"2\" class=\"fig-accent\"/><path d=\"M406 110 l14 6 -14 6 z\" fill=\"currentColor\" class=\"fig-accent\"/><text x=\"318\" y=\"100\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" class=\"fig-accent\">GET /index.html</text><path d=\"M420 170 H234\" stroke=\"currentColor\" stroke-width=\"2\" opacity=\"0.7\"/><path d=\"M234 164 l-14 6 14 6 z\" fill=\"currentColor\" opacity=\"0.7\"/><text x=\"318\" y=\"196\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">200 OK + le fichier HTML</text><text x=\"320\" y=\"246\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">un fichier texte voyage, rien de plus</text></svg>\n" +
+            "```\n\n" +
+            "## Un serveur, ça ressemble à quoi\n\n" +
+            "Oublie l'image du superordinateur clignotant des films. Un serveur est un ordinateur comme le tien, souvent moins puissant, sans écran ni clavier, rangé par milliers dans des armoires de centres de données. Sa seule particularité : il reste allumé et connecté 24 h sur 24, et un logiciel spécialisé (nginx et Apache sont les deux plus répandus) y écoute les demandes qui arrivent pour distribuer les fichiers correspondants.\n\n" +
+            "Tu peux en louer un pour le prix d'un café : un petit serveur virtuel chez OVH ou Hetzner coûte entre 4 et 6 € par mois. Et pour le site que tu vas construire ici, tu n'auras même pas à payer ça : des services comme Netlify ou GitHub Pages hébergent gratuitement les sites de ce type, on le fera ensemble à la dernière leçon.\n\n" +
+            "Détail qui surprend souvent : ta propre machine peut jouer les deux rôles à la fois. Quand tu développeras avec l'extension Live Server de VS Code, ton ordinateur sera à la fois le client (l'onglet du navigateur) et le serveur (l'extension qui sert tes fichiers sur l'adresse locale `127.0.0.1`). La conversation client/serveur a lieu quand même, elle ne quitte juste pas ta machine.\n\n" +
             "## Pourquoi ça compte pour toi\n\n" +
             "Beaucoup de débutants imaginent qu'un site web est un logiciel installé quelque part. Faux. Un site, dans sa forme la plus simple, c'est un dossier de fichiers texte (`.html`, `.css`) posés sur un serveur. C'est exactement ce que tu vas fabriquer dans ce cours, sur ta propre machine d'abord, puis mis en ligne à la fin.\n\n" +
             "Ce type de site s'appelle un **site statique** : les fichiers sont livrés tels quels, sans base de données ni traitement côté serveur. C'est parfait pour un portfolio, une landing page, un blog, une doc. Les sites plus complexes (une boutique, un réseau social) ajoutent des couches, mais le socle reste ce même échange client/serveur.\n\n" +
+            "D'ailleurs, tu peux vérifier tout ça sans rien installer : sur n'importe quelle page, fais Ctrl+U (ou clic droit puis « Afficher le code source de la page »). Ce que tu vois, c'est exactement le texte que le serveur a envoyé. Fais l'essai sur `example.com`, un site de démonstration volontairement minimal : une cinquantaine de lignes en tout. Puis sur la page d'accueil de YouTube : des centaines de milliers. Dans les deux cas, même principe, même langage, celui que tu commences aujourd'hui.\n\n" +
             "## Les trois langages, trois rôles\n\n" +
             "- **HTML** décrit le contenu et sa structure : un titre, un paragraphe, une image, un lien.\n" +
             "- **CSS** décrit l'apparence : couleurs, espacements, disposition, polices.\n" +
             "- **JavaScript** ajoute le comportement : réagir à un clic, charger des données.\n\n" +
             "Une bonne image mentale : le HTML est le squelette, le CSS l'habillage, le JavaScript les muscles. Ce cours se concentre sur les deux premiers, qui suffisent déjà à construire un vrai site.\n\n" +
+            "Cette séparation en trois fichiers n'est pas une lubie de puriste. La page d'accueil de Wikipédia, par exemple, c'est d'abord un document HTML d'une centaine de kilooctets ; sa mise en forme vit dans des fichiers CSS à part. Résultat : on peut refaire entièrement le design d'un site sans toucher une ligne de son contenu, et inversement. Tu en profiteras dès la partie 5, quand tu relookeras ta page de la partie 2 sans modifier son HTML.\n\n" +
+            "## À toi\n\n" +
+            "Pour chaque situation, dis qui est le client et qui est le serveur : 1) tu regardes une vidéo YouTube sur ton téléphone ; 2) une application météo affiche la température du jour ; 3) tu ouvres ton fichier `index.html` en local, en double-cliquant dessus.\n\n" +
+            "> Correction : 1) ton téléphone est le client, les machines de YouTube forment le serveur. 2) pareil : l'application est un client qui interroge un serveur météo. Pas besoin de navigateur, le modèle client/serveur dépasse largement le web. 3) piège : il n'y a aucun serveur du tout. Le navigateur lit le fichier directement sur ton disque, et c'est le sens du `file://` que tu verras dans la barre d'adresse à la leçon 3.\n\n" +
             "> À retenir : le client demande, le serveur répond, et ce qui voyage entre les deux c'est d'abord du HTML. Garde ce trajet en tête, tout le reste en découle.\n",
         },
         {
           id: "l2",
           title: "URL, HTTP et le voyage d'une page",
           type: "text",
-          duration: "15 min",
+          duration: "19 min",
           body:
             "## Décomposer une adresse\n\n" +
             "Une URL n'est pas une chaîne magique, elle a une grammaire. Prenons `https://developer.mozilla.org/fr/docs/Web` :\n\n" +
             "- `https` est le **protocole**, la langue commune client/serveur. Le `s` signifie que l'échange est chiffré.\n" +
             "- `developer.mozilla.org` est le **nom de domaine**, l'adresse lisible d'un serveur. En coulisse, un annuaire appelé DNS le traduit en une adresse numérique (une IP).\n" +
             "- `/fr/docs/Web` est le **chemin**, qui pointe vers une ressource précise sur ce serveur.\n\n" +
+            "Deux morceaux optionnels complètent la grammaire. Les **paramètres de requête**, après un `?` : dans `https://www.google.com/search?q=html`, le `q=html` transmet ta recherche au serveur, et plusieurs paramètres s'enchaînent avec des `&`. Et le **fragment**, après un `#`, qui pointe vers une section précise à l'intérieur d'une page : le navigateur fait défiler jusqu'à l'élément qui porte cet identifiant. Tu recroiseras ce `#` dans la leçon sur les liens.\n\n" +
+            "## À toi\n\n" +
+            "Décompose cette adresse sans tricher : `https://www.leboncoin.fr/recherche?category=9&text=velo`. Protocole ? Domaine ? Chemin ? Paramètres ?\n\n" +
+            "> Correction : protocole `https` (échange chiffré), domaine `www.leboncoin.fr`, chemin `/recherche`, et deux paramètres séparés par un `&` : `category=9` et `text=velo`. C'est comme ça qu'une page de résultats sait quoi afficher : tout est dans l'URL. Tu peux d'ailleurs la copier et l'envoyer à quelqu'un, il verra la même recherche.\n\n" +
+            "## Le s de https, en deux mots\n\n" +
+            "Entre `http` et `https`, la différence n'est pas cosmétique. En `http`, tout ce qui circule entre toi et le serveur passe en clair : sur un wifi public, une personne équipée peut lire au passage ce que tu envoies, mots de passe compris. En `https`, l'échange est chiffré de bout en bout grâce à un certificat installé sur le serveur. Les navigateurs signalent d'ailleurs les pages `http` par un « Non sécurisé » dans la barre d'adresse. Bonne nouvelle : les hébergeurs que tu utiliseras à la fin du cours fournissent le https automatiquement et gratuitement, tu n'auras rien à configurer.\n\n" +
             "## HTTP, la langue de l'échange\n\n" +
             "Le protocole s'appelle HTTP (HTTPS quand il est chiffré). Le navigateur envoie une **requête** et reçoit une **réponse**. La requête la plus courante est un `GET` : \"donne-moi cette ressource\". La réponse contient le fichier demandé, plus un **code de statut** qui résume ce qui s'est passé.\n\n" +
             "Ces codes, tu vas vite les rencontrer :\n\n" +
             "- `200` : tout va bien, voici la page.\n" +
             "- `301` / `302` : la ressource a déménagé, suis la redirection.\n" +
+            "- `403` : le serveur a compris la demande mais refuse l'accès.\n" +
             "- `404` : introuvable, l'adresse ne correspond à rien.\n" +
             "- `500` : le serveur a planté en préparant la réponse.\n\n" +
             "Le fameux 404 n'est donc pas un bug mystérieux, juste un serveur qui dit poliment \"je n'ai pas ça\".\n\n" +
@@ -105,20 +125,27 @@ const course: Course = {
             "4. Le serveur répond avec le HTML (statut `200`).\n" +
             "5. En lisant ce HTML, le navigateur voit qu'il a besoin d'autres fichiers : CSS, images, polices. Il envoie une requête pour chacun.\n" +
             "6. Il assemble le tout et dessine la page.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"La chronologie d'un chargement : le HTML arrive en premier, le reste suit\"}\n" +
+            "<svg viewBox=\"0 0 640 260\" role=\"img\"><title>Chronologie du chargement d'une page</title><rect x=\"15\" y=\"70\" width=\"136\" height=\"70\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"83\" y=\"98\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">1. DNS</text><text x=\"83\" y=\"122\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.6\">domaine vers IP</text><rect x=\"175\" y=\"70\" width=\"136\" height=\"70\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"243\" y=\"98\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">2. GET</text><text x=\"243\" y=\"122\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.6\">la requête part</text><rect x=\"335\" y=\"70\" width=\"136\" height=\"70\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><text x=\"403\" y=\"98\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" class=\"fig-accent\">3. HTML</text><text x=\"403\" y=\"122\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.6\">statut 200</text><rect x=\"495\" y=\"70\" width=\"136\" height=\"70\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"563\" y=\"98\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">4. CSS, images</text><text x=\"563\" y=\"122\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.6\">requêtes en plus</text><path d=\"M151 105 H171\" stroke=\"currentColor\" stroke-width=\"2\" opacity=\"0.6\"/><path d=\"M311 105 H331\" stroke=\"currentColor\" stroke-width=\"2\" opacity=\"0.6\"/><path d=\"M471 105 H491\" stroke=\"currentColor\" stroke-width=\"2\" opacity=\"0.6\"/><path d=\"M15 190 H610\" stroke=\"currentColor\" stroke-width=\"1\" opacity=\"0.4\"/><path d=\"M610 184 l14 6 -14 6 z\" fill=\"currentColor\" opacity=\"0.4\"/><text x=\"320\" y=\"216\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">le temps passe (quelques centaines de millisecondes)</text></svg>\n" +
+            "```\n\n" +
             "Tu peux observer ce ballet toi-même. Ouvre les **outils de développement** de ton navigateur (touche F12), onglet Réseau, puis recharge une page. Chaque ligne est une requête, avec son statut et son poids.\n\n" +
+            "Prends deux minutes pour le faire maintenant : c'est le réflexe de débogage le plus rentable de tout le cours. Sur la page d'accueil de Wikipédia, tu verras d'abord le document HTML, puis une cascade de requêtes pour les styles, les scripts et les images. Clique sur une ligne : tu peux lire les en-têtes envoyés et reçus, le code de statut, la taille transférée. Le jour où une image refusera de s'afficher sur ton site, c'est ici que tu trouveras la ligne en rouge avec son `404`, et le nom exact du fichier que le navigateur a cherché en vain.\n\n" +
             "> À retenir : une page n'arrive pas d'un bloc. Le HTML arrive en premier, puis le navigateur va chercher les fichiers qu'il mentionne. Un site lent, c'est souvent trop de requêtes ou des fichiers trop lourds.\n" +
             "\n" +
-            "Doc de référence pour approfondir : [MDN – Aperçu de HTTP](https://developer.mozilla.org/fr/docs/Web/HTTP/Overview).\n",
+            "Doc de référence pour approfondir : [MDN (Aperçu de HTTP](https://developer.mozilla.org/fr/docs/Web/HTTP/Overview)).\n",
         },
         {
           id: "l3",
           title: "Ton atelier : éditeur, fichier, navigateur",
           type: "text",
-          duration: "13 min",
+          duration: "18 min",
           body:
             "## Le minimum pour commencer\n\n" +
             "Bonne nouvelle : tu n'as besoin d'aucun logiciel payant, d'aucun serveur, d'aucune installation compliquée. Deux choses suffisent : un **éditeur de code** et un **navigateur**. Tu as déjà le second.\n\n" +
             "Pour l'éditeur, installe [Visual Studio Code](https://code.visualstudio.com/), gratuit et de loin le plus utilisé. Un éditeur de code n'est pas un traitement de texte : il colore ta syntaxe, signale tes erreurs et complète tes balises. Écrire du HTML dans Word finirait par ajouter des caractères invisibles qui cassent tout, alors passe par un vrai éditeur dès le départ.\n\n" +
+            "Deux réglages valent la peine dès l'installation. Ouvre les paramètres (Ctrl+,), cherche « Auto Save » et active-le : tu ne perdras plus dix minutes à te demander pourquoi ta modification ne s'affiche pas alors que tu as simplement oublié d'enregistrer. Retiens aussi le raccourci Alt+Maj+F, qui réindente proprement tout le fichier : un HTML bien indenté, où chaque balise imbriquée est décalée d'un cran, se lit dix fois mieux et te montre d'un coup d'œil une balise mal fermée.\n\n" +
+            "Un dernier tour de passe-passe de VS Code : dans un fichier `.html` vide, tape `!` puis la touche Tab. L'éditeur génère le squelette complet du document (c'est une abréviation Emmet, intégrée d'office). Pratique, mais écris-le à la main les premières fois : c'est en le tapant qu'on le retient.\n\n" +
             "## Créer ta première page\n\n" +
             "Crée un dossier `mon-site` sur ton bureau. Dedans, crée un fichier nommé exactement `index.html`. Ce nom n'est pas anodin : par convention, un serveur sert `index.html` quand on demande un dossier sans préciser de fichier. C'est la page d'accueil par défaut.\n\n" +
             "Colle ce contenu et enregistre :\n\n" +
@@ -136,16 +163,24 @@ const course: Course = {
             "</html>\n" +
             "```\n\n" +
             "Maintenant double-clique sur `index.html`. Il s'ouvre dans ton navigateur. Regarde la barre d'adresse : elle commence par `file://` et non `https://`. Tu lis un fichier local, directement depuis ton disque, sans serveur. C'est parfait pour apprendre.\n\n" +
+            "## Le piège Windows qui coûte une heure\n\n" +
+            "Si ta page s'ouvre dans le Bloc-notes au lieu du navigateur, ou si le navigateur affiche ton code brut au lieu de l'interpréter, vérifie le vrai nom du fichier. Par défaut, Windows masque les extensions : ce que l'explorateur affiche comme `index.html` peut en réalité s'appeler `index.html.txt`, parce que le Bloc-notes a ajouté son `.txt` en douce à l'enregistrement. Le correctif : dans l'explorateur de fichiers, onglet Affichage, coche « Extensions de noms de fichiers », puis renomme le fichier pour supprimer le `.txt`. Et pour ne plus jamais rencontrer le problème, crée tes fichiers directement depuis VS Code : clic droit sur le dossier dans le panneau latéral, « New File », et le nom que tu tapes est le nom réel.\n\n" +
+            "## Range ton dossier dès le départ\n\n" +
+            "Ton site va grossir, autant adopter tout de suite la structure que tu garderas jusqu'à la mise en ligne : à la racine, `index.html` ; un fichier `styles.css` à côté (il restera vide jusqu'à la partie 5, aucune importance) ; un dossier `images/` pour les photos et logos. Cette discipline paie double : les chemins relatifs des prochaines leçons resteront courts et prévisibles, et le glisser-déposer final sur l'hébergeur embarquera tout d'un bloc, sans oubli.\n\n" +
+            "Règle d'hygiène associée : minuscules, sans espace ni accent, dans tous les noms de fichiers et de dossiers. `mes photos de vacances.jpg` te vaudra des adresses illisibles et des liens cassés, `photos-vacances.jpg` jamais. On verra pourquoi en détail dans la leçon sur les liens.\n\n" +
             "## La boucle de travail\n\n" +
             "Tout le développement front-end tient dans ce cycle : modifie le fichier dans l'éditeur, enregistre, retourne au navigateur, recharge (Ctrl+R), observe. Répète. Tu vas le faire des centaines de fois. Garde ton éditeur et ton navigateur côte à côte à l'écran.\n\n" +
             "Un confort à installer plus tard : l'extension **Live Server** de VS Code, qui recharge la page automatiquement à chaque enregistrement. Pour l'instant, recharger à la main te fera très bien comprendre le lien entre ton fichier et l'affichage.\n\n" +
+            "## À toi\n\n" +
+            "Modifie ta page : change le `<title>` en « Le site de » suivi de ton prénom, puis ajoute un deuxième paragraphe sous le premier. Enregistre, recharge, et vérifie tes deux changements. L'un des deux ne se voit pas dans la page elle-même : sais-tu où le chercher ?\n\n" +
+            "> Correction : le nouveau paragraphe apparaît dans la page, mais le `<title>` ne s'affiche que dans l'onglet du navigateur (et, plus tard, dans les résultats de recherche). Si rien ne change du tout après rechargement, vérifie l'enregistrement : dans VS Code, un rond à la place de la croix sur l'onglet du fichier signale des modifications non enregistrées.\n\n" +
             "> À retenir : un site local, c'est un dossier avec un `index.html`. Éditeur d'un côté, navigateur de l'autre, et la touche de rechargement entre les deux. Tu tiens déjà tout l'outillage nécessaire pour la suite du cours.\n",
         },
         {
           id: "l4",
           title: "Quiz : le web et l'atelier",
           type: "quiz",
-          duration: "5 min",
+          duration: "6 min",
           questions: [
             {
               id: "q1",
@@ -201,6 +236,20 @@ const course: Course = {
               explanation:
                 "Un traitement de texte insère des caractères de mise en forme invisibles (guillemets typographiques, styles) qui rendent le HTML invalide. Un éditeur de code produit du texte brut, colore la syntaxe et signale les erreurs.",
             },
+            {
+              id: "q26",
+              prompt:
+                "Dans le voyage d'une page, quel est le rôle exact du DNS ?",
+              options: [
+                "Chiffrer la connexion entre le client et le serveur",
+                "Traduire un nom de domaine lisible en adresse IP de serveur",
+                "Vérifier que le HTML reçu est valide avant de l'afficher",
+                "Compresser les images pour accélérer le chargement",
+              ],
+              correctIndex: 1,
+              explanation:
+                "Le DNS est l'annuaire du web : il fait correspondre un nom comme developer.mozilla.org à l'adresse numérique de la machine qui héberge le site. Le chiffrement, lui, c'est le rôle du s de https, et aucune validation du HTML n'a lieu en route.",
+            },
           ],
         },
       ],
@@ -213,12 +262,13 @@ const course: Course = {
           id: "l5",
           title: "Squelette d'une page : doctype, head, body",
           type: "text",
-          duration: "15 min",
+          duration: "19 min",
           body:
             "## Anatomie d'une balise\n\n" +
             "Le HTML fonctionne par **balises**. Une balise ouvrante comme `<p>`, une balise fermante comme `</p>`, et entre les deux le contenu. L'ensemble forme un **élément** : `<p>Un paragraphe.</p>`. La barre oblique dans la balise fermante est ce qui la distingue de l'ouvrante.\n\n" +
             "Certaines balises n'ont pas de contenu et ne se ferment pas, comme l'image `<img>` ou le saut de ligne `<br>`. On les appelle des éléments vides.\n\n" +
             "Les balises peuvent porter des **attributs**, des informations supplémentaires écrites dans la balise ouvrante : `<html lang=\"fr\">`. Ici l'attribut `lang` vaut `fr`. Un attribut a un nom et, le plus souvent, une valeur entre guillemets.\n\n" +
+            "Dernière règle d'or de l'imbrication : les balises se ferment dans l'ordre inverse de leur ouverture. `<p><strong>texte</strong></p>` est correct ; `<p><strong>texte</p></strong>` ne l'est pas. Les balises ne se chevauchent jamais, elles s'emboîtent comme des poupées russes.\n\n" +
             "## Le document minimal, ligne par ligne\n\n" +
             "```html\n" +
             "<!DOCTYPE html>\n" +
@@ -237,19 +287,44 @@ const course: Course = {
             "- `<html lang=\"fr\">` enveloppe toute la page et déclare sa langue. Le `lang` aide les lecteurs d'écran à prononcer correctement et les moteurs de recherche à classer la page.\n" +
             "- `<head>` contient les **métadonnées** : rien de visible dans la page, mais des informations pour le navigateur.\n" +
             "- `<body>` contient tout ce qui s'affiche.\n\n" +
+            "Ce document a une forme d'arbre : chaque balise vit dans une autre, avec `<html>` à la racine. Le navigateur reconstruit cette hiérarchie en mémoire quand il lit ton fichier (les développeurs l'appellent le DOM, pour *Document Object Model*), et le CSS comme le JavaScript raisonneront toujours dessus : « le parent de », « les enfants de ». Autant t'habituer tout de suite à le visualiser.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"L'arbre du document : chaque balise vit dans une autre, html à la racine\"}\n" +
+            "<svg viewBox=\"0 0 640 310\" role=\"img\"><title>Arbre d'un document HTML</title><rect x=\"272\" y=\"18\" width=\"96\" height=\"42\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><text x=\"320\" y=\"45\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" class=\"fig-accent\">html</text><rect x=\"124\" y=\"120\" width=\"96\" height=\"42\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"172\" y=\"147\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\">head</text><rect x=\"420\" y=\"120\" width=\"96\" height=\"42\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"468\" y=\"147\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\">body</text><rect x=\"40\" y=\"230\" width=\"96\" height=\"42\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"88\" y=\"257\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">meta</text><rect x=\"188\" y=\"230\" width=\"96\" height=\"42\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"236\" y=\"257\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">title</text><rect x=\"356\" y=\"230\" width=\"96\" height=\"42\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"404\" y=\"257\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">h1</text><rect x=\"504\" y=\"230\" width=\"96\" height=\"42\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"552\" y=\"257\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">p</text><path d=\"M320 60 V88 H172 V120\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.5\"/><path d=\"M320 60 V88 H468 V120\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.5\"/><path d=\"M172 162 V196 H88 V230\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.5\"/><path d=\"M172 162 V196 H236 V230\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.5\"/><path d=\"M468 162 V196 H404 V230\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.5\"/><path d=\"M468 162 V196 H552 V230\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.5\"/><text x=\"320\" y=\"300\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">invisible à gauche (head), visible à droite (body)</text></svg>\n" +
+            "```\n\n" +
             "## Ce que cache le head\n\n" +
             "Deux lignes du `<head>` méritent qu'on s'y arrête.\n\n" +
             "`<meta charset=\"UTF-8\">` déclare l'encodage des caractères. Oublie-la et tes accents deviennent des symboles cassés du genre `Ã©` à la place de `é`. C'est le bug le plus courant chez les débutants francophones. Mets-la en toute première ligne du head.\n\n" +
             "`<meta name=\"viewport\" ...>` indique au téléphone d'utiliser la largeur réelle de l'écran plutôt que de simuler un écran de bureau et de tout rétrécir. Sans elle, ton site responsive s'affichera minuscule sur mobile. On y reviendra dans la partie responsive, mais prends l'habitude de la mettre dès maintenant.\n\n" +
             "`<title>` est le texte de l'onglet et le titre affiché dans les résultats de recherche. Ce n'est pas le titre visible dans la page, ne le confonds pas avec `<h1>`.\n\n" +
+            "Tant qu'on est dans le head, deux locataires que tu croiseras vite : la favicon, la petite icône d'onglet (`<link rel=\"icon\" href=\"favicon.ico\">`), et la description pour les moteurs de recherche, `<meta name=\"description\" content=\"...\">`, le texte gris affiché sous le titre dans les résultats Google. Ni l'une ni l'autre ne sont obligatoires, mais ce sont elles qui séparent une page brouillon d'une page finie.\n\n" +
+            "## Les commentaires\n\n" +
+            "Tu peux laisser des notes dans ton code, invisibles dans la page : `<!-- ceci est un commentaire -->`. Utile pour marquer une zone (`<!-- fin du menu -->`) ou mettre un bloc de côté sans le supprimer. Attention, un commentaire n'a rien de secret : n'importe qui peut le lire dans le code source avec Ctrl+U, n'y écris jamais rien de sensible.\n\n" +
+            "## Fais vérifier ton code par le validateur\n\n" +
+            "Le navigateur est laxiste : il affiche presque n'importe quoi, même un HTML bancal, en réparant en silence. Confortable au quotidien, piégeux pour apprendre, parce que tes erreurs passent inaperçues jusqu'au jour où l'une d'elles casse la mise en page. Le [validateur du W3C](https://validator.w3.org/) analyse ta page et liste chaque faute avec son numéro de ligne. Oublie la déclaration d'encodage et il répond noir sur blanc : « The character encoding was not declared ». Laisse un `<p>` ouvert au mauvais endroit et tu liras « Unclosed element p ». Colle ton code dans l'onglet « Validate by Direct Input » : prendre l'habitude de valider t'apprendra plus vite que n'importe quel tutoriel.\n\n" +
+            "## À toi\n\n" +
+            "Ce document contient trois erreurs. Trouve-les avant de lire la correction :\n\n" +
+            "```html\n" +
+            "<!DOCTYPE html>\n" +
+            "<html>\n" +
+            "  <head>\n" +
+            "    <title>Ma page\n" +
+            "  </head>\n" +
+            "  <body>\n" +
+            "    <h1>Bienvenue</h1>\n" +
+            "  <body>\n" +
+            "</html>\n" +
+            "```\n\n" +
+            "> Correction : 1) il manque `<meta charset=\"UTF-8\">`, les accents finiront cassés ; 2) le `<title>` n'est jamais fermé, il manque `</title>` avant la fin du head ; 3) l'avant-dernière ligne ouvre un second `<body>` au lieu de fermer le premier : c'est `</body>`, la barre oblique fait toute la différence. Bonus si tu as aussi repéré l'absence de `lang=\"fr\"` sur `<html>` : pas bloquant, mais toujours recommandé.\n\n" +
             "> À retenir : head pour les informations invisibles, body pour le contenu visible. charset UTF-8 et la balise viewport ne sont pas optionnelles, ce sont les deux lignes qui évitent les bugs les plus fréquents.\n",
         },
         {
           id: "l6",
           title: "Balises sémantiques : donner du sens à la structure",
           type: "text",
-          duration: "16 min",
+          duration: "20 min",
           body:
+            "Ouvre n'importe quel gros site, fais un clic droit, Inspecter, et compte les `<div>`. Sur certaines pages tu en trouveras plus de mille, imbriquées sur quinze niveaux. Les développeurs appellent ça la *div soup*, la soupe de div : une structure où plus rien n'a de nom, où il faut lire les classes CSS pour deviner ce qui est un menu et ce qui est un pied de page. Cette leçon t'apprend à faire l'inverse.\n\n" +
             "## Pourquoi pas juste des div partout\n\n" +
             "On pourrait construire un site entier avec un seul élément générique, la `<div>`. Beaucoup le font, et c'est une mauvaise idée. Une `<div>` ne dit rien de ce qu'elle contient. Le HTML propose des balises **sémantiques** qui nomment le rôle de chaque zone. Un `<nav>` n'a pas d'apparence différente d'une `<div>`, mais il annonce : « ici, la navigation ».\n\n" +
             "Ce sens sert trois publics : les lecteurs d'écran, qui permettent aux personnes aveugles de sauter directement au contenu principal ; les moteurs de recherche, qui comprennent mieux la page ; et surtout toi, dans six mois, qui reliras un code où chaque zone porte son nom.\n\n" +
@@ -285,17 +360,41 @@ const course: Course = {
             "- `<article>` : un contenu autonome qui aurait du sens seul, comme un billet de blog ou une fiche produit.\n" +
             "- `<aside>` : un contenu annexe, une barre latérale, un encart.\n" +
             "- `<footer>` : le pied de page, mentions, copyright, liens secondaires.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Les zones sémantiques d'une page : chaque bloc porte son nom\"}\n" +
+            "<svg viewBox=\"0 0 640 400\" role=\"img\"><title>Zones sémantiques d'une page web</title><rect x=\"40\" y=\"20\" width=\"560\" height=\"70\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"60\" y=\"48\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\">header</text><rect x=\"330\" y=\"38\" width=\"250\" height=\"34\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.6\"/><text x=\"350\" y=\"60\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.6\">nav</text><rect x=\"40\" y=\"104\" width=\"400\" height=\"210\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><text x=\"60\" y=\"132\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" class=\"fig-accent\">main</text><rect x=\"64\" y=\"148\" width=\"352\" height=\"146\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.6\"/><text x=\"84\" y=\"174\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.6\">section</text><rect x=\"88\" y=\"190\" width=\"304\" height=\"84\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.45\"/><text x=\"108\" y=\"216\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.45\">article</text><rect x=\"456\" y=\"104\" width=\"144\" height=\"210\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.6\"/><text x=\"476\" y=\"132\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" opacity=\"0.6\">aside</text><rect x=\"40\" y=\"328\" width=\"560\" height=\"52\" rx=\"4\" fill=\"none\" stroke=\"currentColor\"/><text x=\"60\" y=\"358\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\">footer</text></svg>\n" +
+            "```\n\n" +
             "## section ou article : le bon réflexe\n\n" +
             "La confusion classique. Pose-toi la question : « ce bloc garderait-il du sens si je le sortais de la page pour le publier ailleurs ? » Si oui, c'est un `<article>` (un billet, un commentaire, une carte produit). Si c'est juste un regroupement thématique interne à la page, c'est une `<section>`. Un `<article>` peut contenir plusieurs `<section>`, et l'inverse est possible aussi.\n\n" +
             "N'abandonne pas la `<div>` pour autant. Elle reste utile comme simple conteneur quand aucun élément sémantique ne convient, typiquement pour grouper des éléments à des fins de mise en page CSS. La règle : choisis d'abord la balise qui décrit le contenu, et retombe sur `<div>` seulement s'il n'y en a pas.\n\n" +
+            "## Trois pièges qui reviennent tout le temps\n\n" +
+            "Le premier : deux `<main>` visibles dans la même page. C'est interdit, et le validateur du W3C te le dira mot pour mot : « A document must not include more than one visible main element ». S'il te semble avoir besoin de deux main, c'est que l'un des deux est en réalité une section.\n\n" +
+            "Le deuxième : mettre un `<nav>` autour du moindre groupe de liens. Trois liens dans le pied de page ne méritent pas un nav. Réserve-le aux blocs de navigation majeurs, sinon un utilisateur de lecteur d'écran qui demande « la navigation » se retrouve avec six réponses.\n\n" +
+            "Le troisième, en sens inverse : croire que `<header>` et `<footer>` sont réservés au haut et au bas de la page. Un `<article>` peut avoir son propre header (titre, auteur, date) et son propre footer (tags, boutons de partage). C'est parfaitement valide et même recommandé.\n\n" +
+            "## À toi\n\n" +
+            "Prends cette page de recette écrite tout en div et redonne un nom à chaque zone :\n\n" +
+            "```html\n" +
+            "<div class=\"haut\">\n" +
+            "  <div class=\"menu\"><a href=\"/\">Accueil</a> <a href=\"/recettes\">Recettes</a></div>\n" +
+            "</div>\n" +
+            "<div class=\"contenu\">\n" +
+            "  <div class=\"recette\">\n" +
+            "    <h2>Tarte aux pommes</h2>\n" +
+            "    <p>Une tarte simple en 40 minutes.</p>\n" +
+            "  </div>\n" +
+            "</div>\n" +
+            "<div class=\"bas\"><p>&copy; 2026</p></div>\n" +
+            "```\n\n" +
+            "> Correction : `.haut` devient `<header>`, `.menu` devient `<nav>`, `.contenu` devient `<main>`, `.recette` devient `<article>` (une recette publiée ailleurs garderait tout son sens), et `.bas` devient `<footer>`. Les classes peuvent rester si tu en as besoin pour le CSS, mais la structure parle désormais d'elle-même.\n\n" +
             "> À retenir : chaque zone de ta page a un nom. header, nav, main, footer d'abord, puis section et article à l'intérieur. La div n'est pas interdite, elle est juste le dernier recours quand rien de plus précis n'existe.\n",
         },
         {
           id: "l7",
           title: "Texte : titres, paragraphes et emphase",
           type: "text",
-          duration: "13 min",
+          duration: "18 min",
           body:
+            "Le web, c'est du texte à 90 %. Avant les vidéos, avant les animations, une page est d'abord une suite de titres et de paragraphes, et la qualité de ce balisage se voit tout de suite : dans l'affichage, dans les résultats de recherche, dans la voix d'un lecteur d'écran. Bonne nouvelle, il n'y a qu'une poignée de balises à connaître vraiment bien.\n\n" +
             "## La hiérarchie des titres\n\n" +
             "Le HTML propose six niveaux de titres, de `<h1>` à `<h6>`. Ils ne servent pas à faire du texte plus ou moins gros, ils dessinent un **plan**, comme les titres et sous-titres d'un mémoire.\n\n" +
             "Deux règles tiennent la route dans 99 % des cas :\n\n" +
@@ -315,6 +414,9 @@ const course: Course = {
             "<p>Premier paragraphe, une idée complète.</p>\n" +
             "<p>Deuxième paragraphe, une autre idée.</p>\n" +
             "```\n\n" +
+            "## Les espaces ne comptent pas (ou presque)\n\n" +
+            "Surprise classique du premier jour : tape vingt espaces entre deux mots, ou trois retours à la ligne dans un paragraphe, et le navigateur affichera... un seul espace. Le HTML fusionne toute suite d'espaces, tabulations et retours à la ligne en un espace unique. C'est ce qui te permet d'indenter ton code proprement sans déformer la page. Si tu as réellement besoin d'un espace qui ne se fusionne pas, il existe l'entité `&nbsp;` (espace insécable), utile par exemple entre un nombre et son unité : `19&nbsp;€` ne sera jamais coupé en fin de ligne.\n\n" +
+            "Parlant d'entités : trois caractères sont réservés par le HTML lui-même. Pour afficher un chevron ou une esperluette en tant que texte, écris `&lt;` pour <, `&gt;` pour > et `&amp;` pour &. Sans ça, écrire `<3` dans un paragraphe peut faire croire au navigateur qu'une balise commence.\n\n" +
             "## Mettre en valeur avec du sens\n\n" +
             "Deux balises se ressemblent visuellement mais portent un sens différent :\n\n" +
             "- `<strong>` marque une **importance forte**. Rendu en gras par défaut.\n" +
@@ -324,14 +426,24 @@ const course: Course = {
             "- `<a>` pour un lien (partie suivante).\n" +
             "- `<code>` pour du code au fil du texte, comme `const x = 1`.\n" +
             "- `<blockquote>` pour une citation longue, `<q>` pour une courte.\n" +
-            "- `<abbr title=\"HyperText Markup Language\">HTML</abbr>` pour une abréviation avec sa définition au survol.\n\n" +
-            "> À retenir : les titres dessinent un plan, pas des tailles de police. Un seul h1, pas de niveau sauté, et strong/em quand tu veux du sens plutôt que du simple gras décoratif.\n",
+            "- `<abbr title=\"HyperText Markup Language\">HTML</abbr>` pour une abréviation avec sa définition au survol.\n" +
+            "- `<mark>` pour surligner un passage, `<sup>` et `<sub>` pour l'exposant (m<sup>2</sup>) et l'indice (H<sub>2</sub>O).\n\n" +
+            "## À toi\n\n" +
+            "Ce fragment affiche à peu près ce qu'on veut, mais il est mal balisé. Trouve les quatre problèmes :\n\n" +
+            "```html\n" +
+            "<h1>Mon blog</h1>\n" +
+            "<h4>Dernier billet</h4>\n" +
+            "<p>Bonjour à tous<br><br><br>\n" +
+            "Voici mon premier billet, écrit avec <b>beaucoup</b> de soin.</p>\n" +
+            "```\n\n" +
+            "> Correction : 1) le `<h4>` saute deux niveaux, ce devrait être un `<h2>` ; 2) les trois `<br>` servent à espacer, ce qui est le travail du CSS ; 3) ces `<br>` cachent en réalité deux idées distinctes, donc deux `<p>` séparés ; 4) `<b>` marque un gras purement visuel, `<strong>` dirait « important » (ou alors aucun balisage du tout, si le mot n'a rien de spécial).\n\n" +
+            "Ton texte est structuré, il ne demande qu'à pointer vers ailleurs. La partie suivante attaque ce qui a donné son nom au HyperText : les liens.\n",
         },
         {
           id: "l8",
           title: "Quiz : structure et sémantique",
           type: "quiz",
-          duration: "5 min",
+          duration: "6 min",
           questions: [
             {
               id: "q5",
@@ -389,6 +501,20 @@ const course: Course = {
               explanation:
                 "La page s'affichera quand même, mais les titres forment un plan. Sauter du h1 au h3 crée un trou dans ce plan. Les utilisateurs de lecteurs d'écran naviguent de titre en titre, et un plan cohérent aide aussi le référencement.",
             },
+            {
+              id: "q27",
+              prompt:
+                "Dans un paragraphe, tu tapes cinq espaces entre deux mots et le navigateur n'en affiche qu'un. Que se passe-t-il ?",
+              options: [
+                "C'est un bug du navigateur, il faut vider le cache",
+                "Le HTML fusionne les suites d'espaces et de retours à la ligne en un seul espace",
+                "Il manque <meta charset=\"UTF-8\"> dans le head",
+                "Les espaces multiples ne sont autorisés que dans les balises <b>",
+              ],
+              correctIndex: 1,
+              explanation:
+                "Comportement normal : le HTML replie toute suite d'espaces, tabulations et sauts de ligne en un espace unique, ce qui permet d'indenter le code librement. Pour un espace qui ne se fusionne pas et ne se coupe pas, on utilise l'entité &nbsp;.",
+            },
           ],
         },
       ],
@@ -401,8 +527,9 @@ const course: Course = {
           id: "l9",
           title: "Les liens, colonne vertébrale du web",
           type: "text",
-          duration: "14 min",
+          duration: "18 min",
           body:
+            "En 1989, au CERN, Tim Berners-Lee ne proposait pas un langage de mise en page : il proposait de relier des documents entre eux. Le lien est l'invention fondatrice du web, ce qui sépare une page HTML d'un simple fichier Word posé sur un serveur. Trente-cinq ans plus tard, la balise n'a presque pas bougé, et elle tient en une lettre.\n\n" +
             "## Anatomie d'un lien\n\n" +
             "Le lien hypertexte est ce qui fait du web une toile. La balise est `<a>`, pour *anchor*, et son attribut essentiel est `href`, la destination.\n\n" +
             "```html\n" +
@@ -422,6 +549,17 @@ const course: Course = {
             "<a href=\"../index.html\">Retour à l'accueil</a>\n" +
             "```\n\n" +
             "Le `../` signifie « remonte d'un dossier ». C'est exactement la même logique que naviguer dans l'explorateur de fichiers. Les liens relatifs ont un gros avantage : ton site fonctionne pareil en local et une fois en ligne, sans changer une ligne.\n\n" +
+            "Pour t'y retrouver, garde l'arborescence en tête. Imagine ce dossier :\n\n" +
+            "```\n" +
+            "mon-site/\n" +
+            "├── index.html\n" +
+            "├── contact.html\n" +
+            "└── projets/\n" +
+            "    ├── meteo.html\n" +
+            "    └── captures/\n" +
+            "        └── ecran1.png\n" +
+            "```\n\n" +
+            "Depuis `index.html`, tu atteins la météo avec `projets/meteo.html`. Depuis `meteo.html`, tu reviens à l'accueil avec `../index.html` et tu affiches la capture avec `captures/ecran1.png`. Chaque chemin se lit depuis le fichier où il est écrit, jamais depuis la racine du site.\n\n" +
             "## Trois usages pratiques\n\n" +
             "Ouvrir dans un nouvel onglet, avec la sécurité qui va avec :\n\n" +
             "```html\n" +
@@ -439,14 +577,21 @@ const course: Course = {
             "<a href=\"mailto:contact@exemple.fr\">Écris-nous</a>\n" +
             "<a href=\"tel:+33123456789\">Appelle-nous</a>\n" +
             "```\n\n" +
+            "## Le lien qui marche chez toi et casse en ligne\n\n" +
+            "Piège vécu par tous les débutants : le site fonctionne parfaitement en local, tu le mets en ligne, et la moitié des liens renvoient une erreur. La cause, presque à chaque fois, c'est la casse. Windows considère `Photo.JPG` et `photo.jpg` comme le même fichier ; les serveurs web, qui tournent le plus souvent sous Linux, les traitent comme deux fichiers différents. Règle d'hygiène pour tous tes noms de fichiers : tout en minuscules, pas d'espaces (un espace devient `%20` dans l'URL, laid et fragile), pas d'accents. `mes-projets.html` plutôt que `Mes Projets.html`.\n\n" +
+            "Pour repérer les liens et fichiers cassés, ouvre la Console de DevTools : chaque ressource introuvable y laisse une ligne rouge « Failed to load resource: the server responded with a status of 404 », avec l'URL exacte que le navigateur a tentée. Compare-la à l'emplacement réel du fichier et l'erreur saute aux yeux.\n\n" +
+            "## À toi\n\n" +
+            "Avec l'arborescence de tout à l'heure, écris depuis `projets/meteo.html` : 1) un lien vers la page contact ; 2) un lien vers Wikipédia qui s'ouvre dans un nouvel onglet ; 3) un lien d'ancrage vers une section `id=\"sources\"` de la même page.\n\n" +
+            "> Correction : 1) `<a href=\"../contact.html\">Contact</a>`, on remonte d'un dossier ; 2) `<a href=\"https://www.wikipedia.org\" target=\"_blank\" rel=\"noopener\">Wikipédia</a>` ; 3) `<a href=\"#sources\">Voir les sources</a>`. Si tu as écrit `contact.html` sans le `../`, le navigateur cherche `projets/contact.html` et tombe sur un 404.\n\n" +
             "> À retenir : href pointe la destination, absolue vers l'extérieur, relative à l'intérieur de ton site. Écris toujours un intitulé de lien qui a du sens sorti de son contexte, c'est bon pour l'humain comme pour l'accessibilité.\n",
         },
         {
           id: "l10",
           title: "Images : afficher, décrire, alléger",
           type: "text",
-          duration: "14 min",
+          duration: "18 min",
           body:
+            "Sur une page web médiane, les images pèsent autour de 1 Mo, plus que le HTML, le CSS et les scripts réunis, d'après les relevés du HTTP Archive. C'est à la fois ce qui donne vie à ton site et ce qui peut le rendre pénible sur un téléphone en 4G dans le métro. Cette leçon couvre donc les deux faces : afficher correctement, et afficher léger.\n\n" +
             "## La balise img et ses deux attributs vitaux\n\n" +
             "Une image s'insère avec `<img>`, un élément vide qui ne se ferme pas. Deux attributs comptent vraiment :\n\n" +
             "```html\n" +
@@ -461,6 +606,7 @@ const course: Course = {
             "<img src=\"produit.jpg\" alt=\"Sac à dos gris de randonnée\" width=\"600\" height=\"400\">\n" +
             "```\n\n" +
             "Renseigner `width` et `height` permet au navigateur de réserver l'espace de l'image avant même de la télécharger. Sans ça, le texte saute au moment où l'image arrive, un défaut agaçant qu'on appelle décalage de mise en page. Ces valeurs donnent le ratio, le CSS ajustera la taille réelle plus tard.\n\n" +
+            "Autre attribut rentable : `loading=\"lazy\"`. Le navigateur ne télécharge alors l'image que lorsqu'elle approche de la zone visible, au lieu de tout charger d'un coup à l'arrivée. Parfait pour les images en bas de page ; à éviter en revanche sur l'image principale visible dès l'ouverture, celle-là tu la veux tout de suite.\n\n" +
             "## Servir la bonne taille avec srcset\n\n" +
             "Charger une photo de 4000 pixels de large pour l'afficher dans une vignette de 300 pixels gaspille des données et ralentit le mobile. L'attribut `srcset` propose plusieurs versions et laisse le navigateur choisir :\n\n" +
             "```html\n" +
@@ -476,14 +622,20 @@ const course: Course = {
             "- `PNG` quand tu as besoin de transparence.\n" +
             "- `SVG` pour les logos et icônes, car ce sont des images vectorielles qui restent nettes à toute taille.\n" +
             "- `WebP` et `AVIF`, plus modernes, produisent des fichiers plus légers à qualité égale. À privilégier quand tu peux.\n\n" +
+            "## Quand l'image ne s'affiche pas\n\n" +
+            "À la place de ta photo : une petite icône d'image cassée et ton texte alternatif. Dans neuf cas sur dix, c'est un problème de chemin, le fichier n'est pas là où `src` le prétend. Vérifie l'orthographe exacte, l'extension réelle (un fichier enregistré en `chat.jpeg` ne répondra pas à `chat.jpg`), la casse, et l'emplacement du fichier par rapport à la page qui l'appelle. L'onglet Réseau de DevTools montre la requête en rouge avec son statut 404 et surtout l'URL complète que le navigateur a essayée : c'est le moyen le plus rapide de voir où il est allé chercher.\n\n" +
+            "## À toi\n\n" +
+            "Écris l'attribut `alt` pour ces trois situations : 1) la photo d'un produit dans une boutique, un sac à dos gris de 25 litres ; 2) une icône de loupe dans un bouton de recherche qui contient déjà le texte « Rechercher » ; 3) un graphique montrant que les ventes ont doublé entre janvier et juin.\n\n" +
+            "> Correction : 1) `alt=\"Sac à dos gris de randonnée, 25 litres\"`, on décrit ce que l'acheteur doit savoir ; 2) `alt=\"\"`, l'information est déjà dans le texte du bouton, la répéter ferait doublon pour le lecteur d'écran ; 3) `alt=\"Graphique : les ventes ont doublé entre janvier et juin\"`, on donne la conclusion du graphique, pas un vague « graphique des ventes » qui ne dit rien.\n\n" +
             "> À retenir : src pour la source, alt pour la description, et alt vide pour une image purement décorative. Précise width et height pour éviter les sauts, et n'envoie jamais une image de 4000 px là où 600 suffisent.\n",
         },
         {
           id: "l11",
           title: "Listes : à puces, ordonnées, de définitions",
           type: "text",
-          duration: "12 min",
+          duration: "16 min",
           body:
+            "Regarde n'importe quel site avec l'inspecteur : le menu est une liste, les résultats de recherche sont une liste, les caractéristiques produit aussi. Le web est une machine à énumérer. Bien choisir sa liste compte plus qu'il n'y paraît, parce qu'un lecteur d'écran annonce « liste, 12 éléments » avant de la lire : l'utilisateur sait d'avance où il met les pieds.\n\n" +
             "## Deux listes pour deux intentions\n\n" +
             "La liste à puces, `<ul>` pour *unordered list*, sert quand l'ordre n'a pas d'importance : une liste de courses, des fonctionnalités, des tags.\n\n" +
             "```html\n" +
@@ -502,6 +654,7 @@ const course: Course = {
             "</ol>\n" +
             "```\n\n" +
             "Dans les deux cas, chaque élément est un `<li>` pour *list item*. On ne met rien d'autre que des `<li>` en enfant direct d'un `<ul>` ou d'un `<ol>`.\n\n" +
+            "Deux options de `<ol>` à connaître : `start` fait démarrer la numérotation ailleurs qu'à 1 (`<ol start=\"5\">`), et `reversed` compte à rebours, pratique pour un top 10 qui se termine sur le numéro 1.\n\n" +
             "## Listes imbriquées\n\n" +
             "Une liste peut en contenir une autre. Attention, la sous-liste se glisse **à l'intérieur** du `<li>` parent, pas entre deux `<li>` :\n\n" +
             "```html\n" +
@@ -515,7 +668,7 @@ const course: Course = {
             "  <li>Légumes</li>\n" +
             "</ul>\n" +
             "```\n\n" +
-            "C'est l'erreur d'imbrication la plus fréquente : placer la sous-liste au mauvais endroit produit un HTML invalide et un affichage bancal.\n\n" +
+            "C'est l'erreur d'imbrication la plus fréquente : placer la sous-liste entre deux `<li>` produit un HTML invalide et un affichage bancal. Le validateur du W3C te le signale par « Element ul not allowed as child of element ul in this context ». Si tu vois ce message, ta sous-liste est au mauvais étage.\n\n" +
             "## La liste de définitions, méconnue et utile\n\n" +
             "Pour associer des termes à leurs descriptions (un glossaire, des caractéristiques produit, une FAQ courte), il existe `<dl>`, *description list* :\n\n" +
             "```html\n" +
@@ -538,14 +691,18 @@ const course: Course = {
             "</nav>\n" +
             "```\n\n" +
             "Le CSS retirera les puces et alignera les liens à l'horizontale, mais la structure de liste reste juste : c'est bien une énumération d'entrées.\n\n" +
-            "> À retenir : ul quand l'ordre est libre, ol quand il compte, dl pour associer termes et définitions. Les puces se retireront en CSS, mais la sémantique de liste, elle, doit rester correcte.\n",
+            "## À toi\n\n" +
+            "Balise cette recette express : « Ingrédients : farine, œufs, lait. Étapes : mélanger la farine et les œufs, ajouter le lait petit à petit, laisser reposer 30 minutes. »\n\n" +
+            "> Correction : les ingrédients vont dans un `<ul>`, leur ordre est libre. Les étapes vont dans un `<ol>` : relis-les dans le désordre, la pâte est ratée, donc l'ordre compte, donc liste ordonnée. Chaque élément dans son `<li>`, et rien d'autre en enfant direct des deux listes.\n\n" +
+            "Une liste énumère dans une seule dimension. Quand tes données en ont deux, des lignes ET des colonnes, un prix par formule par exemple, il te faut l'outil de la prochaine leçon : le tableau.\n",
         },
         {
           id: "l12",
           title: "Tableaux : données en lignes et colonnes",
           type: "text",
-          duration: "14 min",
+          duration: "18 min",
           body:
+            "Horaires de train, relevé bancaire, comparatif d'abonnements : certaines informations naissent en lignes et colonnes, et les présenter autrement les rendrait illisibles. Le HTML a une famille de balises dédiée, puissante et chargée d'histoire : pendant des années, faute de mieux, les développeurs ont construit des sites entiers dans des tableaux invisibles. On va faire mieux qu'eux.\n\n" +
             "## Un tableau, pour quoi faire\n\n" +
             "Un `<table>` sert à présenter des **données tabulaires** : un tableau de prix, un planning, des statistiques. La règle est stricte : jamais de tableau pour faire de la mise en page. Cette pratique, courante dans les années 2000, est morte. Pour disposer des éléments à l'écran, on utilise Flexbox et Grid, qu'on verra plus tard. Le tableau sert uniquement à des données qui ont vraiment des lignes et des colonnes.\n\n" +
             "## La structure complète\n\n" +
@@ -589,13 +746,17 @@ const course: Course = {
             "<td rowspan=\"3\">Étalé sur trois lignes</td>\n" +
             "```\n\n" +
             "À manier avec parcimonie : un tableau truffé de fusions devient vite illisible et pénible à styliser.\n\n" +
+            "Détail utile pour plus tard : même si tu omets `<tbody>`, le navigateur l'ajoute tout seul dans sa représentation interne de la page. Tu le découvriras en CSS ou en JavaScript, quand un sélecteur qui cherche des `<tr>` enfants directs de `<table>` ne trouvera rien : les lignes sont devenues enfants du tbody fantôme. Autant l'écrire toi-même dès le départ.\n\n" +
+            "## À toi\n\n" +
+            "Construis un tableau de deux colonnes, Langage et Rôle, avec deux lignes de données : HTML structure le contenu, CSS le met en forme. Utilise caption, thead, tbody et les bons scope.\n\n" +
+            "> Correction : `<table>`, puis `<caption>Les langages du web</caption>`, un `<thead>` avec une ligne de deux `<th scope=\"col\">` (Langage, Rôle), puis un `<tbody>` avec deux `<tr>` contenant chacune le nom du langage en `<th scope=\"row\">` et sa description en `<td>`. Si tu as mis les noms de langages dans de simples `<td>`, l'affichage est identique mais le lecteur d'écran perd l'en-tête de ligne : la version th + scope est la bonne.\n\n" +
             "> À retenir : un tableau, c'est pour des données, jamais pour la mise en page. thead pour l'en-tête, tbody pour les données, et surtout scope sur les th pour que le tableau reste compréhensible sans les yeux.\n",
         },
         {
           id: "l13",
           title: "Quiz : liens, images, listes, tableaux",
           type: "quiz",
-          duration: "5 min",
+          duration: "6 min",
           questions: [
             {
               id: "q9",
@@ -653,6 +814,20 @@ const course: Course = {
               explanation:
                 "scope=\"col\" ou scope=\"row\" relie chaque cellule de données à son en-tête. Un lecteur d'écran peut alors annoncer « colonne Prix, ligne Équipe : 29 € ». Sans scope, les données défilent sans repère et le tableau devient incompréhensible à l'oreille.",
             },
+            {
+              id: "q28",
+              prompt:
+                "Ton site marche en local sur Windows, mais une fois en ligne l'image appelée avec src=\"Photos/Chien.JPG\" ne s'affiche plus. Cause la plus probable ?",
+              options: [
+                "Le format JPG n'est pas autorisé sur les serveurs web",
+                "Le serveur, sous Linux, distingue majuscules et minuscules : le chemin ne correspond plus exactement au nom réel du fichier",
+                "Il faut toujours des liens absolus une fois en ligne",
+                "L'attribut alt est manquant, ce qui bloque le chargement",
+              ],
+              correctIndex: 1,
+              explanation:
+                "Windows ignore la casse des noms de fichiers, pas les serveurs Linux : photos/chien.jpg et Photos/Chien.JPG y sont deux chemins différents. D'où la règle d'hygiène : noms tout en minuscules, sans espaces ni accents. L'alt, lui, n'a aucun effet sur le chargement.",
+            },
           ],
         },
       ],
@@ -665,8 +840,9 @@ const course: Course = {
           id: "l14",
           title: "Construire un formulaire qui marche",
           type: "text",
-          duration: "16 min",
+          duration: "20 min",
           body:
+            "Le formulaire est l'endroit où ton site arrête d'être une brochure : recherche, inscription, contact, paiement, tout passe par là. C'est aussi l'endroit où les sites perdent leurs visiteurs. Le Baymard Institute mesure environ 70 % de paniers abandonnés en e-commerce, et les formulaires pénibles y sont pour beaucoup. Chaque détail de cette leçon a un effet direct sur le taux de gens qui vont au bout.\n\n" +
             "## Le conteneur form\n\n" +
             "Un formulaire vit dans une balise `<form>`. Deux attributs définissent son comportement : `action`, l'adresse qui recevra les données, et `method`, la façon de les envoyer (`get` ou `post`). Pour un envoi qui modifie quelque chose côté serveur, comme un message de contact, on utilise `post`.\n\n" +
             "```html\n" +
@@ -695,7 +871,17 @@ const course: Course = {
             "<input type=\"checkbox\">  <!-- case à cocher -->\n" +
             "<input type=\"radio\">     <!-- bouton radio, choix unique -->\n" +
             "```\n\n" +
-            "Choisir le bon `type` t'offre gratuitement le bon clavier et une validation de base. `type=\"email\"` refusera une saisie sans `@`, sans une ligne de code en plus.\n\n" +
+            "Choisir le bon `type` t'offre gratuitement le bon clavier et une validation de base. `type=\"email\"` refusera une saisie sans `@`, sans une ligne de code en plus. Ajoute `required` et le navigateur bloque l'envoi d'un champ vide avec son message natif, « Veuillez renseigner ce champ. » dans un Chrome en français. Cette validation intégrée ne remplace pas une vérification côté serveur, mais elle attrape l'essentiel des oublis sans JavaScript.\n\n" +
+            "## Grouper les choix : radio, fieldset et legend\n\n" +
+            "Les boutons radio ont une règle qui piège tout le monde : ils ne forment un groupe à choix unique que s'ils partagent le même `name`. Deux radios avec des name différents sont deux groupes indépendants, cochables en même temps.\n\n" +
+            "```html\n" +
+            "<fieldset>\n" +
+            "  <legend>Formule</legend>\n" +
+            "  <label><input type=\"radio\" name=\"formule\" value=\"solo\"> Solo</label>\n" +
+            "  <label><input type=\"radio\" name=\"formule\" value=\"equipe\"> Équipe</label>\n" +
+            "</fieldset>\n" +
+            "```\n\n" +
+            "Le `<fieldset>` regroupe visuellement et sémantiquement des champs liés, et sa `<legend>` donne un titre au groupe : un lecteur d'écran annonce « Formule, Solo, bouton radio », le contexte suit l'utilisateur de champ en champ. Remarque au passage la deuxième façon de relier un label : envelopper directement l'input dans le `<label>`, sans for ni id. Les deux formes sont valides, choisis-en une et tiens-t'y.\n\n" +
             "## Zones de texte, listes déroulantes et bouton\n\n" +
             "```html\n" +
             "<label for=\"message\">Message</label>\n" +
@@ -708,16 +894,19 @@ const course: Course = {
             "<button type=\"submit\">Envoyer</button>\n" +
             "```\n\n" +
             "Quelques attributs utiles : `required` rend un champ obligatoire, `placeholder` affiche un exemple grisé (qui ne remplace jamais un label), `value` définit une valeur par défaut. Le `placeholder` disparaît dès qu'on tape, donc il ne doit jamais porter l'information essentielle.\n\n" +
+            "## À toi\n\n" +
+            "Construis un mini-formulaire d'inscription à une newsletter : un champ e-mail obligatoire avec son label, une case à cocher « J'accepte de recevoir la newsletter » et un bouton d'envoi.\n\n" +
+            "> Correction : `<form action=\"/newsletter\" method=\"post\">`, puis `<label for=\"email\">Adresse e-mail</label>` suivi de `<input type=\"email\" id=\"email\" name=\"email\" required>`, puis `<label><input type=\"checkbox\" name=\"consentement\" required> J'accepte de recevoir la newsletter</label>`, et enfin `<button type=\"submit\">S'inscrire</button>`. Les trois erreurs classiques : type text au lieu de email (adieu la validation gratuite), name oublié (la donnée ne part jamais), et un texte posé à côté de la case sans label (impossible à cocher en cliquant le texte).\n\n" +
             "> À retenir : un champ sans label relié par for/id est un champ cassé pour l'accessibilité. Choisis le bon type d'input, donne un name à chaque champ, et n'utilise jamais le placeholder à la place du label.\n",
         },
         {
           id: "l15",
           title: "Accessibilité : les réflexes qui comptent",
           type: "text",
-          duration: "16 min",
+          duration: "20 min",
           body:
             "## L'accessibilité n'est pas une option\n\n" +
-            "Rendre un site accessible, c'est faire en sorte qu'une personne aveugle, malvoyante, avec un handicap moteur ou une navigation au clavier puisse l'utiliser. Ce n'est pas de la charité, c'est un socle de qualité, souvent une obligation légale, et ça améliore le site pour tout le monde. La bonne nouvelle : 80 % de l'accessibilité vient d'un HTML propre, et tu en as déjà vu l'essentiel.\n\n" +
+            "L'OMS estime qu'environ 16 % de la population mondiale vit avec un handicap significatif, une personne sur six. Ajoute les situations temporaires : un bras dans le plâtre, un écran en plein soleil, une souris en panne. Rendre un site accessible, c'est faire en sorte qu'une personne aveugle, malvoyante, avec un handicap moteur ou une navigation au clavier puisse l'utiliser. Ce n'est pas de la charité, c'est un socle de qualité, souvent une obligation légale (l'European Accessibility Act s'applique depuis juin 2025 à la plupart des services en ligne européens), et ça améliore le site pour tout le monde. La bonne nouvelle : 80 % de l'accessibilité vient d'un HTML propre, et tu en as déjà vu l'essentiel.\n\n" +
             "## Ce que tu maîtrises déjà\n\n" +
             "Reprenons les points croisés dans les leçons précédentes, car ce sont les plus rentables :\n\n" +
             "- Un `alt` pertinent sur chaque image porteuse de sens, un `alt` vide sur les décoratives.\n" +
@@ -729,6 +918,8 @@ const course: Course = {
             "## La navigation au clavier\n\n" +
             "Beaucoup d'utilisateurs ne touchent jamais la souris. Teste ton site : appuie sur `Tab` de façon répétée. Le focus doit sauter de lien en lien, de champ en champ, dans un ordre logique, et rester **visible** à l'écran. Si tu ne vois pas où tu es, tu as un problème.\n\n" +
             "Piège fréquent : certains retirent le contour de focus en CSS parce qu'ils le trouvent moche (`outline: none`). Ne fais jamais ça sans le remplacer. Ce contour est le seul repère d'un utilisateur au clavier. Stylise-le si tu veux, mais ne le supprime pas.\n\n" +
+            "## Le contraste, l'oublié le plus fréquent\n\n" +
+            "Le défaut d'accessibilité numéro un du web, année après année dans l'étude WebAIM Million, c'est un texte trop pâle sur fond trop clair. La référence WCAG demande un rapport de contraste d'au moins 4,5:1 pour du texte courant. Tu n'as pas à le calculer de tête : colle tes deux couleurs dans le [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/), il répond passe ou échoue. Le gris clair sur blanc si répandu dans les designs « épurés », genre `#999999` sur `#ffffff`, échoue à 2,8:1. Si tu plisses les yeux pour te relire, tes visiteurs aussi.\n\n" +
             "## ARIA : le complément, pas le remplaçant\n\n" +
             "ARIA (*Accessible Rich Internet Applications*) est un jeu d'attributs qui ajoute de l'information aux technologies d'assistance quand le HTML seul ne suffit pas. Trois exemples courants :\n\n" +
             "```html\n" +
@@ -741,6 +932,14 @@ const course: Course = {
             "La règle d'or, énoncée par les spécifications elles-mêmes : **la première règle d'ARIA, c'est de ne pas utiliser ARIA**. Un vrai `<button>` vaut toujours mieux qu'une `<div role=\"button\">` bricolée. ARIA sert à combler des trous, pas à réparer un HTML qu'on aurait mal choisi.\n\n" +
             "## Un test rapide et gratuit\n\n" +
             "Installe l'extension [axe DevTools](https://www.deque.com/axe/devtools/) ou lance l'audit Lighthouse intégré à Chrome (onglet Lighthouse des outils de développement). Ils listent les problèmes d'accessibilité concrets de ta page en quelques secondes. Fais-le sur ta première page, tu seras surpris de ce que tu peux corriger en cinq minutes.\n\n" +
+            "## À toi\n\n" +
+            "Ce bouton de fermeture de fenêtre cumule trois problèmes d'accessibilité. Lesquels ?\n\n" +
+            "```html\n" +
+            "<div onclick=\"fermer()\" style=\"outline: none\">\n" +
+            "  <img src=\"croix.png\">\n" +
+            "</div>\n" +
+            "```\n\n" +
+            "> Correction : 1) une `<div>` cliquable au lieu d'un `<button>` : pas de focus clavier, pas d'activation par Entrée, pas de rôle annoncé ; 2) l'image n'a pas d'`alt`, le lecteur d'écran lira au mieux « croix.png » ; 3) `outline: none` achève de masquer le focus. La version saine tient en une ligne : `<button aria-label=\"Fermer la fenêtre\">✕</button>`, et tout fonctionne nativement.\n\n" +
             "> À retenir : l'accessibilité commence par un HTML honnête, pas par ARIA. Teste au clavier avec Tab, garde le focus visible, et n'ajoute ARIA que pour ce que le HTML natif ne sait pas exprimer.\n",
         },
         {
@@ -817,8 +1016,9 @@ const course: Course = {
           id: "l17",
           title: "Brancher le CSS et cibler avec des sélecteurs",
           type: "text",
-          duration: "15 min",
+          duration: "19 min",
           body:
+            "En 2003, le designer Dave Shea a lancé CSS Zen Garden : un même fichier HTML, jamais modifié, restylé par des centaines de designers en autant de sites radicalement différents. Le site existe toujours, va y jeter un œil. C'est la meilleure démonstration de ce que tu entames ici : le HTML porte le contenu, le CSS décide de tout le reste.\n\n" +
             "## Trois façons d'ajouter du CSS, une seule à retenir\n\n" +
             "On peut écrire du CSS de trois manières. En ligne, dans un attribut `style` sur la balise : à éviter, ça mélange contenu et présentation. Dans une balise `<style>` au sein du `<head>` : pratique pour tester. Et dans un **fichier séparé** relié par une balise `<link>` : c'est la bonne méthode pour un vrai site.\n\n" +
             "```html\n" +
@@ -857,13 +1057,18 @@ const course: Course = {
             "li:first-child { font-weight: bold; }    /* le premier li d'une liste */\n" +
             "```\n\n" +
             "L'espace entre deux sélecteurs signifie « à l'intérieur de ». Le `:hover` et le `:first-child` sont des **pseudo-classes**, des états ou des positions particulières. Elles ouvrent énormément de possibilités sans une ligne de JavaScript.\n\n" +
+            "## Quand rien ne s'applique\n\n" +
+            "Tu écris ta règle, tu recharges, rien ne change. Check-list dans l'ordre. Un : le fichier CSS est-il vraiment chargé ? Onglet Réseau de DevTools ; si `styles.css` apparaît en rouge avec un 404, ton `href` est faux. Deux : recharge sans cache avec Ctrl+F5, le navigateur ressert volontiers l'ancienne version. Trois : le sélecteur correspond-il vraiment ? Une faute de frappe dans un nom de classe ne produit aucun message d'erreur, le CSS ignore en silence les sélecteurs qui ne trouvent rien et les propriétés inconnues. `.cart` ne stylera jamais `class=\"carte\"`, et personne ne te préviendra. Quatre : inspecte l'élément, le panneau Styles montre les règles réellement appliquées. On s'en sert à fond dès la leçon suivante.\n\n" +
+            "## À toi\n\n" +
+            "Écris les sélecteurs pour : 1) tous les liens dans le pied de page `<footer>` ; 2) les éléments de classe `bouton` au survol ; 3) le premier élément de chaque liste à puces.\n\n" +
+            "> Correction : 1) `footer a`, l'espace signifiant « à l'intérieur de » ; 2) `.bouton:hover`, le point pour la classe, la pseudo-classe collée derrière ; 3) `ul li:first-child`. Si tu as écrit `footer > a` au premier, tu ne prends que les liens enfants directs du footer, pas ceux nichés dans un `<ul>` : le combinateur `>` existe, mais il est plus strict que l'espace.\n\n" +
             "> À retenir : un fichier CSS relié par link, des règles faites d'un sélecteur et de déclarations, et la classe comme outil principal de ciblage. Réserve les id aux ancres et au JS, et n'oublie jamais le point-virgule.\n",
         },
         {
           id: "l18",
           title: "Cascade, héritage et spécificité",
           type: "text",
-          duration: "16 min",
+          duration: "20 min",
           body:
             "## Le C de CSS veut dire Cascade\n\n" +
             "Quand plusieurs règles visent le même élément et se contredisent, laquelle gagne ? C'est toute la question de la **cascade**, et c'est ce qui déroute le plus les débutants. « Pourquoi ma couleur ne s'applique pas ? » : neuf fois sur dix, une autre règle plus forte l'écrase.\n\n" +
@@ -886,6 +1091,10 @@ const course: Course = {
             "#special { color: red; }       /* 1-0-0, encore plus fort */\n" +
             "```\n\n" +
             "Un paragraphe qui a la classe `intro` et l'id `special` sera rouge, même si la règle noire est écrite en dernier : l'id l'emporte sur tout le reste. C'est aussi pourquoi surcharger un style ciblé par id devient vite pénible, une raison de plus de préférer les classes.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"La spécificité : trois poids, comparés de gauche à droite, l'ordre d'écriture ne départage qu'en cas d'égalité\"}\n" +
+            "<svg viewBox=\"0 0 640 260\" role=\"img\"><title>Poids de spécificité des sélecteurs CSS</title><rect x=\"30\" y=\"60\" width=\"170\" height=\"90\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><text x=\"115\" y=\"98\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"15\" fill=\"currentColor\" class=\"fig-accent\">#special</text><text x=\"115\" y=\"128\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" class=\"fig-accent\">1-0-0</text><text x=\"235\" y=\"112\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"16\" fill=\"currentColor\" opacity=\"0.6\">&gt;</text><rect x=\"270\" y=\"60\" width=\"170\" height=\"90\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"355\" y=\"98\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"15\" fill=\"currentColor\" opacity=\"0.7\">.intro</text><text x=\"355\" y=\"128\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" opacity=\"0.7\">0-1-0</text><text x=\"475\" y=\"112\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"16\" fill=\"currentColor\" opacity=\"0.6\">&gt;</text><rect x=\"510\" y=\"60\" width=\"100\" height=\"90\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.45\"/><text x=\"560\" y=\"98\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"15\" fill=\"currentColor\" opacity=\"0.45\">p</text><text x=\"560\" y=\"128\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" opacity=\"0.45\">0-0-1</text><text x=\"320\" y=\"30\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">id &gt; classe / pseudo-classe &gt; balise</text><text x=\"320\" y=\"200\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">nav a = 0-0-2 · .carte h2 = 0-1-1 · #menu .actif = 1-1-0</text><text x=\"320\" y=\"230\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">à égalité parfaite : la dernière règle écrite gagne</text></svg>\n" +
+            "```\n\n" +
             "## Le piège de !important\n\n" +
             "Il existe une échappatoire, `!important`, qui court-circuite tout le calcul :\n\n" +
             "```css\n" +
@@ -901,13 +1110,23 @@ const course: Course = {
             "}\n" +
             "```\n\n" +
             "Les propriétés de texte s'héritent (couleur, police, taille). Celles de disposition, non : une `border` ou un `margin` ne se transmettent pas. On exploite l'héritage pour poser les réglages typographiques une seule fois, à la racine.\n\n" +
+            "## Lire la cascade dans DevTools\n\n" +
+            "Quand une couleur refuse de s'appliquer, ne devine pas : inspecte. Clic droit sur l'élément, Inspecter, panneau Styles. Le navigateur y liste toutes les règles qui visent l'élément, triées de la plus forte à la plus faible, et barre les déclarations perdantes. Une ligne barrée, c'est une règle battue par plus spécifique qu'elle. En dix secondes tu sais qui a gagné et pourquoi, là où on peut perdre une heure à modifier la mauvaise règle dans le mauvais fichier.\n\n" +
+            "## À toi\n\n" +
+            "Sans tricher : quelle couleur pour `<p class=\"note\" id=\"remarque\">` avec ces trois règles ?\n\n" +
+            "```css\n" +
+            "p { color: green; }\n" +
+            "#remarque { color: orange; }\n" +
+            "p.note { color: teal; }\n" +
+            "```\n\n" +
+            "> Correction : orange. `#remarque` pèse 1-0-0, `p.note` pèse 0-1-1, `p` pèse 0-0-1. On compare chiffre par chiffre de gauche à droite : 1-0-0 gagne dès la première colonne, et l'ordre d'écriture n'a plus voix au chapitre. Pour battre un id sans dégainer !important, il faut un sélecteur qui contient lui aussi un id.\n\n" +
             "> À retenir : la cascade tranche par spécificité d'abord, ordre ensuite. id plus fort que classe, classe plus forte que balise. Évite !important, et sers-toi de l'héritage pour définir la typographie globale au niveau du body.\n",
         },
         {
           id: "l19",
           title: "Le box model : tout est une boîte",
           type: "text",
-          duration: "15 min",
+          duration: "20 min",
           body:
             "## Chaque élément est une boîte\n\n" +
             "En CSS, absolument tout élément est une boîte rectangulaire, même un mot dans une phrase. Comprendre cette boîte, c'est comprendre pourquoi tes éléments prennent la place qu'ils prennent. Le **box model** décrit quatre couches, de l'intérieur vers l'extérieur.\n\n" +
@@ -922,6 +1141,10 @@ const course: Course = {
             "  border: 2px solid #ccc;\n" +
             "  margin: 24px;\n" +
             "}\n" +
+            "```\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Le box model : quatre couches, de la marge extérieure au contenu\"}\n" +
+            "<svg viewBox=\"0 0 640 340\" role=\"img\"><title>Les quatre couches du box model CSS</title><rect x=\"24\" y=\"20\" width=\"592\" height=\"300\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.35\"/><text x=\"48\" y=\"48\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.5\">margin</text><rect x=\"88\" y=\"62\" width=\"464\" height=\"216\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.6\"/><text x=\"112\" y=\"90\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.6\">border</text><rect x=\"152\" y=\"104\" width=\"336\" height=\"132\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.8\"/><text x=\"176\" y=\"132\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.8\">padding</text><rect x=\"216\" y=\"146\" width=\"208\" height=\"48\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><text x=\"320\" y=\"176\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" class=\"fig-accent\">contenu (width)</text><text x=\"320\" y=\"262\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.6\">padding : espace intérieur · margin : repousse les voisins</text></svg>\n" +
             "```\n\n" +
             "## Le piège historique de la largeur\n\n" +
             "Voici ce qui a fait râler des générations de développeurs. Par défaut, `width` définit la largeur du **contenu seul**. Le padding et la border s'ajoutent par-dessus. Une carte en `width: 300px` avec `padding: 20px` et `border: 5px` occupe en réalité 300 + 20 + 20 + 5 + 5 = 350 pixels. Tu demandes 300, tu obtiens 350, et ta mise en page déborde.\n\n" +
@@ -942,14 +1165,26 @@ const course: Course = {
             "## La fusion des marges verticales\n\n" +
             "Un comportement qui surprend : deux marges verticales qui se touchent **fusionnent** au lieu de s'additionner. Si un paragraphe a `margin-bottom: 20px` et le suivant `margin-top: 30px`, l'espace entre eux n'est pas 50 mais 30 pixels, la plus grande des deux. Ce n'est pas un bug, c'est voulu, et ça ne concerne que les marges verticales. Sachant cela, tu ne chercheras pas pendant une heure d'où vient un espace « manquant ».\n\n" +
             "Un outil pour tout voir : dans les outils de développement, sélectionne un élément et regarde le panneau « Computed ». Il dessine le box model avec les valeurs réelles de chaque couche. C'est le meilleur moyen de comprendre pourquoi un élément fait la taille qu'il fait.\n\n" +
+            "## À toi\n\n" +
+            "Sans box-sizing modifié, quelle largeur totale occupe ce badge, marges comprises ?\n\n" +
+            "```css\n" +
+            ".badge {\n" +
+            "  width: 120px;\n" +
+            "  padding: 8px 12px;\n" +
+            "  border: 2px solid #333;\n" +
+            "  margin: 0 10px;\n" +
+            "}\n" +
+            "```\n\n" +
+            "> Correction : 120 + 12 + 12 de padding + 2 + 2 de bordure = 148 px de boîte visible, plus 10 + 10 de marge = 168 px d'emprise totale. Avec `box-sizing: border-box`, la boîte visible ferait 120 px tout rond et l'emprise 140 px. Relis le raccourci `padding: 8px 12px` : 8 en haut et en bas, 12 à gauche et à droite, donc seuls les 12 comptent dans la largeur.\n\n" +
             "> À retenir : contenu, padding, border, margin, dans cet ordre. Active box-sizing: border-box dès la première ligne pour que width veuille dire ce que tu crois, et rappelle-toi que les marges verticales fusionnent au lieu de s'ajouter.\n",
         },
         {
           id: "l20",
           title: "Couleurs, typographie et unités",
           type: "text",
-          duration: "15 min",
+          duration: "19 min",
           body:
+            "Ouvre les réglages de ton navigateur, cherche « taille de police », passe-la de 16 à 20. Une partie des sites suit ton choix, l'autre reste figée : tu viens de repérer ceux qui taillent leur texte en pixels fixes. Toute cette leçon tourne autour de cette idée : des couleurs et des tailles qui restent au service du lecteur, pas l'inverse.\n\n" +
             "## Écrire une couleur\n\n" +
             "Plusieurs notations coexistent, autant les connaître :\n\n" +
             "```css\n" +
@@ -972,6 +1207,7 @@ const course: Course = {
             "```\n\n" +
             "La `font-family` liste des polices par ordre de préférence : le navigateur prend la première disponible. Termine toujours par une famille générique (`sans-serif`, `serif`) comme filet de sécurité. Le mot-clé `system-ui` utilise la police native du système, rapide et sans téléchargement.\n\n" +
             "La `line-height` (hauteur de ligne) sans unité est un multiplicateur de la taille du texte. `1.6` donne une respiration confortable pour de la lecture. En dessous de `1.4`, les lignes se collent et fatiguent l'œil.\n\n" +
+            "Pour une police qui ne vit pas sur la machine du visiteur, le plus simple reste [Google Fonts](https://fonts.google.com) : tu choisis une famille, le site te donne une balise `<link>` à coller dans le head et la `font-family` correspondante. Deux réflexes : limite-toi à une ou deux familles, chaque police se télécharge et pèse sur le chargement, et garde toujours la famille générique en fin de liste pour l'affichage en attendant le téléchargement.\n\n" +
             "## Les unités, le vrai sujet\n\n" +
             "C'est le point qui sépare un débutant d'un intermédiaire.\n\n" +
             "- `px` (pixel) est une unité **fixe**. Précise, mais elle ignore les préférences de l'utilisateur.\n" +
@@ -985,6 +1221,9 @@ const course: Course = {
             "p    { font-size: 1rem; }   /* 16px */\n" +
             "```\n\n" +
             "Ma recommandation concrète : `rem` pour les tailles de texte et les grands espacements, `px` seulement pour les détails fins comme une bordure de 1 pixel.\n\n" +
+            "## À toi\n\n" +
+            "Ta racine est à 16 px. Convertis en rem : un titre de 40 px, un texte courant de 18 px, une mention légale de 12 px.\n\n" +
+            "> Correction : on divise par 16, donc `2.5rem`, `1.125rem` et `0.75rem`. Si les décimales te gênent, c'est normal et sans gravité, les navigateurs les gèrent parfaitement. Beaucoup d'équipes s'en tiennent d'ailleurs à des paliers réguliers (0.75, 1, 1.25, 1.5, 2, 2.5) précisément pour garder des chiffres ronds.\n\n" +
             "> À retenir : hexadécimal pour les couleurs de maquette, HSL pour ajuster à la main, et surtout des rem plutôt que des px sur le texte pour respecter les préférences de taille de l'utilisateur. Vérifie le contraste, c'est de la lisibilité pour tout le monde.\n",
         },
         {
@@ -1049,6 +1288,20 @@ const course: Course = {
               explanation:
                 "Les marges verticales adjacentes fusionnent : elles ne s'additionnent pas, c'est la plus grande qui s'applique, soit 30px ici. Ce comportement voulu ne concerne que les marges verticales et surprend souvent quand on cherche un espace « manquant ».",
             },
+            {
+              id: "q29",
+              prompt:
+                "Tu écris une règle pour .carte mais rien ne change à l'écran, et aucune erreur ne s'affiche nulle part. Pourquoi ce silence ?",
+              options: [
+                "Le CSS n'affiche jamais d'erreur : un sélecteur qui ne correspond à rien ou une propriété inconnue sont simplement ignorés",
+                "Le navigateur bloque le fichier CSS entier à la première faute",
+                "Il faut activer un mode debug dans le fichier CSS",
+                "Les classes ne fonctionnent que si l'élément a aussi un id",
+              ],
+              correctIndex: 0,
+              explanation:
+                "Contrairement à beaucoup de langages, le CSS échoue en silence : une faute de frappe dans .carte ou dans un nom de propriété ne produit aucun message. Le bon réflexe est d'inspecter l'élément et de vérifier dans le panneau Styles si la règle apparaît, et si elle est barrée ou absente.",
+            },
           ],
         },
       ],
@@ -1061,8 +1314,9 @@ const course: Course = {
           id: "l22",
           title: "Flexbox : aligner en une dimension",
           type: "text",
-          duration: "16 min",
+          duration: "20 min",
           body:
+            "« Comment on centre ce truc, verticalement ? » Cette question a torturé les développeurs pendant quinze ans, au point de devenir un mème du métier. La réponse moderne tient en trois lignes, et elle s'appelle Flexbox.\n\n" +
             "## Le problème que Flexbox résout\n\n" +
             "Pendant des années, centrer un élément ou aligner trois cartes côte à côte relevait du bricolage (`float`, `inline-block`, marges négatives). Flexbox a rangé tout ça. C'est un mode de disposition pensé pour aligner des éléments sur **une dimension**, une ligne ou une colonne, avec une répartition d'espace intelligente.\n\n" +
             "On l'active sur le **conteneur**, pas sur les enfants :\n\n" +
@@ -1082,6 +1336,12 @@ const course: Course = {
             "}\n" +
             "```\n\n" +
             "`justify-content` gère l'espace horizontal : `flex-start`, `center`, `space-between` (colle aux bords, espace au milieu), `space-around`, `space-evenly`. `align-items` gère l'alignement vertical : `center` aligne au milieu de la hauteur, `stretch` étire, `flex-start` colle en haut.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Les deux axes en direction row : justify-content répartit sur le principal, align-items cale sur le secondaire\"}\n" +
+            "<svg viewBox=\"0 0 640 300\" role=\"img\"><title>Axes principal et secondaire de Flexbox</title><rect x=\"40\" y=\"40\" width=\"520\" height=\"190\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.5\"/><text x=\"52\" y=\"28\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">display: flex</text><rect x=\"70\" y=\"90\" width=\"110\" height=\"90\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"125\" y=\"142\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">item</text><rect x=\"210\" y=\"90\" width=\"110\" height=\"90\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"265\" y=\"142\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">item</text><rect x=\"350\" y=\"90\" width=\"110\" height=\"90\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"405\" y=\"142\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">item</text><line x1=\"40\" y1=\"262\" x2=\"548\" y2=\"262\" stroke=\"currentColor\" class=\"fig-accent\"/><polygon points=\"548,256 560,262 548,268\" fill=\"currentColor\" class=\"fig-accent\"/><text x=\"300\" y=\"288\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" class=\"fig-accent\">axe principal : justify-content</text><line x1=\"600\" y1=\"40\" x2=\"600\" y2=\"218\" stroke=\"currentColor\" opacity=\"0.7\"/><polygon points=\"594,218 600,230 606,218\" fill=\"currentColor\" opacity=\"0.7\"/><text x=\"430\" y=\"62\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">axe secondaire :</text><text x=\"460\" y=\"80\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">align-items</text></svg>\n" +
+            "```\n\n" +
+            "## Le piège quand la direction change\n\n" +
+            "Retiens bien : `justify-content` suit l'axe principal, pas « l'horizontal ». En `flex-direction: column`, l'axe principal devient vertical, donc justify-content gère le haut-bas et align-items le gauche-droite. Le grand classique du débutant : passer en colonne, garder `justify-content: center` et s'étonner que le centrage horizontal ait disparu. Rien n'est cassé, les axes ont pivoté avec la direction.\n\n" +
             "## Le centrage parfait, enfin simple\n\n" +
             "Le graal qui a tant fait souffrir tient désormais en trois lignes :\n\n" +
             "```css\n" +
@@ -1108,14 +1368,18 @@ const course: Course = {
             ".principal { flex: 1; }  /* prend tout l'espace restant */\n" +
             ".fixe { flex: 0 0 200px; }  /* reste à 200px, ne grandit ni ne rétrécit */\n" +
             "```\n\n" +
+            "`flex: 1` est un raccourci pour « partage tout l'espace restant ». Le duo classique du web : une colonne latérale en `flex: 0 0 200px` et un contenu en `flex: 1`, soit la mise en page à colonne fixe et reste fluide. Et pour ajuster un seul enfant sans toucher aux autres, `align-self` remplace align-items au cas par cas, pratique pour caler un bouton en bas d'une carte quand tout le reste est centré.\n\n" +
             "Une barre de navigation avec un logo à gauche et des liens à droite, un footer sur trois colonnes, une carte avec image et texte alignés : Flexbox couvre l'immense majorité des besoins d'alignement du quotidien. Pour t'exercer de façon ludique, le jeu [Flexbox Froggy](https://flexboxfroggy.com/#fr) fait passer les concepts en une demi-heure.\n\n" +
+            "## À toi\n\n" +
+            "Une barre de navigation : logo à gauche, trois liens groupés à droite, le tout centré verticalement dans une barre de 64 px de haut. Écris le CSS du conteneur.\n\n" +
+            "> Correction : sur la barre, `display: flex; justify-content: space-between; align-items: center; height: 64px;`, et les trois liens réunis dans un conteneur commun, par exemple un `<ul>` lui-même en `display: flex; gap: 24px;`. Le space-between pousse le logo et le bloc de liens aux deux extrémités. Sans conteneur commun autour des liens, les quatre éléments se répartiraient chacun dans leur coin.\n\n" +
             "> À retenir : display: flex sur le conteneur, justify-content pour l'axe principal, align-items pour le secondaire. gap pour espacer, flex-wrap pour le responsive, et le trio center pour centrer enfin sans douleur.\n",
         },
         {
           id: "l23",
           title: "Grid : construire en deux dimensions",
           type: "text",
-          duration: "16 min",
+          duration: "20 min",
           body:
             "## Flexbox ou Grid : ce qui les sépare\n\n" +
             "Flexbox gère une dimension à la fois, une ligne ou une colonne. CSS Grid gère les **deux en même temps**, lignes et colonnes, comme un quadrillage. Règle pratique : Flexbox pour aligner une série d'éléments (une barre, une liste de cartes), Grid pour poser la structure globale d'une page ou une vraie grille régulière. Les deux se combinent très bien, on met souvent du Flexbox à l'intérieur des cellules d'un Grid.\n\n" +
@@ -1128,6 +1392,10 @@ const course: Course = {
             "}\n" +
             "```\n\n" +
             "`display: grid` active le mode, `grid-template-columns` définit les colonnes. L'unité `fr` (fraction) est propre à Grid : elle partage l'espace disponible. `1fr 1fr 1fr` crée trois colonnes de largeur égale. `2fr 1fr` en ferait deux, la première deux fois plus large que la seconde.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Une grille 2fr 1fr sur deux rangées : Grid pense en lignes ET en colonnes à la fois\"}\n" +
+            "<svg viewBox=\"0 0 640 320\" role=\"img\"><title>Grille CSS à deux colonnes et deux rangées</title><text x=\"250\" y=\"46\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" class=\"fig-accent\">2fr</text><text x=\"512\" y=\"46\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\" class=\"fig-accent\">1fr</text><rect x=\"80\" y=\"64\" width=\"340\" height=\"100\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><rect x=\"444\" y=\"64\" width=\"136\" height=\"100\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><rect x=\"80\" y=\"188\" width=\"340\" height=\"100\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><rect x=\"444\" y=\"188\" width=\"136\" height=\"100\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\"/><text x=\"40\" y=\"120\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">row 1</text><text x=\"40\" y=\"244\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">row 2</text><text x=\"432\" y=\"126\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" class=\"fig-accent\">gap</text><text x=\"330\" y=\"310\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">grid-template-columns: 2fr 1fr · l'espace se partage en trois parts</text></svg>\n" +
+            "```\n\n" +
             "## Le motif responsive le plus utile de tout le cours\n\n" +
             "Voici un bloc que tu vas réutiliser sans arrêt. Il crée autant de colonnes que la largeur le permet, chacune d'au moins 200 pixels, et réarrange tout automatiquement quand la fenêtre change de taille, sans une seule media query :\n\n" +
             "```css\n" +
@@ -1156,14 +1424,26 @@ const course: Course = {
             ".page > footer  { grid-area: pied; }\n" +
             "```\n\n" +
             "Le dessin en toutes lettres décrit la mise en page : en-tête sur toute la largeur, menu à gauche, contenu à droite, pied sur toute la largeur. On lit la structure d'un coup d'œil, et on peut la réorganiser en media query juste en redessinant ces lignes.\n\n" +
+            "## Étendre une cellule\n\n" +
+            "Un item peut occuper plusieurs pistes avec `grid-column` et `grid-row` :\n\n" +
+            "```css\n" +
+            ".hero {\n" +
+            "  grid-column: 1 / 3;  /* de la ligne de colonne 1 à la 3 : deux colonnes */\n" +
+            "  grid-row: span 2;    /* deux rangées de haut */\n" +
+            "}\n" +
+            "```\n\n" +
+            "Attention, les chiffres désignent les lignes de séparation, pas les colonnes : une grille de trois colonnes a quatre lignes numérotées de 1 à 4, et `1 / 4` traverse donc tout. C'est le point qui déroute le plus au début. DevTools affiche ces numéros quand tu cliques le badge « grid » à côté de l'élément dans l'inspecteur, un surlignage dessine alors toute la grille sur la page.\n\n" +
             "Pour pratiquer, [Grid Garden](https://cssgridgarden.com/#fr) fait le même travail que Flexbox Froggy pour Grid. Une demi-heure bien investie.\n\n" +
+            "## À toi\n\n" +
+            "Une page d'article : le texte principal à gauche sur deux tiers de la largeur, une colonne latérale sur le tiers restant, 32 px d'écart. Écris la grille.\n\n" +
+            "> Correction : `display: grid; grid-template-columns: 2fr 1fr; gap: 32px;` sur le conteneur. Deux fr contre un : le texte occupe deux tiers de l'espace disponible quelle que soit la largeur réelle. Une version `66% 33%` marcherait à peu près, mais le gap s'ajouterait aux pourcentages et finirait par faire déborder l'ensemble ; l'unité fr, elle, se répartit après déduction du gap.\n\n" +
             "> À retenir : Flexbox pour une ligne d'éléments, Grid pour une vraie structure à deux dimensions. Retiens par cœur le motif repeat(auto-fill, minmax(...)) : une grille responsive sans media query, c'est le geste qui impressionne le plus pour l'effort minimal.\n",
         },
         {
           id: "l24",
           title: "Responsive : un site qui s'adapte à tous les écrans",
           type: "text",
-          duration: "16 min",
+          duration: "20 min",
           body:
             "## Un seul site pour tous les écrans\n\n" +
             "Plus de la moitié du trafic web vient du mobile. Un site responsive n'est pas une version mobile séparée, c'est un même code qui se réarrange selon la largeur disponible. Le HTML reste identique, le CSS s'adapte.\n\n" +
@@ -1197,6 +1477,11 @@ const course: Course = {
             "}\n" +
             "```\n\n" +
             "Ces seuils de largeur s'appellent des **points de rupture** (*breakpoints*). Ne les choisis pas d'après des modèles de téléphones précis, ils changent tout le temps. Choisis-les là où **ton** design commence à mal vieillir : élargis la fenêtre du navigateur jusqu'à ce que ça devienne moche, et pose un breakpoint à cet endroit. Les valeurs autour de 600, 768 et 1024 px sont des points de départ raisonnables.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Le même HTML à trois largeurs : chaque breakpoint ajoute une colonne\"}\n" +
+            "<svg viewBox=\"0 0 640 300\" role=\"img\"><title>Points de rupture responsive : une, deux puis trois colonnes</title><rect x=\"40\" y=\"40\" width=\"110\" height=\"190\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.6\"/><rect x=\"52\" y=\"54\" width=\"86\" height=\"48\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><rect x=\"52\" y=\"112\" width=\"86\" height=\"48\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><rect x=\"52\" y=\"170\" width=\"86\" height=\"48\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><text x=\"95\" y=\"262\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">base : 1fr</text><rect x=\"210\" y=\"40\" width=\"170\" height=\"190\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.6\"/><rect x=\"222\" y=\"54\" width=\"68\" height=\"70\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><rect x=\"300\" y=\"54\" width=\"68\" height=\"70\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><rect x=\"222\" y=\"134\" width=\"68\" height=\"70\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><text x=\"295\" y=\"262\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">min-width: 768px</text><rect x=\"440\" y=\"40\" width=\"170\" height=\"190\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.6\"/><rect x=\"450\" y=\"54\" width=\"46\" height=\"70\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><rect x=\"502\" y=\"54\" width=\"46\" height=\"70\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><rect x=\"554\" y=\"54\" width=\"46\" height=\"70\" rx=\"3\" fill=\"none\" stroke=\"currentColor\" class=\"fig-accent\"/><text x=\"525\" y=\"262\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">min-width: 1024px</text></svg>\n" +
+            "```\n\n" +
+            "Les media queries ne testent d'ailleurs pas que la largeur. `@media (prefers-color-scheme: dark)` détecte le mode sombre du système, `@media (prefers-reduced-motion: reduce)` signale qu'un utilisateur demande moins d'animations. Deux conditions à connaître de nom, tu les croiseras vite.\n\n" +
             "## Des outils qui font le responsive presque tout seuls\n\n" +
             "Certaines techniques réduisent le besoin de media queries. Tu les as déjà vues :\n\n" +
             "- `flex-wrap: wrap` avec Flexbox, qui fait retomber les éléments à la ligne.\n" +
@@ -1210,6 +1495,9 @@ const course: Course = {
             "```\n\n" +
             "## Tester pour de vrai\n\n" +
             "Les outils de développement du navigateur ont un mode responsive (l'icône de téléphone/tablette, ou Ctrl+Shift+M sur Chrome). Il simule différentes tailles d'écran. Sers-t'en constamment. Redimensionne aussi la vraie fenêtre à la souris : voir la mise en page se réorganiser en direct est le meilleur retour possible pendant que tu codes.\n\n" +
+            "## À toi\n\n" +
+            "Ton style de base affiche la navigation en colonne. Écris, en mobile first, la media query qui la passe en ligne à partir de 768 px.\n\n" +
+            "> Correction : dans le style de base, `.nav { display: flex; flex-direction: column; }`, puis `@media (min-width: 768px) { .nav { flex-direction: row; } }`. En mobile first, on n'écrit que des min-width : le style de base sert les petits écrans et chaque palier n'ajoute que ce qui change. Mélanger min-width et max-width crée des zones de recouvrement pénibles à déboguer.\n\n" +
             "> À retenir : la balise viewport d'abord, sinon rien ne marche sur mobile. Conçois en mobile first, ajoute des media queries min-width là où ton design casse, pas selon des modèles de téléphone, et laisse Flexbox et Grid faire une partie du travail à ta place.\n",
         },
         {

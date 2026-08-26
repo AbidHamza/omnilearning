@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import type { CourseStatus, Role, User } from "@/lib/types";
 import BillingPortalButton from "@/components/billing-portal-button";
+import { useT } from "@/i18n/provider";
 import {
-  AwardIcon,
   ClockIcon,
   EyeIcon,
   LayersIcon,
@@ -18,13 +18,18 @@ import {
 const inputCls =
   "mt-2 w-full rounded-lg border border-line bg-bg px-3.5 py-2.5 text-sm outline-none transition focus:border-primary";
 
-const days = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
-
-const statusMeta: Record<CourseStatus, { label: string; cls: string }> = {
-  online: { label: "En ligne", cls: "bg-success-soft text-success" },
-  pending: { label: "En attente de validation", cls: "bg-warning/15 text-warning" },
-  draft: { label: "En cours de création", cls: "bg-surface-2 text-muted" },
+const statusCls: Record<CourseStatus, string> = {
+  online: "bg-success-soft text-success",
+  pending: "bg-warning/15 text-warning",
+  draft: "bg-surface-2 text-muted",
 };
+
+// Un onglet « Certifications » figurait ici. La plateforme ne délivre aucun
+// certificat : dal.ts renvoie une liste vide en dur, la base n'a pas de modèle,
+// et le bouton de téléchargement n'était relié à rien. L'onglet ne pouvait donc
+// qu'afficher son état vide, définitivement. Retiré en attendant que la
+// fonctionnalité existe.
+type TabId = "profile" | "reminders" | "tracking" | "created" | "stats";
 
 export interface BillingState {
   stripeEnabled: boolean;
@@ -43,50 +48,58 @@ export default function ParametresClient({
   courseTitles: Record<string, string>;
   billing: BillingState;
 }) {
-  const tabs =
-    role === "formateur"
-      ? ["Informations personnelles", "Formations créés", "Statistiques des formations"]
-      : role === "admin"
-        ? ["Informations personnelles"]
-        : ["Informations personnelles", "Rappels", "Suivi d'apprentissage", "Certifications"];
+  const t = useT();
+  const s = t.settings;
 
-  const [tab, setTab] = useState(tabs[0]);
+  const labels: Record<TabId, string> = {
+    profile: s.tabProfile,
+    reminders: s.tabReminders,
+    tracking: s.tabTracking,
+    created: s.tabCreated,
+    stats: s.tabStats,
+  };
+
+  const tabIds: TabId[] =
+    role === "formateur"
+      ? ["profile", "created", "stats"]
+      : role === "admin"
+        ? ["profile"]
+        : ["profile", "reminders", "tracking"];
+
+  const [tab, setTab] = useState<TabId>(tabIds[0]);
 
   if (!user) return null;
 
   return (
     <div className="container-page py-10">
       <span className="rule-accent mb-3" />
-      <h1 className="text-4xl font-semibold">Paramètres</h1>
+      <h1 className="text-4xl font-semibold">{t.nav.settings}</h1>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[240px_1fr]">
         <nav className="flex gap-2 overflow-x-auto border-line lg:flex-col lg:overflow-visible lg:border-r lg:pr-6">
-          {tabs.map((t) => (
+          {tabIds.map((id) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={id}
+              onClick={() => setTab(id)}
               className={`shrink-0 rounded-lg px-4 py-2.5 text-left text-sm transition ${
-                tab === t
+                tab === id
                   ? "bg-primary-soft font-bold text-primary-dark"
                   : "text-muted hover:bg-surface"
               }`}
             >
-              {t}
+              {labels[id]}
             </button>
           ))}
         </nav>
 
         <div className="max-w-xl">
-          {tab === "Informations personnelles" && (
-            <ProfileTab user={user} billing={billing} />
-          )}
-          {tab === "Rappels" && <RappelsTab />}
-          {tab === "Suivi d'apprentissage" && (
+          {tab === "profile" && <ProfileTab user={user} billing={billing} />}
+          {tab === "reminders" && <RappelsTab />}
+          {tab === "tracking" && (
             <SuiviTab user={user} courseTitles={courseTitles} />
           )}
-          {tab === "Certifications" && <CertifsTab user={user} />}
-          {tab === "Formations créés" && <FormationsCreesTab user={user} />}
-          {tab === "Statistiques des formations" && <StatsTab user={user} />}
+          {tab === "created" && <FormationsCreesTab user={user} />}
+          {tab === "stats" && <StatsTab user={user} />}
         </div>
       </div>
     </div>
@@ -94,6 +107,7 @@ export default function ParametresClient({
 }
 
 function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
+  const s = useT().settings;
   const [saved, setSaved] = useState(false);
   return (
     <form
@@ -104,10 +118,10 @@ function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
       }}
     >
       <h2 className="flex items-center gap-2 font-display text-lg font-bold">
-        <UserIcon width={20} height={20} /> Profil
+        <UserIcon width={20} height={20} /> {s.profileHeading}
       </h2>
 
-      <p className="mt-6 text-sm font-semibold">Photo de profil</p>
+      <p className="mt-6 text-sm font-semibold">{s.photoLabel}</p>
       <div className="mt-2 flex items-center gap-4">
         <span className="grid h-16 w-16 place-items-center rounded-full bg-brand-soft text-lg font-bold text-primary-dark">
           {user.initials}
@@ -117,22 +131,22 @@ function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
           className="inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary"
         >
           <PencilIcon width={14} height={14} />
-          Changer de photo
+          {s.changePhoto}
         </button>
       </div>
 
-      <label className="mt-6 block text-sm font-semibold">Nom</label>
+      <label className="mt-6 block text-sm font-semibold">{s.nameLabel}</label>
       <input defaultValue={user.name} className={inputCls} />
 
-      <label className="mt-5 block text-sm font-semibold">Mail</label>
+      <label className="mt-5 block text-sm font-semibold">{s.emailLabel}</label>
       <input type="email" defaultValue={user.email} className={inputCls} />
 
       <h2 className="mt-10 flex items-center gap-2 font-display text-lg font-bold">
-        <ShieldIcon width={19} height={19} /> Changer de mot de passe
+        <ShieldIcon width={19} height={19} /> {s.changePwHeading}
       </h2>
-      <label className="mt-5 block text-sm font-semibold">Mot de passe actuel</label>
+      <label className="mt-5 block text-sm font-semibold">{s.currentPw}</label>
       <input type="password" placeholder="••••••••" className={inputCls} />
-      <label className="mt-5 block text-sm font-semibold">Nouveau mot de passe</label>
+      <label className="mt-5 block text-sm font-semibold">{s.newPw}</label>
       <input type="password" placeholder="••••••••" className={inputCls} />
 
       <div className="mt-7 flex items-center gap-3">
@@ -140,9 +154,9 @@ function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
           type="submit"
           className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
         >
-          Changer mot de passe
+          {s.changePwBtn}
         </button>
-        {saved && <span className="text-sm text-success">Enregistré ✓</span>}
+        {saved && <span className="text-sm text-success">{s.saved} ✓</span>}
       </div>
 
       {billing.stripeEnabled && <BillingPortalButton hasCustomer={billing.hasCustomer} />}
@@ -151,16 +165,23 @@ function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
 }
 
 function FormationsCreesTab({ user }: { user: User }) {
+  const t = useT();
+  const s = t.settings;
+  const statusLabel: Record<CourseStatus, string> = {
+    online: t.status.online,
+    pending: t.status.pending,
+    draft: t.status.draft,
+  };
   const created = user.created ?? [];
   return (
     <div>
-      <h2 className="font-display text-lg font-bold">Formations créés</h2>
-      <p className="mt-1 text-sm text-muted">Listes de formations</p>
+      <h2 className="font-display text-lg font-bold">{s.createdHeading}</h2>
+      <p className="mt-1 text-sm text-muted">{s.createdSubtitle}</p>
 
       <div className="mt-5 space-y-3">
         {created.length === 0 ? (
           <p className="rounded-xl bg-surface px-4 py-3.5 text-sm text-muted">
-            Vous n&apos;avez pas encore créé de formation.
+            {s.noCreated}
           </p>
         ) : (
           created.map((c) => (
@@ -170,19 +191,19 @@ function FormationsCreesTab({ user }: { user: User }) {
             >
               <span className="font-semibold">{c.title}</span>
               <span
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusMeta[c.status].cls}`}
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusCls[c.status]}`}
               >
-                {statusMeta[c.status].label}
+                {statusLabel[c.status]}
               </span>
               <div className="ml-auto flex gap-2">
-                {c.status === "online" && <Pill href="/creer">Modifier</Pill>}
-                {c.status === "draft" && <Pill href="/creer">Reprendre</Pill>}
+                {c.status === "online" && <Pill href="/creer">{t.actions.edit}</Pill>}
+                {c.status === "draft" && <Pill href="/creer">{t.actions.resume}</Pill>}
                 <Pill href="/formations/cybersecurite" icon>
-                  Voir
+                  {t.actions.view}
                 </Pill>
                 {c.status !== "pending" && (
                   <button className="rounded-full border border-line bg-bg px-3.5 py-1.5 text-xs font-semibold text-muted transition hover:border-danger hover:text-danger">
-                    Supprimer
+                    {t.actions.delete}
                   </button>
                 )}
               </div>
@@ -195,21 +216,22 @@ function FormationsCreesTab({ user }: { user: User }) {
 }
 
 function StatsTab({ user }: { user: User }) {
+  const s = useT().settings;
   const stats = user.stats;
   const created = user.created ?? [];
   if (!stats) return null;
   const tiles = [
-    { icon: LayersIcon, value: stats.started, label: "Commencées" },
-    { icon: ClockIcon, value: stats.finished, label: "Finies" },
+    { icon: LayersIcon, value: stats.started, label: s.statStarted },
+    { icon: ClockIcon, value: stats.finished, label: s.statFinished },
     {
       icon: StarIcon,
       value: stats.rating.toFixed(1).replace(".0", ""),
-      label: "Note moyenne",
+      label: s.statRating,
     },
   ];
   return (
     <div>
-      <h2 className="font-display text-lg font-bold">Statistiques des formations</h2>
+      <h2 className="font-display text-lg font-bold">{s.statsHeading}</h2>
 
       <div className="mt-5 grid grid-cols-3 gap-3">
         {tiles.map((t) => (
@@ -227,9 +249,9 @@ function StatsTab({ user }: { user: User }) {
         <table className="w-full min-w-[420px] border-collapse text-sm">
           <thead>
             <tr className="text-left text-xs font-semibold text-muted">
-              <th className="pb-3 pr-4 font-semibold">Formation</th>
-              <th className="pb-3 pr-4 font-semibold">Commencé</th>
-              <th className="pb-3 font-semibold">Fini</th>
+              <th className="pb-3 pr-4 font-semibold">{s.tableFormation}</th>
+              <th className="pb-3 pr-4 font-semibold">{s.tableStarted}</th>
+              <th className="pb-3 font-semibold">{s.tableFinished}</th>
             </tr>
           </thead>
           <tbody>
@@ -237,7 +259,7 @@ function StatsTab({ user }: { user: User }) {
               <tr key={c.title} className="border-t border-line">
                 <td className="py-3 pr-4 font-medium">{c.title}</td>
                 <td className="py-3 pr-4">{c.started}</td>
-                <td className="py-3">{c.status === "online" ? c.finished : "—"}</td>
+                <td className="py-3">{c.status === "online" ? c.finished : "--"}</td>
               </tr>
             ))}
           </tbody>
@@ -268,6 +290,9 @@ function Pill({
 }
 
 function RappelsTab() {
+  const t = useT();
+  const s = t.settings;
+  const days = s.days;
   const [all, setAll] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
 
@@ -286,33 +311,30 @@ function RappelsTab() {
 
   return (
     <form onSubmit={(e) => e.preventDefault()}>
-      <h2 className="font-display text-lg font-bold">Notifications</h2>
+      <h2 className="font-display text-lg font-bold">{s.tabReminders}</h2>
 
       <div className="mt-5 space-y-5">
         <NotifRow
-          title="Rappels d'apprentissage"
-          desc="Nous vous rappelons de continuer les leçons, de rendre les devoirs dans les délais."
+          title={s.reminderLearnTitle}
+          desc={s.reminderLearnDesc}
           email
           sms
         />
         <NotifRow
-          title="Mise à jour de contenu"
-          desc="Nous vous alertons pour l'ajout de nouvelles leçons, vidéos ou autre contenu."
+          title={s.reminderContentTitle}
+          desc={s.reminderContentDesc}
           sms
         />
       </div>
 
       <h2 className="mt-10 font-display text-lg font-bold">
-        Objectif de rappel d&apos;apprentissage
+        {s.reminderGoalTitle}
       </h2>
-      <p className="mt-1 text-sm text-muted">
-        Les jours d&apos;apprentissage choisis pour lesquels vous recevrez une
-        alerte si vous ne continuez pas votre apprentissage.
-      </p>
+      <p className="mt-1 text-sm text-muted">{s.reminderGoalDesc}</p>
 
       <label className="mt-5 flex items-center gap-3 text-sm font-semibold">
         <CheckBox checked={all} onChange={toggleAll} />
-        Tout sélectionner
+        {s.selectAll}
       </label>
       <div className="mt-3 space-y-3 pl-6">
         {days.map((d) => (
@@ -327,7 +349,7 @@ function RappelsTab() {
         type="submit"
         className="mt-7 rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
       >
-        Enregistrer
+        {t.common.save}
       </button>
     </form>
   );
@@ -344,8 +366,9 @@ function NotifRow({
   email?: boolean;
   sms?: boolean;
 }) {
+  const s = useT().settings;
   const [e, setE] = useState(!!email);
-  const [s, setS] = useState(!!sms);
+  const [sm, setSm] = useState(!!sms);
   return (
     <div className="flex items-start justify-between gap-6 border-b border-line pb-5">
       <div>
@@ -354,12 +377,12 @@ function NotifRow({
       </div>
       <div className="flex shrink-0 gap-6 pt-1">
         <label className="flex flex-col items-center gap-1.5 text-xs text-muted">
-          Email
+          {s.email}
           <CheckBox checked={e} onChange={() => setE((v) => !v)} round />
         </label>
         <label className="flex flex-col items-center gap-1.5 text-xs text-muted">
-          SMS
-          <CheckBox checked={s} onChange={() => setS((v) => !v)} round />
+          {s.sms}
+          <CheckBox checked={sm} onChange={() => setSm((v) => !v)} round />
         </label>
       </div>
     </div>
@@ -400,17 +423,18 @@ function SuiviTab({
   user: User;
   courseTitles: Record<string, string>;
 }) {
+  const s = useT().settings;
   const enrolled = user.enrolled.map((e) => ({
     ...e,
     title: courseTitles[e.slug] ?? e.slug,
   }));
   return (
     <div>
-      <h2 className="font-display text-lg font-bold">Suivi d&apos;apprentissage</h2>
+      <h2 className="font-display text-lg font-bold">{s.trackingHeading}</h2>
       <div className="mt-5 space-y-4">
         {enrolled.length === 0 ? (
           <p className="rounded-xl border border-line p-4 text-sm text-muted">
-            Vous ne suivez aucune formation pour le moment.
+            {s.noTracking}
           </p>
         ) : (
           enrolled.map((e) => (
@@ -422,7 +446,7 @@ function SuiviTab({
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface">
                 <div className="h-full rounded-[3px] bg-primary" style={{ width: `${e.progress}%` }} />
               </div>
-              <p className="mt-2 text-sm text-muted">Dernière leçon : {e.lastLesson}</p>
+              <p className="mt-2 text-sm text-muted">{s.lastLesson} {e.lastLesson}</p>
             </div>
           ))
         )}
@@ -431,29 +455,3 @@ function SuiviTab({
   );
 }
 
-function CertifsTab({ user }: { user: User }) {
-  return (
-    <div>
-      <h2 className="font-display text-lg font-bold">Certifications</h2>
-      <div className="mt-5 space-y-4">
-        {user.certificates.map((c) => (
-          <div key={c.course} className="flex items-center gap-4 rounded-xl border border-line p-4">
-            <span className="grid h-11 w-11 place-items-center rounded-[3px] bg-success-soft text-success">
-              <AwardIcon />
-            </span>
-            <div className="flex-1">
-              <div className="font-semibold">{c.course}</div>
-              <div className="text-sm text-muted">Obtenu le {c.date}</div>
-            </div>
-            <button className="rounded-full border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary">
-              Télécharger
-            </button>
-          </div>
-        ))}
-        <p className="text-sm text-muted">
-          Terminez vos formations en cours pour débloquer de nouveaux certificats.
-        </p>
-      </div>
-    </div>
-  );
-}

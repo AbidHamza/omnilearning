@@ -8,6 +8,20 @@ export interface QuizQuestion {
   explanation?: string;
 }
 
+/**
+ * Question telle qu'elle part au navigateur : l'énoncé et les propositions,
+ * jamais la bonne réponse. La correction est rendue par le serveur une fois la
+ * réponse soumise (voir `checkQuizAnswerAction`).
+ */
+export type PublicQuizQuestion = Omit<QuizQuestion, "correctIndex" | "explanation">;
+
+/** Verdict renvoyé par le serveur après soumission d'une réponse. */
+export interface QuizVerdict {
+  correct: boolean;
+  correctIndex: number;
+  explanation?: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -15,7 +29,17 @@ export interface Lesson {
   duration: string;
   body?: string;
   videoLabel?: string;
+  /** Source jouable (MP4 progressif ou manifeste HLS). Vide = pas encore tournée. */
+  videoUrl?: string;
+  /** Image d'attente 16:9. Sans elle, le lecteur affiche un carré noir. */
+  videoPoster?: string;
+  /** Durée réelle en secondes (le champ `duration` reste l'étiquette lisible). */
+  videoDurationSec?: number;
+  /** Pistes de sous-titres par langue : { fr: "/videos/x.fr.vtt", en: "…" }. */
+  captions?: Record<string, string>;
   questions?: QuizQuestion[];
+  /** Accès libre sans compte (les 2 premières leçons de chaque cours). */
+  isFree?: boolean;
 }
 
 export interface CoursePart {
@@ -57,7 +81,10 @@ export interface Category {
 export interface EnrolledCourse {
   slug: string;
   progress: number;
+  /** Key de la dernière leçon consultée (ex. "l7") ; anciennes valeurs = titre. */
   lastLesson: string;
+  /** Nombre de leçons terminées (LessonProgress isCompleted). */
+  completedLessons: number;
 }
 
 export type Role = "visiteur" | "etudiant" | "formateur" | "admin";

@@ -1,56 +1,79 @@
 import { LocaleLink } from "@/i18n/navigation";
-import { siteName } from "@/lib/site";
+import { isLocale, defaultLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/get-dictionary";
+import type { Metadata } from "next";
+import { alternatesFor, pageUrl, siteName } from "@/lib/site";
 import SupportButton from "@/components/support-button";
 import type { SupportTier } from "@/lib/stripe";
 
-const tiers: Array<{
-  name: string;
-  tier: SupportTier;
-  price: string;
-  featured?: boolean;
-  perks: string[];
-}> = [
-  { name: "Soutien", tier: "soutien", price: "5 €", perks: ["Badge de soutien", "Accès anticipé aux nouveautés"] },
-  {
-    name: "Mécène",
-    tier: "mecene",
-    price: "15 €",
-    featured: true,
-    perks: ["Tout le palier Soutien", "Sessions live mensuelles", "Vote sur les prochaines formations"],
-  },
-  { name: "Partenaire", tier: "partenaire", price: "50 €", perks: ["Tout le palier Mécène", "Logo sur la plateforme", "Accompagnement dédié"] },
-];
+// Ordre + tarifs = données stables ; noms et avantages viennent du dictionnaire.
+const tierMeta: Array<{ tier: SupportTier; price: string; featured?: boolean }> =
+  [
+    { tier: "soutien", price: "5 €" },
+    { tier: "mecene", price: "15 €", featured: true },
+    { tier: "partenaire", price: "50 €" },
+  ];
 
-export default function SupportPage() {
+export async function generateMetadata(
+  props: PageProps<"/[lang]/soutenir">,
+): Promise<Metadata> {
+  const { lang } = await props.params;
+  const locale = isLocale(lang) ? lang : defaultLocale;
+  const dict = await getDictionary(locale);
+  const title = dict.nav.support;
+  const description = dict.support.subtitle.replace("{siteName}", siteName);
+
+  return {
+    title,
+    description,
+    alternates: alternatesFor(locale, "/soutenir"),
+    openGraph: {
+      type: "website",
+      siteName,
+      title: `${title} · ${siteName}`,
+      description,
+      url: pageUrl(locale, "/soutenir"),
+      locale,
+    },
+  };
+}
+
+export default async function SupportPage({ params }: PageProps<"/[lang]">) {
+  const { lang } = await params;
+  const locale = isLocale(lang) ? lang : defaultLocale;
+  const dict = await getDictionary(locale);
+  const s = dict.support;
+
+  const tiers = tierMeta.map((m, i) => ({ ...m, ...s.tiers[i] }));
+
   return (
     <div className="container-page py-16">
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Soutenir la plateforme
+          {dict.nav.support}
         </h1>
         <p className="mt-4 text-lg text-muted">
-          {siteName} est gratuit pour tous. Votre soutien finance la création
-          de nouvelles formations et garde le savoir accessible à chacun.
+          {s.subtitle.replace("{siteName}", siteName)}
         </p>
       </div>
 
       <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-3">
         {tiers.map((t) => (
           <div
-            key={t.name}
+            key={t.tier}
             className={`flex flex-col rounded-[var(--radius-card)] border bg-bg p-6 ${
               t.featured ? "border-primary shadow-sm" : "border-line"
             }`}
           >
             {t.featured && (
               <span className="mb-3 w-fit rounded-[3px] bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
-                Le plus populaire
+                {s.popular}
               </span>
             )}
             <h3 className="font-semibold">{t.name}</h3>
             <div className="mt-2 text-3xl font-bold">
               {t.price}
-              <span className="text-base font-normal text-muted"> /mois</span>
+              <span className="text-base font-normal text-muted"> {s.perMonth}</span>
             </div>
             <ul className="mt-5 flex-1 space-y-2 text-sm text-muted">
               {t.perks.map((p) => (
@@ -60,15 +83,19 @@ export default function SupportPage() {
                 </li>
               ))}
             </ul>
-            <SupportButton tier={t.tier} label={`Choisir ${t.name}`} featured={t.featured} />
+            <SupportButton
+              tier={t.tier}
+              label={s.choose.replace("{name}", t.name)}
+              featured={t.featured}
+            />
           </div>
         ))}
       </div>
 
       <p className="mt-10 text-center text-sm text-muted">
-        Vous préférez contribuer autrement ?{" "}
+        {s.otherWay}{" "}
         <LocaleLink href="/creer" className="font-medium text-primary hover:underline">
-          Créez et partagez votre propre formation.
+          {s.otherWayLink}
         </LocaleLink>
       </p>
     </div>

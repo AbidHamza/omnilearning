@@ -3,6 +3,13 @@ import { getInstructorDashboard, getBillingState, requireRole } from "@/lib/dal"
 import { getCourses } from "@/lib/courses";
 import type { User } from "@/lib/types";
 import ParametresClient from "./parametres-client";
+import type { Metadata } from "next";
+
+// Écran privé : derrière une session, sans contenu public. Il n'a rien à faire
+// dans un index, et une canonique n'aurait aucun sens sur une page dont le
+// contenu change avec le compte connecté.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
 
 export default async function ParametresPage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;

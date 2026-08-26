@@ -4,7 +4,18 @@ import { locales } from "@/i18n/config";
 import { siteUrl } from "@/lib/site";
 
 // Chemins publics indexables (hors espaces privés : admin, tableau de bord, paramètres…).
-const publicPaths = ["", "/formations", "/soutenir", "/connexion", "/creer-compte"];
+// Pages a indexer. Connexion/inscription en sont volontairement absentes :
+// ce sont des formulaires, pas des pages de destination.
+const publicPaths = [
+  "",
+  "/formations",
+  "/soutenir",
+  "/a-propos",
+  "/contact",
+  "/mentions-legales",
+  "/cgu",
+  "/confidentialite",
+];
 
 function languagesFor(path: string): Record<string, string> {
   return Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}${path}`]));

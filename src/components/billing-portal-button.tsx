@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { openBillingPortalAction } from "@/lib/actions/stripe";
+import { useT } from "@/i18n/provider";
 
 // Bouton "Gérer mon abonnement" : ouvre le portail client Stripe (redirige côté
 // serveur). N'affiche qu'un message non bloquant si le portail est indisponible.
@@ -10,6 +11,7 @@ export default function BillingPortalButton({
 }: {
   hasCustomer: boolean;
 }) {
+  const { billing } = useT();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -25,11 +27,9 @@ export default function BillingPortalButton({
 
   return (
     <div>
-      <h2 className="mt-10 font-display text-lg font-bold">Abonnement</h2>
+      <h2 className="mt-10 font-display text-lg font-bold">{billing.heading}</h2>
       <p className="mt-1 text-sm text-muted">
-        {hasCustomer
-          ? "Gérez votre soutien, modifiez ou annulez votre abonnement via le portail sécurisé Stripe."
-          : "Vous n'avez pas encore d'abonnement actif. Soutenez la plateforme pour en démarrer un."}
+        {hasCustomer ? billing.descActive : billing.descInactive}
       </p>
       <button
         type="button"
@@ -37,7 +37,7 @@ export default function BillingPortalButton({
         disabled={pending}
         className="mt-4 inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-primary hover:text-primary-dark disabled:opacity-60"
       >
-        {pending ? "Ouverture…" : "Gérer mon abonnement"}
+        {pending ? billing.opening : billing.manage}
       </button>
       {error && <p className="mt-2 text-sm text-danger">{error}</p>}
     </div>

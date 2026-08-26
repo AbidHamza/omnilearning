@@ -2,10 +2,23 @@
 
 import { useState } from "react";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
+import { useT } from "@/i18n/provider";
 import { signupAction } from "@/lib/actions/auth";
 import { GraduationIcon, CheckIcon } from "@/components/icons";
 
+// Cible de retour passée par une page verrouillée (?next=/formations/...).
+// Lue au moment du submit (pas de useSearchParams → pas de Suspense imposée).
+// Chemin interne SANS préfixe de locale ; tout le reste est rejeté.
+function nextFromLocation(): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.search).get("next");
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return null;
+  return raw;
+}
+
 export default function CreerComptePage() {
+  const t = useT();
+  const s = t.signup;
   const router = useLocaleRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -17,7 +30,7 @@ export default function CreerComptePage() {
     const password = fd.get("password") as string;
     const confirm = fd.get("confirmPassword") as string;
     if (password !== confirm) {
-      setError("Les mots de passe ne correspondent pas.");
+      setError(s.mismatch);
       return;
     }
     setPending(true);
@@ -29,7 +42,8 @@ export default function CreerComptePage() {
       setError(res.error);
       return;
     }
-    router.push("/tableau-de-bord");
+    // Si l'inscription part d'une leçon verrouillée, on y renvoie directement.
+    router.push(nextFromLocation() ?? "/tableau-de-bord");
     router.refresh();
   }
 
@@ -39,28 +53,27 @@ export default function CreerComptePage() {
         <form onSubmit={submit} className="w-full max-w-sm">
           <span className="rule-accent mb-4" />
           <h1 className="text-[2.4rem] font-semibold leading-tight">
-            Créer votre compte
+            {s.title}
           </h1>
-          <p className="mt-2 text-sm text-muted">
-            Vous rejoignez OmniLearn en tant qu&apos;apprenant. Pour devenir
-            formateur, contactez l&apos;équipe une fois inscrit.
-          </p>
+          <p className="mt-2 text-sm text-muted">{s.subtitle}</p>
 
-          <label className="mt-6 block text-sm font-medium">Mail</label>
+          <label className="mt-6 block text-sm font-medium">
+            {t.settings.emailLabel}
+          </label>
           <input type="email" name="email" required placeholder="vous@email.com" className="field mt-2" />
 
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium">Prénom</label>
+              <label className="block text-sm font-medium">{s.firstName}</label>
               <input type="text" name="firstName" required className="field mt-2" />
             </div>
             <div>
-              <label className="block text-sm font-medium">Nom</label>
+              <label className="block text-sm font-medium">{s.lastName}</label>
               <input type="text" name="lastName" required className="field mt-2" />
             </div>
           </div>
 
-          <label className="mt-5 block text-sm font-medium">Mot de passe</label>
+          <label className="mt-5 block text-sm font-medium">{t.auth.password}</label>
           <input
             type="password"
             name="password"
@@ -71,7 +84,7 @@ export default function CreerComptePage() {
           />
 
           <label className="mt-5 block text-sm font-medium">
-            Confirmation du mot de passe
+            {s.confirmPassword}
           </label>
           <input
             type="password"
@@ -90,13 +103,13 @@ export default function CreerComptePage() {
             className="mt-7 inline-flex w-full items-center justify-center gap-1.5 rounded-[3px] border border-primary/40 bg-brand-soft py-3 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a] disabled:opacity-60"
           >
             <span className="opacity-70">$</span>
-            Créer mon compte
+            {s.submit}
           </button>
 
           <p className="mt-4 text-sm text-muted">
-            Vous avez déjà un compte ?{" "}
+            {s.haveAccount}{" "}
             <LocaleLink href="/connexion" className="font-semibold text-primary hover:underline">
-              Se connecter
+              {t.common.signIn}
             </LocaleLink>
           </p>
         </form>
@@ -119,15 +132,11 @@ export default function CreerComptePage() {
         <div className="relative">
           <p className="font-mono text-xs text-muted-soft"># useradd --role student</p>
           <p className="mt-3 font-display text-3xl font-extrabold leading-tight tracking-tight text-ink">
-            Rejoignez des milliers d&apos;apprenants{" "}
-            <span className="text-primary">curieux</span>.
+            {s.panelTitleLead}{" "}
+            <span className="text-primary">{s.panelTitleAccent}</span>.
           </p>
           <ul className="mt-7 space-y-3.5">
-            {[
-              "Accès illimité au catalogue, gratuitement",
-              "Suivi de progression et certificats",
-              "Apprenez à votre rythme, en fr / en / ar",
-            ].map((item) => (
+            {s.panelBenefits.map((item) => (
               <li key={item} className="flex items-center gap-3 font-sans text-sm text-muted">
                 <span className="grid h-6 w-6 shrink-0 place-items-center rounded-[3px] bg-brand-soft text-primary">
                   <CheckIcon width={13} height={13} />
@@ -139,7 +148,7 @@ export default function CreerComptePage() {
         </div>
 
         <p className="relative font-mono text-xs uppercase tracking-[0.14em] text-muted-soft">
-          Apprenez. Pratiquez. Progressez.
+          {t.footer.motto}
         </p>
       </div>
     </div>

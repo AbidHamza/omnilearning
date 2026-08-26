@@ -1,39 +1,65 @@
 "use client";
 
-import { useRef, useState } from "react";
-import type { QuizQuestion } from "@/lib/types";
+import { useRef, useState, useTransition } from "react";
+import type { PublicQuizQuestion, QuizVerdict } from "@/lib/types";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, XIcon } from "./icons";
 import { useT } from "@/i18n/provider";
 import { recordQuizAttemptAction } from "@/lib/actions/progress";
+import { checkQuizAnswerAction } from "@/lib/actions/quiz";
 
+/**
+ * Quiz d'une leçon.
+ *
+ * Le composant ne connaît PAS les bonnes réponses : il reçoit des questions
+ * publiques (énoncé + propositions) et demande le verdict au serveur quand
+ * l'apprenant valide. Auparavant, `correctIndex` et l'explication voyageaient
+ * dans le HTML : 346 réponses lisibles en clair sur la page catalogue.
+ */
 export default function Quiz({
   questions,
   onFinished,
   courseSlug,
   lessonKey,
 }: {
-  questions: QuizQuestion[];
+  questions: PublicQuizQuestion[];
   onFinished?: () => void;
-  // Si fournis : la tentative est persistée en DB pour l'utilisateur connecté.
-  courseSlug?: string;
-  lessonKey?: string;
+  // Requis pour la correction serveur ; sert aussi à persister la tentative.
+  courseSlug: string;
+  lessonKey: string;
 }) {
   const t = useT();
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
-  const [checked, setChecked] = useState(false);
+  const [verdict, setVerdict] = useState<QuizVerdict | null>(null);
+  const [failedCheck, setFailedCheck] = useState(false);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const [pending, startTransition] = useTransition();
   const answers = useRef<number[]>([]);
 
   const question = questions[index];
   const isLast = index === questions.length - 1;
+  const checked = verdict !== null;
 
   function check() {
-    if (selected === null) return;
-    setChecked(true);
-    answers.current[index] = selected;
-    if (selected === question.correctIndex) setScore((s) => s + 1);
+    if (selected === null || pending) return;
+    setFailedCheck(false);
+    const chosen = selected;
+    startTransition(async () => {
+      const result = await checkQuizAnswerAction({
+        courseSlug,
+        lessonKey,
+        questionId: question.id,
+        selected: chosen,
+      });
+      if (!result) {
+        setFailedCheck(true);
+        return;
+      }
+      answers.current[index] = chosen;
+      setVerdict(result);
+      if (result.correct) setScore((s) => s + 1);
+    });
   }
 
   function next() {
@@ -41,35 +67,37 @@ export default function Quiz({
       setDone(true);
       onFinished?.();
       // Persiste la tentative (no-op serveur si non connecté).
-      if (courseSlug && lessonKey) {
-        void recordQuizAttemptAction({
-          courseSlug,
-          lessonKey,
-          answers: answers.current,
-          score,
-          maxScore: questions.length,
-        });
-      }
+      void recordQuizAttemptAction({
+        courseSlug,
+        lessonKey,
+        answers: answers.current,
+        score,
+        maxScore: questions.length,
+      });
       return;
     }
     setIndex((i) => i + 1);
     setSelected(null);
-    setChecked(false);
+    setVerdict(null);
+    setFailedCheck(false);
   }
 
   function prev() {
     if (index === 0) return;
     setIndex((i) => i - 1);
     setSelected(null);
-    setChecked(false);
+    setVerdict(null);
+    setFailedCheck(false);
   }
 
   function restart() {
     setIndex(0);
     setSelected(null);
-    setChecked(false);
+    setVerdict(null);
+    setFailedCheck(false);
     setScore(0);
     setDone(false);
+    answers.current = [];
   }
 
   if (done) {
@@ -131,7 +159,7 @@ export default function Quiz({
       <div className="mt-5 space-y-3">
         {question.options.map((opt, i) => {
           const isSelected = selected === i;
-          const isCorrect = i === question.correctIndex;
+          const isCorrect = verdict !== null && i === verdict.correctIndex;
           let ring = "border-line";
           if (checked) {
             if (isCorrect) ring = "border-success bg-success-soft";
@@ -143,7 +171,7 @@ export default function Quiz({
           return (
             <button
               key={i}
-              disabled={checked}
+              disabled={checked || pending}
               onClick={() => setSelected(i)}
               className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-start text-sm transition ${ring} ${
                 !checked ? "hover:border-primary" : ""
@@ -177,9 +205,15 @@ export default function Quiz({
         })}
       </div>
 
-      {checked && question.explanation && (
+      {verdict?.explanation && (
         <p className="mt-4 rounded-xl bg-surface p-4 text-sm text-muted">
-          {question.explanation}
+          {verdict.explanation}
+        </p>
+      )}
+
+      {failedCheck && (
+        <p role="alert" className="mt-4 text-sm text-danger">
+          {t.quiz.checkFailed}
         </p>
       )}
 
@@ -187,10 +221,11 @@ export default function Quiz({
         {!checked ? (
           <button
             onClick={check}
-            disabled={selected === null}
+            disabled={selected === null || pending}
+            aria-busy={pending}
             className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {t.quiz.validate}
+            {pending ? t.quiz.checking : t.quiz.validate}
           </button>
         ) : (
           <button

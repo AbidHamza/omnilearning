@@ -4,6 +4,7 @@ import { useState } from "react";
 import { categories } from "@/lib/data";
 import { UploadIcon, PlusIcon, TrashIcon } from "@/components/icons";
 import { useLocaleRouter } from "@/i18n/navigation";
+import { useT } from "@/i18n/provider";
 import { saveDraftAction } from "@/lib/actions/draft";
 
 interface Upload {
@@ -11,12 +12,6 @@ interface Upload {
   url: string;
   name: string;
 }
-
-const steps = [
-  "Présentation de la formation",
-  "Contenu de la formation",
-  "Récapitulatif",
-];
 
 const labelCls = "block text-sm font-semibold";
 const inputCls =
@@ -32,6 +27,8 @@ interface Activity {
 let uid = 1;
 
 export default function CreerFormationClient() {
+  const c = useT().create;
+  const steps = c.steps;
   const router = useLocaleRouter();
   const [step, setStep] = useState(0);
 
@@ -125,30 +122,30 @@ export default function CreerFormationClient() {
       {/* Contenu */}
       <div className="max-w-2xl">
         <h1 className="text-3xl font-extrabold tracking-tight">
-          Créer une formation
+          {c.title}
         </h1>
 
         {step === 0 && (
           <div className="mt-8 space-y-8">
             <section className="space-y-5">
               <h2 className="font-display text-lg font-bold">
-                Information générale de la formation
+                {c.generalTitle}
               </h2>
               <div>
-                <label className={labelCls}>Catégorie / Domaine</label>
+                <label className={labelCls}>{c.categoryLabel}</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className={inputCls}
                 >
-                  <option value="">Choisissez une catégorie</option>
-                  {categories.map((c) => (
-                    <option key={c.id}>{c.label}</option>
+                  <option value="">{c.categoryPlaceholder}</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id}>{cat.label}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Nom de la formation</label>
+                <label className={labelCls}>{c.nameLabel}</label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -156,48 +153,48 @@ export default function CreerFormationClient() {
                 />
               </div>
               <div>
-                <label className={labelCls}>Description de la formation</label>
+                <label className={labelCls}>{c.descLabel}</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Décrivez les objectifs, les contenus…"
+                  placeholder={c.descPlaceholder}
                   className={areaCls}
                 />
               </div>
               <div>
-                <label className={labelCls}>Niveau de difficulté</label>
+                <label className={labelCls}>{c.levelLabel}</label>
                 <select
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
                   className={inputCls}
                 >
-                  <option value="">Choisissez un niveau</option>
-                  <option>Débutant</option>
-                  <option>Intermédiaire</option>
-                  <option>Avancé</option>
+                  <option value="">{c.levelPlaceholder}</option>
+                  <option>{c.levelBeginner}</option>
+                  <option>{c.levelIntermediate}</option>
+                  <option>{c.levelAdvanced}</option>
                 </select>
               </div>
             </section>
 
             <section className="space-y-5">
               <h2 className="font-display text-lg font-bold">
-                Objectifs pédagogiques
+                {c.objectivesTitle}
               </h2>
               <div>
-                <label className={labelCls}>Compétences visées</label>
+                <label className={labelCls}>{c.skillsLabel}</label>
                 <textarea
                   value={skills}
                   onChange={(e) => setSkills(e.target.value)}
-                  placeholder="Décrivez les compétences que les apprenants vont développer avec cette formation."
+                  placeholder={c.skillsPlaceholder}
                   className={areaCls}
                 />
               </div>
               <div>
-                <label className={labelCls}>Compétences prérequis</label>
+                <label className={labelCls}>{c.prereqLabel}</label>
                 <textarea
                   value={prereq}
                   onChange={(e) => setPrereq(e.target.value)}
-                  placeholder="Décrivez les connaissances ou compétences nécessaires avant de commencer."
+                  placeholder={c.prereqPlaceholder}
                   className={areaCls}
                 />
               </div>
@@ -209,28 +206,28 @@ export default function CreerFormationClient() {
           <div className="mt-8 space-y-8">
             <section className="space-y-5">
               <h2 className="font-display text-lg font-bold">
-                Organisation et contenu
+                {c.contentTitle}
               </h2>
               <div>
-                <label className={labelCls}>Structure du cours</label>
+                <label className={labelCls}>{c.structureLabel}</label>
                 <textarea
                   value={structure}
                   onChange={(e) => setStructure(e.target.value)}
-                  placeholder="Décrivez les chapitres, modules, leçons…"
+                  placeholder={c.structurePlaceholder}
                   className={areaCls}
                 />
               </div>
               <div>
-                <label className={labelCls}>Ressources à importer</label>
+                <label className={labelCls}>{c.resourcesLabel}</label>
                 <UploadZone
                   field="resources"
-                  hint="Téléchargez les vidéos, PDF, quiz, exercices interactifs, cas pratiques"
+                  hint={c.resourcesHint}
                   uploads={uploads}
                   onUploaded={addUpload}
                 />
               </div>
               <div>
-                <label className={labelCls}>Activités interactives</label>
+                <label className={labelCls}>{c.activitiesLabel}</label>
                 {activities.map((a) => (
                   <div
                     key={a.id}
@@ -248,10 +245,10 @@ export default function CreerFormationClient() {
                         }
                         className="flex-1 rounded-lg border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-primary"
                       >
-                        <option value="">Choisissez un type d&apos;activité</option>
-                        <option>Quiz</option>
-                        <option>Exercice pratique</option>
-                        <option>Étude de cas</option>
+                        <option value="">{c.activityTypePlaceholder}</option>
+                        <option>{c.activityQuiz}</option>
+                        <option>{c.activityExercise}</option>
+                        <option>{c.activityCase}</option>
                       </select>
                       <button
                         type="button"
@@ -259,7 +256,7 @@ export default function CreerFormationClient() {
                           setActivities((arr) => arr.filter((x) => x.id !== a.id))
                         }
                         className="grid h-9 w-9 place-items-center rounded-lg text-muted transition hover:bg-surface hover:text-danger"
-                        aria-label="Supprimer l'activité"
+                        aria-label={c.removeActivity}
                       >
                         <TrashIcon width={16} height={16} />
                       </button>
@@ -275,7 +272,7 @@ export default function CreerFormationClient() {
                           )
                         )
                       }
-                      placeholder="Décrivez en détail les instructions pour l'activité."
+                      placeholder={c.activityInstructionPlaceholder}
                       className="w-full resize-y rounded-lg border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-primary"
                       rows={3}
                     />
@@ -292,33 +289,31 @@ export default function CreerFormationClient() {
                   className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary hover:text-primary-dark"
                 >
                   <PlusIcon width={15} height={15} />
-                  Ajouter une activité
+                  {c.addActivity}
                 </button>
               </div>
             </section>
 
             <section className="space-y-5">
               <h2 className="font-display text-lg font-bold">
-                Présentation visuelle
+                {c.visualTitle}
               </h2>
               <div>
-                <label className={labelCls}>Image de couverture / vignette</label>
+                <label className={labelCls}>{c.coverLabel}</label>
                 <UploadZone
                   field="cover"
-                  title="Téléchargez l'image"
-                  hint="Format accepté : SVG, PNG, JPG/JPEG"
+                  title={c.uploadImage}
+                  hint={c.imageHint}
                   uploads={uploads}
                   onUploaded={addUpload}
                 />
               </div>
               <div>
-                <label className={labelCls}>
-                  Vidéo de présentation (optionnel)
-                </label>
+                <label className={labelCls}>{c.videoLabel}</label>
                 <UploadZone
                   field="video"
-                  title="Téléchargez la vidéo"
-                  hint="Format accepté : MP4, MOV, WEBM"
+                  title={c.uploadVideo}
+                  hint={c.videoHint}
                   uploads={uploads}
                   onUploaded={addUpload}
                 />
@@ -329,27 +324,26 @@ export default function CreerFormationClient() {
 
         {step === 2 && (
           <div className="mt-8 space-y-6">
-            <h2 className="font-display text-lg font-bold">Récapitulatif</h2>
+            <h2 className="font-display text-lg font-bold">{c.recapTitle}</h2>
             <dl className="divide-y divide-line rounded-[var(--radius-card)] border border-line">
-              <Recap label="Catégorie" value={category} />
-              <Recap label="Nom de la formation" value={name} />
-              <Recap label="Niveau" value={level} />
-              <Recap label="Description" value={description} />
-              <Recap label="Compétences visées" value={skills} />
-              <Recap label="Prérequis" value={prereq} />
-              <Recap label="Structure du cours" value={structure} />
+              <Recap label={c.recapCategory} value={category} />
+              <Recap label={c.recapName} value={name} />
+              <Recap label={c.recapLevel} value={level} />
+              <Recap label={c.recapDesc} value={description} />
+              <Recap label={c.recapSkills} value={skills} />
+              <Recap label={c.recapPrereq} value={prereq} />
+              <Recap label={c.recapStructure} value={structure} />
               <Recap
-                label="Activités interactives"
+                label={c.recapActivities}
                 value={
                   activities.length
-                    ? `${activities.length} activité(s)`
+                    ? c.activitiesCount.replace("{n}", String(activities.length))
                     : ""
                 }
               />
             </dl>
             <p className="rounded-xl bg-brand-band/60 p-4 text-sm text-muted">
-              Votre formation sera soumise à validation par un administrateur
-              avant publication.
+              {c.validationNote}
             </p>
             {error && <p className="text-sm font-medium text-danger">{error}</p>}
           </div>
@@ -363,7 +357,7 @@ export default function CreerFormationClient() {
               onClick={() => router.push("/tableau-de-bord")}
               className="rounded-full border border-line px-6 py-2.5 text-sm font-semibold transition hover:bg-surface hover:text-danger"
             >
-              Supprimer
+              {c.delete}
             </button>
           ) : (
             <button
@@ -371,7 +365,7 @@ export default function CreerFormationClient() {
               onClick={prev}
               className="rounded-full border border-line px-6 py-2.5 text-sm font-semibold transition hover:bg-surface"
             >
-              Étape précédente
+              {c.prevStep}
             </button>
           )}
 
@@ -381,7 +375,7 @@ export default function CreerFormationClient() {
               onClick={next}
               className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
             >
-              Étape suivante
+              {c.nextStep}
             </button>
           ) : (
             <button
@@ -390,7 +384,7 @@ export default function CreerFormationClient() {
               disabled={submitting}
               className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:opacity-60"
             >
-              Envoyer la demande de création
+              {c.submit}
             </button>
           )}
         </div>
@@ -401,7 +395,7 @@ export default function CreerFormationClient() {
 
 function UploadZone({
   field,
-  title = "Glissez vos fichiers ici",
+  title,
   hint,
   uploads,
   onUploaded,
@@ -412,6 +406,8 @@ function UploadZone({
   uploads: Upload[];
   onUploaded: (u: Upload) => void;
 }) {
+  const c = useT().create;
+  const zoneTitle = title ?? c.dropHint;
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const mine = uploads.filter((u) => u.field === field);
@@ -427,12 +423,12 @@ function UploadZone({
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) {
-        setErr(data.error ?? "Échec de l'upload.");
+        setErr(data.error ?? c.uploadError);
       } else {
         onUploaded({ field, url: data.url, name: data.name });
       }
     } catch {
-      setErr("Échec de l'upload.");
+      setErr(c.uploadError);
     } finally {
       setBusy(false);
       e.target.value = "";
@@ -445,7 +441,7 @@ function UploadZone({
         <span className="grid h-11 w-11 place-items-center rounded-full bg-brand-soft text-primary-dark">
           <UploadIcon width={20} height={20} />
         </span>
-        <span className="text-sm font-semibold">{busy ? "Envoi en cours…" : title}</span>
+        <span className="text-sm font-semibold">{busy ? c.uploading : zoneTitle}</span>
         <span className="text-xs text-muted-soft">{hint}</span>
         <input type="file" className="hidden" onChange={onChange} disabled={busy} />
       </label>
@@ -464,11 +460,12 @@ function UploadZone({
 }
 
 function Recap({ label, value }: { label: string; value: string }) {
+  const c = useT().create;
   return (
     <div className="flex gap-4 px-5 py-4">
       <dt className="w-40 shrink-0 text-sm font-semibold text-muted">{label}</dt>
       <dd className="flex-1 text-sm">
-        {value ? value : <span className="text-muted-soft">Non renseigné</span>}
+        {value ? value : <span className="text-muted-soft">{c.notProvided}</span>}
       </dd>
     </div>
   );

@@ -17,9 +17,11 @@ const barLabels = [5, 4, 3, 2, 1];
 export default function CourseReviews({
   summary,
   title,
+  countLabel,
 }: {
   summary: ReviewSummary;
   title: string;
+  countLabel: string;
 }) {
   if (summary.count === 0) return null;
 
@@ -38,7 +40,7 @@ export default function CourseReviews({
           </div>
           <Stars rating={summary.average} className="mt-1 text-lg" />
           <p className="mt-1 text-xs text-muted">
-            {summary.count.toLocaleString("fr-FR")} avis
+            {summary.count.toLocaleString("fr-FR")} {countLabel}
           </p>
 
           <div className="mt-4 space-y-1.5">

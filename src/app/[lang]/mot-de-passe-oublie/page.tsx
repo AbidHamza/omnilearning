@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { MailIcon } from "@/components/icons";
+import { useT } from "@/i18n/provider";
 
 export default function MotDePasseOubliePage() {
+  const f = useT().forgotPassword;
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
@@ -22,15 +24,12 @@ export default function MotDePasseOubliePage() {
               <MailIcon width={26} height={26} />
             </span>
             <h1 className="mt-5 text-2xl font-extrabold tracking-tight">
-              Réinitialiser votre mot de passe
+              {f.title}
             </h1>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Un mail de réinitialisation de mot de passe vous sera envoyé à
-              l&apos;adresse que vous saisissez.
-            </p>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{f.desc}</p>
 
             <label className="mt-7 block text-left text-sm font-medium">
-              Votre mail
+              {f.emailLabel}
             </label>
             <input
               type="email"
@@ -45,14 +44,14 @@ export default function MotDePasseOubliePage() {
               type="submit"
               className="mt-6 w-full rounded-[3px] bg-primary py-3 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
             >
-              Envoyer un mail
+              {f.send}
             </button>
 
             <Link
               href="/connexion"
               className="mt-5 block text-sm text-primary-dark underline-offset-4 hover:underline"
             >
-              Retourner à la page de connexion
+              {f.backToLogin}
             </Link>
           </form>
         ) : (
@@ -61,28 +60,27 @@ export default function MotDePasseOubliePage() {
               <MailIcon width={26} height={26} />
             </span>
             <h1 className="mt-5 text-2xl font-extrabold tracking-tight">
-              Le mail a été envoyé
+              {f.sentTitle}
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              Un mail de réinitialisation de mot de passe vous a été envoyé à
-              l&apos;adresse suivante :
+              {f.sentDesc}
               <br />
               <span className="font-semibold text-ink">{email}</span>
             </p>
             <p className="mt-6 text-sm text-muted">
-              Vous n&apos;avez pas reçu le mail ?{" "}
+              {f.notReceived}{" "}
               <button
                 onClick={() => setSent(false)}
                 className="font-semibold text-primary-dark hover:underline"
               >
-                Renvoyer
+                {f.resend}
               </button>
             </p>
             <button
               onClick={() => setSent(false)}
               className="mt-1 text-sm text-muted underline-offset-4 hover:underline"
             >
-              Ce n&apos;est pas la bonne adresse ? Modifier
+              {f.wrongAddress}
             </button>
           </div>
         )}

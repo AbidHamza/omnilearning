@@ -36,7 +36,14 @@ export const getCurrentUser = cache(
     const dbUser = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        enrollments: { include: { course: { select: { slug: true } } } },
+        enrollments: {
+          include: {
+            course: { select: { slug: true } },
+            _count: {
+              select: { lessonProgress: { where: { isCompleted: true } } },
+            },
+          },
+        },
       },
     });
     if (!dbUser) return null;
@@ -51,7 +58,12 @@ export const getCurrentUser = cache(
         slug: e.course.slug,
         progress: e.progress,
         lastLesson: e.lastLesson ?? "",
+        completedLessons: e._count.lessonProgress,
       })),
+      // Toujours vide, et ce n'est pas un oubli : aucun certificat n'existe
+      // côté base ni côté génération. Le champ survit dans le type le temps que
+      // la fonctionnalité soit construite. Ne rien afficher à partir de lui :
+      // l'interface promettait un certificat que personne ne recevait jamais.
       certificates: [],
     };
 
@@ -224,8 +236,8 @@ export const getAdminDashboard = cache(
       id: d.id,
       title: d.name?.trim() || "Formation sans titre",
       instructor: d.author.name ?? d.author.email,
-      category: d.category ?? "—",
-      level: d.level ?? "—",
+      category: d.category ?? "--",
+      level: d.level ?? "--",
       submitted: fmtDate(d.updatedAt),
     }));
 
@@ -245,6 +257,35 @@ export const getAdminDashboard = cache(
         learners: learnerCount,
       },
       recentUsers,
+    };
+  },
+);
+
+/**
+ * État "visiteur vs membre" pour une fiche cours / page leçon : authentifié ?
+ * et, si oui, quelles leçons de CE cours sont déjà terminées (keys). Sert au
+ * gating freemium et aux coches de complétion. Mémoïsé par render.
+ */
+export const getCourseViewerState = cache(
+  async (
+    courseSlug: string,
+  ): Promise<{ isAuthenticated: boolean; completedKeys: string[] }> => {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) return { isAuthenticated: false, completedKeys: [] };
+
+    const enrollment = await prisma.enrollment.findFirst({
+      where: { userId, course: { slug: courseSlug } },
+      select: {
+        lessonProgress: {
+          where: { isCompleted: true },
+          select: { lesson: { select: { key: true } } },
+        },
+      },
+    });
+    return {
+      isAuthenticated: true,
+      completedKeys: enrollment?.lessonProgress.map((p) => p.lesson.key) ?? [],
     };
   },
 );

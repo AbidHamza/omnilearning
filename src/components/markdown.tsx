@@ -1,12 +1,45 @@
 import type { ReactNode } from "react";
 
 // Rendu Markdown maison, volontairement limité au sous-ensemble utilisé dans les
-// cours (titres ##/###, listes, code, citations, gras, code inline, liens).
-// Pas de dépendance externe : un composant serveur qui parse ligne par ligne.
-// Le contenu vient de la base (rédigé par l'équipe), pas d'une saisie utilisateur
-// arbitraire — on n'insère jamais de HTML brut.
+// cours (titres ##/###, listes, code, citations, tableaux, images, gras, code
+// inline, liens). Pas de dépendance externe : un composant serveur qui parse
+// ligne par ligne. Le contenu vient de la base (rédigé par l'équipe), pas d'une
+// saisie utilisateur arbitraire. Seule exception au « pas de HTML brut » : les
+// blocs ```figure (SVG pédagogiques du seed), injectés après un contrôle strict
+// (doit commencer par <svg, aucun script/handler/href ; cf. safeSvg).
 
 type Props = { source: string; className?: string };
+
+// ----- figures SVG (blocs ```figure : 1re ligne JSON méta, puis un <svg>) -----
+
+/**
+ * Contrôle défensif du SVG d'une figure. Le contenu est rédigé par l'équipe
+ * (seed), mais on refuse quand même tout vecteur de script : le markup doit
+ * commencer par `<svg` et ne contenir ni <script>, ni handler on*, ni href,
+ * ni <foreignObject>/<image>, ni javascript:.
+ */
+function safeSvg(markup: string): string | null {
+  const svg = markup.trim();
+  if (!/^<svg[\s>]/i.test(svg)) return null;
+  if (
+    /<script|<foreignobject|<image|<iframe|<embed|<object|javascript:|\son\w+\s*=|href\s*=/i.test(
+      svg,
+    )
+  ) {
+    return null;
+  }
+  return svg;
+}
+
+function parseFigureMeta(line: string): { caption?: string } | null {
+  try {
+    const meta = JSON.parse(line) as unknown;
+    if (meta && typeof meta === "object") return meta as { caption?: string };
+  } catch {
+    /* méta illisible -> figure rejetée */
+  }
+  return null;
+}
 
 // ----- inline : gras, code, liens -----
 
@@ -68,7 +101,7 @@ export default function Markdown({ source, className }: Props) {
   while (i < lines.length) {
     const line = lines[i];
 
-    // Bloc de code ```lang
+    // Bloc de code ```lang (dont le bloc spécial ```figure)
     if (/^```/.test(line.trim())) {
       const lang = line.trim().slice(3).trim();
       const buf: string[] = [];
@@ -78,6 +111,23 @@ export default function Markdown({ source, className }: Props) {
         i++;
       }
       i++; // ferme le ```
+
+      // ```figure : 1re ligne = méta JSON ({"caption": …}), reste = <svg>.
+      if (lang === "figure") {
+        const meta = buf.length > 0 ? parseFigureMeta(buf[0]) : null;
+        const svg = meta ? safeSvg(buf.slice(1).join("\n")) : null;
+        if (meta && svg) {
+          blocks.push(
+            <figure key={`b${key++}`} className="md-figure">
+              <div dangerouslySetInnerHTML={{ __html: svg }} />
+              {meta.caption && <figcaption>{meta.caption}</figcaption>}
+            </figure>,
+          );
+        }
+        // Figure invalide : on n'affiche rien plutôt que du markup brut.
+        continue;
+      }
+
       blocks.push(
         <pre
           key={`b${key++}`}
@@ -154,6 +204,66 @@ export default function Markdown({ source, className }: Props) {
       continue;
     }
 
+    // Image seule sur sa ligne : ![alt](src)
+    const img = /^!\[([^\]]*)\]\(([^)\s]+)\)\s*$/.exec(line.trim());
+    if (img) {
+      blocks.push(
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={`b${key++}`} src={img[2]} alt={img[1]} className="md-img" loading="lazy" />,
+      );
+      i++;
+      continue;
+    }
+
+    // Tableau pipe simple : ligne d'en-tête | séparateur |---| puis lignes
+    if (
+      /^\|.*\|\s*$/.test(line.trim()) &&
+      i + 1 < lines.length &&
+      /^\|?[\s:|-]+\|?\s*$/.test(lines[i + 1].trim()) &&
+      lines[i + 1].includes("-")
+    ) {
+      const splitRow = (row: string) =>
+        row
+          .trim()
+          .replace(/^\|/, "")
+          .replace(/\|$/, "")
+          .split("|")
+          .map((cell) => cell.trim());
+
+      const headers = splitRow(line);
+      i += 2; // saute en-tête + séparateur
+      const rows: string[][] = [];
+      while (i < lines.length && /^\|.*\|\s*$/.test(lines[i].trim())) {
+        rows.push(splitRow(lines[i]));
+        i++;
+      }
+      blocks.push(
+        <div key={`b${key++}`} className="md-table-wrap">
+          <table className="md-table">
+            <thead>
+              <tr>
+                {headers.map((h2, idx) => (
+                  <th key={idx}>{renderInline(h2, `th${key}-${idx}`)}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((cells, r) => (
+                <tr key={r}>
+                  {headers.map((_, cIdx) => (
+                    <td key={cIdx}>
+                      {renderInline(cells[cIdx] ?? "", `td${key}-${r}-${cIdx}`)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>,
+      );
+      continue;
+    }
+
     // Liste à puces
     if (/^[-*]\s+/.test(line)) {
       const items: string[] = [];
@@ -180,7 +290,9 @@ export default function Markdown({ source, className }: Props) {
       !/^(#{2,3})\s+/.test(lines[i]) &&
       !/^>\s?/.test(lines[i]) &&
       !/^\d+\.\s+/.test(lines[i]) &&
-      !/^[-*]\s+/.test(lines[i])
+      !/^[-*]\s+/.test(lines[i]) &&
+      !/^!\[[^\]]*\]\([^)\s]+\)\s*$/.test(lines[i].trim()) &&
+      !/^\|.*\|\s*$/.test(lines[i].trim())
     ) {
       para.push(lines[i]);
       i++;

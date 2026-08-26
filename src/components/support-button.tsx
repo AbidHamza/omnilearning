@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { createCheckoutAction } from "@/lib/actions/stripe";
+import { createCheckoutAction, type CheckoutError } from "@/lib/actions/stripe";
 import type { SupportTier } from "@/lib/stripe";
+import { useI18n } from "@/i18n/provider";
 
-// Bouton d'un palier de soutien : lance le Checkout Stripe (redirige côté serveur).
-// Si Stripe n'est pas configuré, affiche un message non bloquant.
+// Bouton d'un palier de soutien : lance le Checkout Stripe (redirige cote
+// serveur). L'action ne renvoie qu'un code d'erreur ; la phrase affichee vient
+// du dictionnaire, donc dans la langue de la page.
 export default function SupportButton({
   tier,
   label,
@@ -15,15 +17,16 @@ export default function SupportButton({
   label: string;
   featured?: boolean;
 }) {
-  const [error, setError] = useState<string | null>(null);
+  const { locale, dict } = useI18n();
+  const [error, setError] = useState<CheckoutError | null>(null);
   const [pending, setPending] = useState(false);
 
   async function onClick() {
     setPending(true);
     setError(null);
-    // En cas de succès, l'action redirige (pas de retour). On ne reçoit une
-    // valeur que si une erreur a été renvoyée.
-    const res = await createCheckoutAction(tier);
+    // En cas de succes, l'action redirige (pas de retour). On ne recoit une
+    // valeur que si une erreur a ete renvoyee.
+    const res = await createCheckoutAction(tier, locale);
     setPending(false);
     if (res && !res.ok) setError(res.error);
   }
@@ -41,7 +44,11 @@ export default function SupportButton({
       >
         {label}
       </button>
-      {error && <p className="mt-2 text-center text-xs text-danger">{error}</p>}
+      {error && (
+        <p role="alert" className="mt-2 text-center text-xs text-danger">
+          {dict.support.errors[error]}
+        </p>
+      )}
     </div>
   );
 }
