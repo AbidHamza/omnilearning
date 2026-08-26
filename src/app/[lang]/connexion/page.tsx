@@ -3,13 +3,25 @@
 import { useState } from "react";
 import { GoogleIcon, GithubIcon, AppleIcon, GraduationIcon } from "@/components/icons";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
-import { useT } from "@/i18n/provider";
+import { useI18n, useT } from "@/i18n/provider";
+import { localePath } from "@/i18n/config";
 import { homeByRole } from "@/lib/session";
 import { loginAction } from "@/lib/actions/auth";
 import { oauthSignIn } from "@/lib/actions/oauth";
 
+// Cible de retour passée par une page verrouillée (?next=/formations/...).
+// Lue au moment du clic (pas de useSearchParams → pas de Suspense imposée).
+// Chemin interne SANS préfixe de locale ; tout le reste est rejeté.
+function nextFromLocation(): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.search).get("next");
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return null;
+  return raw;
+}
+
 export default function ConnexionPage() {
   const t = useT();
+  const { locale } = useI18n();
   const router = useLocaleRouter();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -29,8 +41,9 @@ export default function ConnexionPage() {
       setError(true);
       return;
     }
-    // Le rôle réel vient de la session : on navigue vers l'espace correspondant.
-    router.push(homeByRole[res.role]);
+    // Retour à la leçon d'origine si on venait d'un contenu verrouillé,
+    // sinon vers l'espace correspondant au rôle réel (issu de la session).
+    router.push(nextFromLocation() ?? homeByRole[res.role]);
     router.refresh();
   }
 
@@ -119,7 +132,12 @@ export default function ConnexionPage() {
           <div className="mt-3 flex gap-3">
             <button
               type="button"
-              onClick={() => oauthSignIn("google", "/tableau-de-bord")}
+              onClick={() =>
+                oauthSignIn(
+                  "google",
+                  localePath(locale, nextFromLocation() ?? "/tableau-de-bord"),
+                )
+              }
               aria-label="Google"
               className="grid h-12 flex-1 place-items-center rounded-[3px] border border-line bg-surface text-ink transition hover:border-primary hover:bg-surface-2"
             >
@@ -127,7 +145,12 @@ export default function ConnexionPage() {
             </button>
             <button
               type="button"
-              onClick={() => oauthSignIn("github", "/tableau-de-bord")}
+              onClick={() =>
+                oauthSignIn(
+                  "github",
+                  localePath(locale, nextFromLocation() ?? "/tableau-de-bord"),
+                )
+              }
               aria-label="GitHub"
               className="grid h-12 flex-1 place-items-center rounded-[3px] border border-line bg-surface text-ink transition hover:border-primary hover:bg-surface-2"
             >
@@ -159,10 +182,10 @@ export default function ConnexionPage() {
         </div>
 
         <div className="relative">
-          <p className="font-mono text-xs text-muted-soft"># apprendre.sh</p>
+          <p className="font-mono text-xs text-muted-soft"># session --resume</p>
           <p className="mt-3 font-display text-3xl font-extrabold leading-tight tracking-tight text-ink">
-            Apprendre ne devrait jamais avoir de{" "}
-            <span className="text-primary">prix</span>.
+            {t.auth.resumeLead}{" "}
+            <span className="text-primary">{t.auth.resumeAccent}</span>.
             <span className="term-cursor" aria-hidden />
           </p>
           <p className="mt-5 max-w-sm font-sans text-sm leading-relaxed text-muted">

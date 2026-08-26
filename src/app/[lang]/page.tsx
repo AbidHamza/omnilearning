@@ -1,29 +1,60 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import CourseCard from "@/components/course-card";
 import CategoryIcon from "@/components/category-icon";
 import { getCategories, getCourses, popularSlugs } from "@/lib/courses";
 import {
   ArrowRightIcon,
-  AwardIcon,
   CheckIcon,
   ChevronDown,
   ClockIcon,
   DocIcon,
-  HeartIcon,
   LayersIcon,
   PlayIcon,
   QuizIcon,
-  QuoteIcon,
   StarIcon,
-  UsersIcon,
 } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { isLocale, localePath } from "@/i18n/config";
+import { defaultLocale, isLocale, localePath } from "@/i18n/config";
+import { alternatesFor, pageUrl } from "@/lib/site";
 import { notFound } from "next/navigation";
 
-const featureIcons = [LayersIcon, ClockIcon, StarIcon, AwardIcon];
-const statIcons = [UsersIcon, LayersIcon, ClockIcon, HeartIcon];
-const statValues = ["12 400+", "42", "180+", "96%"];
+const featureIcons = [LayersIcon, ClockIcon, StarIcon, QuizIcon];
+const statIcons = [LayersIcon, DocIcon, ClockIcon, CheckIcon];
+
+/**
+ * Les quatre chiffres de la bande sont comptés sur le catalogue publié au
+ * moment du rendu. Ils tenaient avant dans un tableau de constantes, ce qui
+ * les laissait dériver de ce que la plateforme contient réellement.
+ */
+function chiffresCatalogue(cours: { hours: number; parts: { lessons: { isFree?: boolean }[] }[] }[]) {
+  let lecons = 0;
+  let libres = 0;
+  for (const c of cours) {
+    for (const p of c.parts) {
+      lecons += p.lessons.length;
+      libres += p.lessons.filter((l) => l.isFree).length;
+    }
+  }
+  return {
+    formations: cours.length,
+    lecons,
+    heures: cours.reduce((s, c) => s + c.hours, 0),
+    libres,
+  };
+}
+
+export async function generateMetadata(
+  props: PageProps<"/[lang]">,
+): Promise<Metadata> {
+  const { lang } = await props.params;
+  const locale = isLocale(lang) ? lang : defaultLocale;
+  // Titre et description viennent du layout ; la page ne pose que son adresse.
+  return {
+    alternates: alternatesFor(locale),
+    openGraph: { url: pageUrl(locale) },
+  };
+}
 
 export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
@@ -37,11 +68,13 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
     .map((s) => bySlug.get(s))
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
 
+  const n = chiffresCatalogue(allCourses);
+  const nf = new Intl.NumberFormat(lang === "ar" ? "ar" : lang === "en" ? "en-US" : "fr-FR");
   const stats = [
-    { value: statValues[0], label: t.home.statLearners },
-    { value: statValues[1], label: t.home.statCourses },
-    { value: statValues[2], label: t.home.statHours },
-    { value: statValues[3], label: t.home.statSatisfaction },
+    { value: nf.format(n.formations), label: t.home.statCourses },
+    { value: nf.format(n.lecons), label: t.home.statLessons },
+    { value: `${nf.format(n.heures)} h`, label: t.home.statHours },
+    { value: nf.format(n.libres), label: t.home.statFree },
   ];
 
   return (
@@ -102,7 +135,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             </p>
           </div>
 
-          {/* Colonne mockup produit — fenêtre terminal */}
+          {/* Colonne mockup produit : fenêtre terminal */}
           <div className="rise relative mx-auto w-full max-w-md lg:mx-0">
             {/* Bloom accent en arrière-plan, donne de la profondeur */}
             <div className="absolute -inset-x-3 -top-5 bottom-8 rounded-[10px] bg-gradient-to-br from-brand-soft to-transparent blur-2xl" />
@@ -138,14 +171,16 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               </div>
 
               <div className="px-5 pb-5">
-                {/* Barre de progression */}
+                {/* Barre de progression. 67 % = les deux leçons marquées done
+                    sur les trois listées plus bas : la maquette doit rester
+                    cohérente avec elle-même, un chiffre décoratif se remarque. */}
                 <div className="mt-5">
                   <div className="flex items-center justify-between font-mono text-[11px] font-semibold text-muted">
                     <span>{t.home.mockProgressLabel}</span>
-                    <span className="text-primary">62%</span>
+                    <span className="text-primary">67%</span>
                   </div>
                   <div className="mt-1.5 h-2 overflow-hidden rounded-[2px] bg-surface-2">
-                    <div className="h-full w-[62%] rounded-[2px] bg-primary" />
+                    <div className="h-full w-[67%] rounded-[2px] bg-primary" />
                   </div>
                 </div>
 
@@ -182,20 +217,11 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               </div>
             </div>
 
-            {/* Pastille flottante : certificat */}
-            <div className="absolute -bottom-5 end-2 flex items-center gap-2 rounded-[6px] border border-line bg-surface px-3.5 py-2.5 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.7)]">
-              <span className="grid h-8 w-8 place-items-center rounded-[3px] border border-primary/30 bg-brand-soft text-primary">
-                <AwardIcon width={16} height={16} />
-              </span>
-              <div className="text-start">
-                <p className="font-display text-[11px] font-bold leading-tight text-ink">
-                  {t.home.featureTitles[3]}
-                </p>
-                <p className="font-mono text-[10px] leading-tight text-muted">
-                  {t.home.mockProgressLabel} · 96%
-                </p>
-              </div>
-            </div>
+            {/* Une pastille flottante annonçait ici « Certificat de fin de
+                parcours · Progression 96% ». La plateforme ne délivre aucun
+                certificat (dal.ts renvoie une liste vide, la base n'a pas de
+                modèle), et le 96 % ne comptait rien. Retirée plutôt que
+                réécrite : la carte se suffit. */}
           </div>
         </div>
       </section>
@@ -326,41 +352,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
-      {/* ── Témoignages ────────────────────────────────────────────── */}
-      <section className="container-page py-16">
-        <div className="max-w-xl">
-          <span className="rule-accent mb-4" />
-          <h2 className="text-3xl font-semibold sm:text-4xl">
-            {t.home.testimonialsTitle}
-          </h2>
-          <p className="mt-2 text-sm text-muted sm:text-base">
-            {t.home.testimonialsSubtitle}
-          </p>
-        </div>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {t.home.testimonials.map((item) => (
-            <figure
-              key={item.name}
-              className="flex flex-col rounded-2xl border border-line bg-bg p-6 shadow-[0_18px_44px_-30px_rgba(10,21,29,0.45)]"
-            >
-              <QuoteIcon width={28} height={28} className="text-brand" />
-              <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-ink">
-                {item.quote}
-              </blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 border-t border-line pt-5">
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-sm font-bold text-primary-dark">
-                  {initials(item.name)}
-                </span>
-                <div className="text-start">
-                  <p className="text-sm font-semibold text-ink">{item.name}</p>
-                  <p className="text-xs text-muted">{item.role}</p>
-                </div>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
-
       {/* ── Accès gratuit (pricing) ────────────────────────────────── */}
       <section className="border-t border-line bg-surface">
         <div className="container-page py-16">
@@ -454,7 +445,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
-      {/* ── CTA final — invocation terminal ────────────────────────── */}
+      {/* ── CTA final : invocation terminal ────────────────────────── */}
       <section className="container-page pb-20">
         <div className="section-dark relative overflow-hidden rounded-[10px] border border-line px-8 py-14 text-center sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-80">
@@ -521,15 +512,4 @@ function MockLesson({
       )}
     </li>
   );
-}
-
-/* Initiales depuis un nom complet, pour l'avatar des témoignages. */
-function initials(name: string): string {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join("")
-    .toUpperCase();
 }

@@ -541,9 +541,9 @@ export const studentUser: User = {
   initials: "LD",
   role: "etudiant",
   enrolled: [
-    { slug: "cybersecurite", progress: 45, lastLesson: "Les menaces de cybersécurité" },
-    { slug: "javascript-cours-expert", progress: 70, lastLesson: "Closures et portée des variables" },
-    { slug: "figma-avance", progress: 20, lastLesson: "Auto-layout et contraintes" },
+    { slug: "cybersecurite", progress: 45, completedLessons: 9, lastLesson: "Les menaces de cybersécurité" },
+    { slug: "javascript-cours-expert", progress: 70, completedLessons: 14, lastLesson: "Closures et portée des variables" },
+    { slug: "figma-avance", progress: 20, completedLessons: 4, lastLesson: "Auto-layout et contraintes" },
   ],
   certificates: [{ course: "Commencer le HTML", date: "12 mars 2026" }],
 };

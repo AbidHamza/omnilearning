@@ -1,6 +1,6 @@
 # OmniLearning
 
-Plateforme e-learning de **OmniLearnConsultingCommerce LLC** — formations tech gratuites
+Plateforme e-learning de **OmniLearnConsultingCommerce LLC**, formations tech gratuites
 (développement, cybersécurité, data, design…), espace apprenant/formateur/admin,
 abonnements de soutien et internationalisation (fr / en / ar).
 
@@ -13,7 +13,7 @@ LIVE : **https://omnilearning.tech**
 | Framework      | Next.js 16 (App Router, React 19, Server Components + Actions)    |
 | Langage        | TypeScript (strict)                                               |
 | Style          | Tailwind CSS v4, thème clair/sombre                               |
-| Base de données| Prisma 7 — **SQLite** en dev (driver adapter), **Postgres** en prod |
+| Base de données| Prisma 7, **SQLite** en dev (driver adapter), **Postgres** en prod |
 | Auth           | Auth.js / NextAuth v5 (credentials bcrypt + OAuth Google/GitHub, sessions JWT, rôles) |
 | Paiements      | Stripe (abonnements Checkout + portail client + webhook)          |
 | i18n           | Routing `/[lang]` (fr par défaut, en, ar RTL)                     |
@@ -24,19 +24,19 @@ LIVE : **https://omnilearning.tech**
 
 ## Architecture
 
-- `src/app/[lang]/` — pages localisées (landing, formations, tableau de bord,
+- `src/app/[lang]/` : pages localisées (landing, formations, tableau de bord,
   espaces `formateur`/`admin`/`parametres`, `soutenir`, auth).
-- `src/app/api/` — routes : `auth/[...nextauth]`, `stripe/webhook`, `upload`.
+- `src/app/api/` : routes : `auth/[...nextauth]`, `stripe/webhook`, `upload`.
 - `src/lib/`
-  - `db.ts` — client Prisma (adapter SQLite dev / Postgres prod).
-  - `auth.ts` — config NextAuth (providers OAuth env-gated, callbacks rôle).
-  - `dal.ts` — **Data Access Layer** server-only : session courante, dashboards
+  - `db.ts` : client Prisma (adapter SQLite dev / Postgres prod).
+  - `auth.ts` : config NextAuth (providers OAuth env-gated, callbacks rôle).
+  - `dal.ts` : **Data Access Layer** server-only : session courante, dashboards
     formateur/admin, état facturation (lecture DB en forme UI).
-  - `courses.ts` — catalogue depuis la DB.
-  - `actions/` — Server Actions : `auth`, `draft`, `progress`, `stripe`
+  - `courses.ts` : catalogue depuis la DB.
+  - `actions/` : Server Actions : `auth`, `draft`, `progress`, `stripe`
     (checkout + portail), `moderation` (validation des cours par l'admin).
-  - `data.ts` — données de démo (seed + repli pour le mode visiteur).
-- `prisma/schema.prisma` + `prisma/seed.ts` — schéma et données initiales.
+  - `data.ts` : données de démo (seed + repli pour le mode visiteur).
+- `prisma/schema.prisma` + `prisma/seed.ts` : schéma et données initiales.
 
 ### Rôles
 
@@ -74,7 +74,7 @@ Comptes de démo (dev uniquement) : `etudiant` / `formateur` / `admin`
 Voir `.env.example` pour la liste complète et commentée. Essentiel :
 
 - **DB** : `DATABASE_URL` (SQLite `file:./dev.db` en dev ; `postgresql://…` en prod
-  — passer aussi `provider="postgresql"` dans `prisma/schema.prisma` et utiliser
+  Passer aussi `provider="postgresql"` dans `prisma/schema.prisma` et utiliser
   l'adapter Postgres dans `src/lib/db.ts`).
 - **Auth** : `AUTH_SECRET` (obligatoire), `AUTH_URL` (prod), `AUTH_GOOGLE_ID/SECRET`,
   `AUTH_GITHUB_ID/SECRET` (OAuth optionnel, activés seulement si présents).
@@ -83,7 +83,7 @@ Voir `.env.example` pour la liste complète et commentée. Essentiel :
 - **Uploads** : `UPLOAD_PROVIDER` (`local` par défaut, `s3` + clés AWS sinon).
 - **Divers** : `NEXT_PUBLIC_APP_URL`.
 
-## Déploiement (prod — VPS + PM2)
+## Déploiement (prod : VPS + PM2)
 
 L'app tourne en build **standalone** derrière nginx, gérée par PM2.
 

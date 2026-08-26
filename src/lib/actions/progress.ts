@@ -50,6 +50,31 @@ export async function enrollAction(courseSlug: string) {
   return { ok: true as const };
 }
 
+/**
+ * Ouverture d'une leçon par un utilisateur connecté : crée l'inscription si
+ * besoin (auto-enrollment) et mémorise la KEY de la leçon comme point de
+ * reprise (`lastLesson`), sans la marquer terminée.
+ */
+export async function openLessonAction(courseSlug: string, lessonKey: string) {
+  const userId = await currentUserId();
+  if (!userId) return { ok: false as const };
+
+  const course = await prisma.course.findUnique({ where: { slug: courseSlug } });
+  if (!course) return { ok: false as const };
+  const lesson = await prisma.lesson.findFirst({
+    where: { key: lessonKey, part: { courseId: course.id } },
+    select: { key: true },
+  });
+  if (!lesson) return { ok: false as const };
+
+  const enrollment = await ensureEnrollment(userId, course.id);
+  await prisma.enrollment.update({
+    where: { id: enrollment.id },
+    data: { lastLesson: lesson.key, lastAccessedAt: new Date() },
+  });
+  return { ok: true as const };
+}
+
 /** Marque une leçon comme terminée (vidéo/texte vue, ou quiz réussi). */
 export async function markLessonCompleteAction(courseSlug: string, lessonKey: string) {
   const userId = await currentUserId();
@@ -76,9 +101,11 @@ export async function markLessonCompleteAction(courseSlug: string, lessonKey: st
     },
   });
 
+  // `lastLesson` stocke la KEY stable de la leçon (ex. "l7"), pas son titre :
+  // c'est elle qui permet de reconstruire l'URL de reprise.
   await prisma.enrollment.update({
     where: { id: enrollment.id },
-    data: { lastLesson: lesson.title, lastAccessedAt: new Date() },
+    data: { lastLesson: lesson.key, lastAccessedAt: new Date() },
   });
 
   const progress = await recomputeProgress(enrollment.id, course.id);

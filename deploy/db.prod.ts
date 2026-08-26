@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-// PROD (Postgres) — driver adapter pg. Swap documenté dans le fichier d'origine.
+// PROD (Postgres) : driver adapter pg. Swap documenté dans le fichier d'origine.
 const connectionString = process.env.DATABASE_URL;
 
 function createPrisma(): PrismaClient {

@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import type { CreatedCourse, CourseStatus, InstructorStats } from "@/lib/types";
 import { ClockIcon, LayersIcon, StarIcon } from "@/components/icons";
 import ProgressChart from "@/components/progress-chart";
+import { useT } from "@/i18n/provider";
 
-const statusMeta: Record<CourseStatus, { label: string; cls: string }> = {
-  online: { label: "En ligne", cls: "bg-success-soft text-success" },
-  pending: { label: "En attente de validation", cls: "bg-warning/15 text-warning" },
-  draft: { label: "En cours de création", cls: "bg-surface-2 text-muted" },
+const statusCls: Record<CourseStatus, string> = {
+  online: "bg-success-soft text-success",
+  pending: "bg-warning/15 text-warning",
+  draft: "bg-surface-2 text-muted",
 };
 
 export default function FormateurClient({
@@ -21,6 +22,13 @@ export default function FormateurClient({
   created: CreatedCourse[];
   stats: InstructorStats;
 }) {
+  const t = useT();
+  const i = t.instructor;
+  const statusLabel: Record<CourseStatus, string> = {
+    online: t.status.online,
+    pending: t.status.pending,
+    draft: t.status.draft,
+  };
   const router = useRouter();
 
   const firstName = name.split(" ")[0];
@@ -32,15 +40,15 @@ export default function FormateurClient({
         <span className="text-primary">$</span> sudo -u {firstName} omnilearn
       </p>
       <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight">
-        Espace <span className="text-primary">formateur</span>
+        {i.titleLead} <span className="text-primary">{i.titleAccent}</span>
       </h1>
 
       {/* Vos actions en cours */}
       <section className="mt-8 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">
-        <h2 className="text-sm font-semibold text-muted">Vos actions en cours</h2>
+        <h2 className="text-sm font-semibold text-muted">{i.actionsTitle}</h2>
         {actions.length === 0 ? (
           <p className="mt-4 rounded-xl bg-bg px-4 py-3.5 text-sm text-muted">
-            Aucune action en cours. Toutes vos formations sont à jour.
+            {i.noActions}
           </p>
         ) : (
           <ul className="mt-4 space-y-3">
@@ -55,12 +63,10 @@ export default function FormateurClient({
                     href="/creer"
                     className="rounded-[3px] bg-primary px-4 py-2 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
                   >
-                    Continuer à créer votre formation
+                    {i.continueCreating}
                   </Link>
                 ) : (
-                  <span className="text-sm text-muted">
-                    En attente de validation de la part de l&apos;administrateur
-                  </span>
+                  <span className="text-sm text-muted">{i.pendingAdmin}</span>
                 )}
               </li>
             ))}
@@ -70,32 +76,24 @@ export default function FormateurClient({
 
       {/* Tableau des formations */}
       <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">
-        <h2 className="text-sm font-semibold text-muted">Tableau des formations</h2>
+        <h2 className="text-sm font-semibold text-muted">{i.tableTitle}</h2>
 
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[680px] border-collapse text-sm">
             <thead>
               <tr className="text-left align-top text-xs font-semibold text-muted">
-                <th className="pb-3 pr-4 font-semibold">Nom</th>
-                <th className="pb-3 pr-4 font-semibold">Statut</th>
-                <th className="pb-3 pr-4 font-semibold">
-                  Nb de personnes ayant
-                  <br />
-                  commencé la formation
-                </th>
-                <th className="pb-3 pr-4 font-semibold">
-                  Nb de personnes ayant
-                  <br />
-                  fini la formation
-                </th>
-                <th className="pb-3 font-semibold">Actions</th>
+                <th className="pb-3 pr-4 font-semibold">{i.colName}</th>
+                <th className="pb-3 pr-4 font-semibold">{i.colStatus}</th>
+                <th className="pb-3 pr-4 font-semibold">{i.colStarted}</th>
+                <th className="pb-3 pr-4 font-semibold">{i.colFinished}</th>
+                <th className="pb-3 font-semibold">{i.colActions}</th>
               </tr>
             </thead>
             <tbody>
               {created.length === 0 ? (
                 <tr className="border-t border-line">
                   <td colSpan={5} className="py-6 text-center text-sm text-muted">
-                    Vous n&apos;avez pas encore créé de formation.
+                    {t.settings.noCreated}
                   </td>
                 </tr>
               ) : (
@@ -104,24 +102,24 @@ export default function FormateurClient({
                     <td className="py-4 pr-4 font-semibold">{c.title}</td>
                     <td className="py-4 pr-4">
                       <span
-                        className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${statusMeta[c.status].cls}`}
+                        className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${statusCls[c.status]}`}
                       >
-                        {statusMeta[c.status].label}
+                        {statusLabel[c.status]}
                       </span>
                     </td>
                     <td className="py-4 pr-4 font-semibold">{c.started}</td>
                     <td className="py-4 pr-4">
-                      {c.status === "online" ? c.finished : "—"}
+                      {c.status === "online" ? c.finished : "--"}
                     </td>
                     <td className="py-4">
                       <div className="flex gap-2">
                         {c.status === "draft" ? (
-                          <RowBtn href="/creer">Continuer</RowBtn>
+                          <RowBtn href="/creer">{t.actions.continue}</RowBtn>
                         ) : (
-                          <RowBtn href="/creer">Modifier</RowBtn>
+                          <RowBtn href="/creer">{t.actions.edit}</RowBtn>
                         )}
                         {c.status === "online" && (
-                          <RowBtn href="/formations/cybersecurite">Voir +</RowBtn>
+                          <RowBtn href="/formations/cybersecurite">{t.actions.viewPlus}</RowBtn>
                         )}
                       </div>
                     </td>
@@ -137,7 +135,7 @@ export default function FormateurClient({
             onClick={() => router.push("/creer")}
             className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
           >
-            Créer une nouvelle formation
+            {i.createNew}
           </button>
         </div>
       </section>
@@ -145,32 +143,32 @@ export default function FormateurClient({
       {/* Statistiques */}
       <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">Statistiques</h2>
+          <h2 className="font-display text-xl font-bold">{i.statsTitle}</h2>
           <button className="rounded-full border border-line bg-bg px-4 py-1.5 text-sm font-semibold transition hover:border-primary">
-            Voir le détail
+            {i.viewDetail}
           </button>
         </div>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[300px_1fr]">
           <div className="rounded-xl bg-bg p-5">
-            <p className="text-sm font-semibold text-muted">Total</p>
+            <p className="text-sm font-semibold text-muted">{i.total}</p>
             <ul className="mt-4 space-y-4">
               <StatRow icon={<LayersIcon width={18} height={18} />} value={stats.started}>
-                Formations ont été commencées
+                {i.statStarted}
               </StatRow>
               <StatRow icon={<ClockIcon width={18} height={18} />} value={stats.finished}>
-                Formations ont été finies
+                {i.statFinished}
               </StatRow>
               <StatRow
                 icon={<StarIcon width={18} height={18} />}
                 value={stats.rating.toFixed(1).replace(".0", "")}
               >
-                Note moyenne donnée à vos cours
+                {i.statRating}
               </StatRow>
             </ul>
           </div>
 
-          <ProgressChart title="Nombre de vues sur vos formations" />
+          <ProgressChart title={i.viewsTitle} />
         </div>
       </section>
     </div>

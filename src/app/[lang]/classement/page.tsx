@@ -1,14 +1,23 @@
 import Link from "next/link";
 import { isLocale, defaultLocale, localePath } from "@/i18n/config";
+import { getDictionary } from "@/i18n/get-dictionary";
 import { requireRole } from "@/lib/dal";
 import { auth } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/gamification";
+import type { Metadata } from "next";
+
+// Écran privé : derrière une session, sans contenu public. Il n'a rien à faire
+// dans un index, et une canonique n'aurait aucun sens sur une page dont le
+// contenu change avec le compte connecté.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
 
 const medal = ["🥇", "🥈", "🥉"];
 
 export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   const locale = isLocale(lang) ? lang : defaultLocale;
+  const t = (await getDictionary(locale)).leaderboard;
 
   await requireRole(locale, ["etudiant", "formateur", "admin"]);
   const session = await auth();
@@ -18,26 +27,22 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
   return (
     <div className="container-page py-10">
       <p className="font-mono text-xs text-muted-soft">
-        <span className="text-primary">$</span> top — apprenants
+        <span className="text-primary">$</span> top # {t.kicker}
       </p>
       <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight">
-        Le <span className="text-primary">classement</span>
+        {t.titleLead} <span className="text-primary">{t.titleAccent}</span>
       </h1>
-      <p className="mt-2 max-w-xl text-sm text-muted">
-        On met en avant l&apos;effort, pas la performance brute. Chaque leçon
-        terminée et chaque quiz réussi rapporte de l&apos;XP. Revenez chaque jour
-        pour entretenir votre série.
-      </p>
+      <p className="mt-2 max-w-xl text-sm text-muted">{t.intro}</p>
 
       <section className="mt-8 overflow-hidden rounded-[var(--radius-card)] bg-surface">
         {rows.length === 0 ? (
           <p className="p-6 text-sm text-muted">
-            Personne n&apos;a encore gagné d&apos;XP. Soyez le premier :{" "}
+            {t.emptyText}{" "}
             <Link
               href={localePath(locale, "/formations")}
               className="font-semibold text-primary hover:underline"
             >
-              choisissez une formation
+              {t.emptyLink}
             </Link>
             .
           </p>
@@ -61,11 +66,13 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
                     {r.name}
                     {r.isCurrentUser && (
                       <span className="ms-2 text-xs font-normal text-primary">
-                        vous
+                        {t.you}
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-muted">Niveau {r.level}</p>
+                  <p className="text-xs text-muted">
+                    {t.levelPrefix} {r.level}
+                  </p>
                 </div>
                 <span className="shrink-0 font-display text-lg font-bold text-primary">
                   {r.xp.toLocaleString("fr-FR")}
@@ -82,7 +89,7 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
           href={localePath(locale, "/tableau-de-bord")}
           className="text-sm font-semibold text-primary hover:underline"
         >
-          ← Retour au tableau de bord
+          ← {t.back}
         </Link>
       </div>
     </div>

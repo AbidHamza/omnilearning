@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="Agents IA avec Claude">
+  <defs>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0 H0 V64" fill="none" stroke="#d97757" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="4" height="6" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" opacity="0.02"/>
+    </pattern>
+    <radialGradient id="glow" cx="78%" cy="28%" r="60%">
+      <stop offset="0%" stop-color="#d97757" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#d97757" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="800" fill="#0b0f0d"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+
+  
+    <g transform="translate(920 110)" stroke="#d97757" fill="none" stroke-width="3">
+      <path d="M140 30 L40 130 M140 30 L240 130 M40 130 L140 230 M240 130 L140 230 M40 130 H240" opacity="0.4"/>
+      <circle cx="140" cy="30" r="22" opacity="0.9"/>
+      <circle cx="40" cy="130" r="16" opacity="0.6"/>
+      <circle cx="240" cy="130" r="16" opacity="0.6"/>
+      <circle cx="140" cy="230" r="16" opacity="0.6"/>
+      <circle cx="140" cy="30" r="7" fill="#d97757" stroke="none"/>
+    </g>
+
+  <!-- prompt -->
+  <text x="84" y="128" font-size="30" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#d97757">$ <tspan fill="#9fb4a8">agents-ia-claude</tspan><tspan fill="#d97757"> ▍</tspan></text>
+
+  <!-- titre -->
+  <text x="84" y="522" font-size="72" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">Agents IA avec Claude</text>
+  <rect x="84" y="548" width="120" height="6" fill="#d97757"/>
+
+  <!-- pied -->
+  <text x="84" y="736" font-size="22" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#5c6f64">omnilearn<tspan fill="#d97757">.</tspan>formations</text>
+
+  <rect width="1280" height="800" fill="url(#scan)"/>
+  <rect x="1.5" y="1.5" width="1277" height="797" fill="none" stroke="#d97757" stroke-opacity="0.28" stroke-width="3"/>
+</svg>

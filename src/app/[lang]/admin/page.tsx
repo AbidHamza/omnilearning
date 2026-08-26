@@ -1,6 +1,13 @@
 import { isLocale, defaultLocale } from "@/i18n/config";
 import { getAdminDashboard, requireRole } from "@/lib/dal";
 import AdminClient from "./admin-client";
+import type { Metadata } from "next";
+
+// Écran privé : derrière une session, sans contenu public. Il n'a rien à faire
+// dans un index, et une canonique n'aurait aucun sens sur une page dont le
+// contenu change avec le compte connecté.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
 
 export default async function AdminDashboard({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;

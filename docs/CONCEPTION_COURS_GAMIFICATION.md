@@ -1,4 +1,4 @@
-# Conception des cours gamifiés asynchrones — doc de décision
+# Conception des cours gamifiés asynchrones : doc de décision
 
 Référence pour décider quoi coder et quels cours écrire. Tout est benchmarké sur Duolingo, Brilliant, Codecademy, freeCodeCamp, Scrimba, Boot.dev, Exercism, Khan Academy, Coursera, DataCamp + littérature (Bloom, Ebbinghaus, SDT, Prospect Theory, SM-2/FSRS). Sources citées inline.
 
@@ -82,39 +82,39 @@ Brilliant, Codecademy et Boot.dev convergent : à chaque unité difficile, prév
 
 ---
 
-## 3. Mécaniques de gamification — le pourquoi, et ce qui marche vraiment
+## 3. Mécaniques de gamification : le pourquoi, et ce qui marche vraiment
 
 ### Le principe directeur (à ne pas rater)
 
-La théorie de l'auto-détermination (Deci & Ryan) : la motivation durable vient de 3 besoins — **autonomie, compétence, relatedness**. Le piège documenté est l'**effet de surjustification** (Deci 1971) : ajouter une récompense externe à une activité déjà intrinsèquement motivante *réduit* la motivation intrinsèque ; quand la récompense ralentit, l'engagement s'effondre. Une méta-analyse (Springer 2023) confirme : la gamification améliore motivation, autonomie et relatedness, mais a un impact **minimal sur la compétence** réelle. https://link.springer.com/article/10.1007/s11423-023-10337-7
+La théorie de l'auto-détermination (Deci & Ryan) : la motivation durable vient de 3 besoins (**autonomie, compétence, relatedness**). Le piège documenté est l'**effet de surjustification** (Deci 1971) : ajouter une récompense externe à une activité déjà intrinsèquement motivante *réduit* la motivation intrinsèque ; quand la récompense ralentit, l'engagement s'effondre. Une méta-analyse (Springer 2023) confirme : la gamification améliore motivation, autonomie et relatedness, mais a un impact **minimal sur la compétence** réelle. https://link.springer.com/article/10.1007/s11423-023-10337-7
 
-Conséquence pratique : **la gamification doit servir l'apprentissage, pas le remplacer.** Le contre-exemple, c'est Duolingo lui-même — « exceptionnellement engageant mais modérément efficace » ; les streaks poussent à « speed-run des leçons faciles pour protéger le streak », ce qui déclenche la rétention *sans l'apprentissage* (https://dev.to/pocket_linguist). Le bon modèle est Brilliant : gamification volontairement sobre (streak + XP + niveaux + badges légers) subordonnée à une pédagogie active.
+Conséquence pratique : **la gamification doit servir l'apprentissage, pas le remplacer.** Le contre-exemple, c'est Duolingo lui-même, « exceptionnellement engageant mais modérément efficace » ; les streaks poussent à « speed-run des leçons faciles pour protéger le streak », ce qui déclenche la rétention *sans l'apprentissage* (https://dev.to/pocket_linguist). Le bon modèle est Brilliant : gamification volontairement sobre (streak + XP + niveaux + badges légers) subordonnée à une pédagogie active.
 
-Effets mesurés (méta-analyses) : cognitif g≈.49, motivationnel g≈.36, comportemental g≈.25 — significatifs mais **petits**, et le prédicteur n°1 n'est pas la présence de points/badges mais **l'alignement des mécaniques sur des objectifs d'apprentissage clairs**. https://pmc.ncbi.nlm.nih.gov/articles/PMC8037535/
+Effets mesurés (méta-analyses) : cognitif g≈.49, motivationnel g≈.36, comportemental g≈.25, significatifs mais **petits**, et le prédicteur n°1 n'est pas la présence de points/badges mais **l'alignement des mécaniques sur des objectifs d'apprentissage clairs**. https://pmc.ncbi.nlm.nih.gov/articles/PMC8037535/
 
 ### Mécanique par mécanique
 
-**XP / points** — *Efficace, à mettre en premier.* C'est le fil unique qui relie tout (Duolingo : le même XP alimente niveaux ET classement). Règle anti-triche à copier de DataCamp/Boot.dev : XP indexé sur la **difficulté**, réduit si on prend un indice, annulé si on révèle la solution ou si on refait une leçon déjà validée. On récompense l'effort de récupération, pas le clic.
+**XP / points** : *Efficace, à mettre en premier.* C'est le fil unique qui relie tout (Duolingo : le même XP alimente niveaux ET classement). Règle anti-triche à copier de DataCamp/Boot.dev : XP indexé sur la **difficulté**, réduit si on prend un indice, annulé si on révèle la solution ou si on refait une leçon déjà validée. On récompense l'effort de récupération, pas le clic.
 
-**Niveaux** — *Efficace, dérivé du XP.* Donne une échelle de progression lisible (Brilliant fait monter en niveaux de difficulté qui débloquent du contenu). Coût d'implémentation quasi nul une fois le XP posé.
+**Niveaux** : *Efficace, dérivé du XP.* Donne une échelle de progression lisible (Brilliant fait monter en niveaux de difficulté qui débloquent du contenu). Coût d'implémentation quasi nul une fois le XP posé.
 
-**Streaks quotidiens** — *Le levier de rétention le plus fort ET le plus dangereux.* Base : loss aversion (Prospect Theory, une perte pèse ~2× un gain). Data Duolingo : au-delà de 7 jours, un streak freeze fait passer de 11,6 à 17,2 jours moyens (+48 %). MAIS : ~40 % des users qui cassent un streak de 60+ jours abandonnent sous 2 semaines (https://uxmag.com), et la « streak anxiety » est un dark pattern documenté. Mitigations obligatoires : **streak freeze / jours de grâce**, objectif atteignable, et sérieusement envisager un **streak hebdomadaire plutôt que quotidien** (les streaks plafonnés type reset-7-jours retiennent mieux à long terme sans l'anxiété : https://yukaichou.com). Ne jamais notifier « ton streak va mourir » de façon culpabilisante.
+**Streaks quotidiens** : *Le levier de rétention le plus fort ET le plus dangereux.* Base : loss aversion (Prospect Theory, une perte pèse ~2× un gain). Data Duolingo : au-delà de 7 jours, un streak freeze fait passer de 11,6 à 17,2 jours moyens (+48 %). MAIS : ~40 % des users qui cassent un streak de 60+ jours abandonnent sous 2 semaines (https://uxmag.com), et la « streak anxiety » est un dark pattern documenté. Mitigations obligatoires : **streak freeze / jours de grâce**, objectif atteignable, et sérieusement envisager un **streak hebdomadaire plutôt que quotidien** (les streaks plafonnés type reset-7-jours retiennent mieux à long terme sans l'anxiété : https://yukaichou.com). Ne jamais notifier « ton streak va mourir » de façon culpabilisante.
 
-**Hearts / vies** — *Contre-productif par défaut, à éviter au lancement.* Même base loss-aversion mais génère de la frustration-churn, et Duolingo l'a lui-même remplacé en 2025 par un système « énergie » très mal reçu (perçu comme un levier de monétisation). Pour une plateforme qui démarre, les vies punissent l'erreur — or l'erreur est le moment d'apprentissage. À écarter.
+**Hearts / vies** : *Contre-productif par défaut, à éviter au lancement.* Même base loss-aversion mais génère de la frustration-churn, et Duolingo l'a lui-même remplacé en 2025 par un système « énergie » très mal reçu (perçu comme un levier de monétisation). Pour une plateforme qui démarre, les vies punissent l'erreur, or l'erreur est le moment d'apprentissage. À écarter.
 
-**Badges / achievements** — *Efficace si tiéré et rare.* Data Duolingo : compléter un achievement à J1 → 33,4 % de rétention 14 jours vs 20,4 % ; et la rétention monte avec la difficulté du badge (32 % pour le plus facile → 74 % pour le plus dur). Khan tiére Meteorite→Moon→Earth→Sun→Black Hole. Donc : badges à **paliers de rareté**, ancrés sur de vrais accomplissements (finir un module, 7 jours de streak, 100 % à un test de maîtrise), pas sur des micro-actions.
+**Badges / achievements** : *Efficace si tiéré et rare.* Data Duolingo : compléter un achievement à J1 → 33,4 % de rétention 14 jours vs 20,4 % ; et la rétention monte avec la difficulté du badge (32 % pour le plus facile → 74 % pour le plus dur). Khan tiére Meteorite→Moon→Earth→Sun→Black Hole. Donc : badges à **paliers de rareté**, ancrés sur de vrais accomplissements (finir un module, 7 jours de streak, 100 % à un test de maîtrise), pas sur des micro-actions.
 
-**Barres de progression** — *Toujours, gratuit, très efficace.* Deux effets exploitables : **goal-gradient** (on accélère près du but ; Kivetz 2006) et surtout **endowed progress** (Nunes & Drèze 2006 : un départ pré-rempli a ~doublé le taux de complétion pour un effort identique). Règle : **ne jamais afficher une barre à 0 %.** Créditer une amorce (« profil créé : 1/5 »). Barres partout : leçon, module, cours, track.
+**Barres de progression** : *Toujours, gratuit, très efficace.* Deux effets exploitables : **goal-gradient** (on accélère près du but ; Kivetz 2006) et surtout **endowed progress** (Nunes & Drèze 2006 : un départ pré-rempli a ~doublé le taux de complétion pour un effort identique). Règle : **ne jamais afficher une barre à 0 %.** Créditer une amorce (« profil créé : 1/5 »). Barres partout : leçon, module, cours, track.
 
-**Leaderboards / ligues** — *À double tranchant, v2 pas MVP.* Un leaderboard absolu démotive tout le monde sauf le top ~20 % (embarras des derniers, https://cluelabs.com). Le fix validé : **ligues relatives par cohortes de niveau** (Duolingo : ~30 users, 10 tiers Bronze→Diamond, promotion/relégation par tier). Le ranking *relatif* maintient la motivation à toutes les positions ; l'absolu ne booste que le haut (https://sciencedirect S1041608024001651). Si on en met, on copie le modèle ligue segmentée, pas le classement global.
+**Leaderboards / ligues** : *À double tranchant, v2 pas MVP.* Un leaderboard absolu démotive tout le monde sauf le top ~20 % (embarras des derniers, https://cluelabs.com). Le fix validé : **ligues relatives par cohortes de niveau** (Duolingo : ~30 users, 10 tiers Bronze→Diamond, promotion/relégation par tier). Le ranking *relatif* maintient la motivation à toutes les positions ; l'absolu ne booste que le haut (https://sciencedirect S1041608024001651). Si on en met, on copie le modèle ligue segmentée, pas le classement global.
 
-**Quêtes / défis** — *Efficace pour varier et créer du rythme.* Duolingo : daily/weekend/friend quests → points vers un badge mensuel. Attention au réglage : Duolingo a fâché ses users en montant les exigences mensuelles à 50-100 quêtes. Garder des objectifs atteignables et rotatifs.
+**Quêtes / défis** : *Efficace pour varier et créer du rythme.* Duolingo : daily/weekend/friend quests → points vers un badge mensuel. Attention au réglage : Duolingo a fâché ses users en montant les exigences mensuelles à 50-100 quêtes. Garder des objectifs atteignables et rotatifs.
 
-**Déblocage progressif (mastery gating)** — *Efficace, pédagogiquement fondé.* Exercism : arbre de dépendances de concepts (« apprends les Strings pour débloquer TwoFer »). Khan : passage Proficient→Mastered seulement via un test d'unité. C'est du mastery learning (Bloom, voir §4) déguisé en jeu. À implémenter comme condition de progression, pas comme simple carotte.
+**Déblocage progressif (mastery gating)** : *Efficace, pédagogiquement fondé.* Exercism : arbre de dépendances de concepts (« apprends les Strings pour débloquer TwoFer »). Khan : passage Proficient→Mastered seulement via un test d'unité. C'est du mastery learning (Bloom, voir §4) déguisé en jeu. À implémenter comme condition de progression, pas comme simple carotte.
 
-**Répétition espacée (SM-2)** — *Le meilleur ROI d'apprentissage réel de la liste.* C'est la seule mécanique qui attaque directement la courbe d'oubli. Détail algo ci-dessous. À poser dès qu'on a des flashcards.
+**Répétition espacée (SM-2)** : *Le meilleur ROI d'apprentissage réel de la liste.* C'est la seule mécanique qui attaque directement la courbe d'oubli. Détail algo ci-dessous. À poser dès qu'on a des flashcards.
 
-**Célébrations** — *Gratuit, à faire.* Animation à la complétion, confetti, son de réussite, récap « tu as appris X, Y, Z ». Renforce la compétence perçue (SDT). Peu coûteux, fort effet ressenti.
+**Célébrations** : *Gratuit, à faire.* Animation à la complétion, confetti, son de réussite, récap « tu as appris X, Y, Z ». Renforce la compétence perçue (SDT). Peu coûteux, fort effet ressenti.
 
 ### Priorisation pour une plateforme qui démarre
 
@@ -125,7 +125,7 @@ Effets mesurés (méta-analyses) : cognitif g≈.49, motivationnel g≈.36, comp
 
 ### Répétition espacée : implémenter SM-2 (spec exacte)
 
-Pour un build from-scratch sans historique de reviews, **SM-2 est le bon choix** : ~15 lignes, déterministe, aucune donnée d'entraînement, éprouvé. Leitner (boîtes) est plus simple mais rigide ; FSRS est plus précis (~20-30 % de reviews en moins) mais nécessite le modèle DSR + un optimizer entraîné sur un corpus de reviews — ne paie qu'à l'échelle. Commencer SM-2, migrer FSRS plus tard si le volume le justifie.
+Pour un build from-scratch sans historique de reviews, **SM-2 est le bon choix** : ~15 lignes, déterministe, aucune donnée d'entraînement, éprouvé. Leitner (boîtes) est plus simple mais rigide ; FSRS est plus précis (~20-30 % de reviews en moins) mais nécessite le modèle DSR + un optimizer entraîné sur un corpus de reviews, il ne paie qu'à l'échelle. Commencer SM-2, migrer FSRS plus tard si le volume le justifie.
 
 État par carte : `repetitions n`, `easinessFactor EF` (init 2.5, plancher 1.3), `interval I` (jours). Note de qualité `q` 0-5.
 
@@ -152,17 +152,17 @@ Simplification UI façon Anki : 4 boutons (Again/Hard/Good/Easy) mappés sur q, 
 
 ## 4. Boucles de rétention et progression
 
-**Onboarding** — le premier jour prédit tout (Duolingo : achievement à J1 → +64 % de rétention 14 j). Objectif : amener l'utilisateur à **finir sa première leçon en < 5 min**, sans friction (choix du parcours, objectif quotidien, première leçon facile qui garantit une réussite + une célébration). Créditer immédiatement une barre de progression non-vide (endowed progress).
+**Onboarding** : le premier jour prédit tout (Duolingo : achievement à J1 → +64 % de rétention 14 j). Objectif : amener l'utilisateur à **finir sa première leçon en < 5 min**, sans friction (choix du parcours, objectif quotidien, première leçon facile qui garantit une réussite + une célébration). Créditer immédiatement une barre de progression non-vide (endowed progress).
 
-**Objectif quotidien** — réglable (Duolingo : 5/10/15/20 min = Casual/Regular/Serious/Intense). L'utilisateur choisit → autonomie (SDT). Le « jour compte » doit avoir un seuil clair (DataCamp : ≥ 250 XP/jour valide le streak).
+**Objectif quotidien** : réglable (Duolingo : 5/10/15/20 min = Casual/Regular/Serious/Intense). L'utilisateur choisit → autonomie (SDT). Le « jour compte » doit avoir un seuil clair (DataCamp : ≥ 250 XP/jour valide le streak).
 
-**Rappels** — notification/e-mail au moment où l'objectif du jour n'est pas atteint, formulée en positif (« 5 min pour garder ta progression »), jamais en menace. Respecter un cap de fréquence.
+**Rappels** : notification/e-mail au moment où l'objectif du jour n'est pas atteint, formulée en positif (« 5 min pour garder ta progression »), jamais en menace. Respecter un cap de fréquence.
 
-**Sentiment de progression** — barres à tous les niveaux, XP visible, historique de streak, carte du parcours qui montre le chemin parcouru et à venir (Duolingo Path, Exercism concept tree). Récap de fin de leçon (« tu maîtrises maintenant… »).
+**Sentiment de progression** : barres à tous les niveaux, XP visible, historique de streak, carte du parcours qui montre le chemin parcouru et à venir (Duolingo Path, Exercism concept tree). Récap de fin de leçon (« tu maîtrises maintenant… »).
 
-**Courbe de difficulté** — montée graduelle *dans* un topic (Brilliant : les problèmes s'intensifient, avec indices au point de blocage). Éviter le piège Duolingo (algo qui sous-pousse vers le difficile parce que l'erreur fait baisser les métriques d'engagement) : accepter que l'apprenant échoue, c'est là qu'il apprend. Interleaving dans les révisions.
+**Courbe de difficulté** : montée graduelle *dans* un topic (Brilliant : les problèmes s'intensifient, avec indices au point de blocage). Éviter le piège Duolingo (algo qui sous-pousse vers le difficile parce que l'erreur fait baisser les métriques d'engagement) : accepter que l'apprenant échoue, c'est là qu'il apprend. Interleaving dans les révisions.
 
-**Mastery learning** — le plus gros levier pédagogique du dossier. Bloom (1984, effet 2-sigma) : maîtrise + tutorat rapprochent l'élève moyen de ~2 écarts-types (au-dessus de ~98 % du groupe contrôle). Mécanique Khan : Attempted → Familiar (70-85 %) → Proficient (100 % sur exercice/quiz) → Mastered (100 % sur test d'unité), avec « Mastery Challenges » de 6 questions qui recyclent 3 skills. À copier : **on ne débloque la suite qu'en prouvant la maîtrise** (test d'unité gardé), et on renvoie vers du corrective content en cas d'échec, plutôt que de laisser passer un trou de connaissance.
+**Mastery learning** : le plus gros levier pédagogique du dossier. Bloom (1984, effet 2-sigma) : maîtrise + tutorat rapprochent l'élève moyen de ~2 écarts-types (au-dessus de ~98 % du groupe contrôle). Mécanique Khan : Attempted → Familiar (70-85 %) → Proficient (100 % sur exercice/quiz) → Mastered (100 % sur test d'unité), avec « Mastery Challenges » de 6 questions qui recyclent 3 skills. À copier : **on ne débloque la suite qu'en prouvant la maîtrise** (test d'unité gardé), et on renvoie vers du corrective content en cas d'échec, plutôt que de laisser passer un trou de connaissance.
 
 La boucle complète à faire tourner : *onboarding → objectif quotidien → leçon active (retrieval) → feedback + XP + célébration → progression visible → gate de maîtrise en fin de module → révision espacée des acquis → rappel → jour suivant.*
 
@@ -196,16 +196,16 @@ La boucle complète à faire tourner : *onboarding → objectif quotidien → le
 
 Choisis pour : demande réelle, bonne monétisation, et surtout **format qui se prête au découpage micro + pratique auto-corrigée + flashcards** (ce que notre moteur sait faire). Priorité de production en tête.
 
-1. **Développement web moderne (JS/React/Next.js)** — demande énorme, se prête parfaitement au code auto-corrigé façon Codecademy/Boot.dev, projets de fin (portfolio, app CRUD). Track « de zéro à dev full-stack » = produit d'appel. Monétisation forte (reconversion, freelance).
-2. **IA appliquée & prompt engineering / build avec les LLM** — sujet le plus chaud du marché 2025-26, peu de contenu structuré de qualité. Unités : concept + QCM + exercices « écris/corrige ce prompt » (auto-évaluables) + études de cas. Public large (pas que devs). Excellent potentiel de prix premium.
-3. **Marketing digital & growth (SEO, ads, funnels, analytics)** — demande pro constante, se prête aux études de cas et scénarios de décision. Aligné avec ton propre savoir-faire (réutilisable comme contenu d'autorité pour la LLC).
-4. **Finance personnelle & investissement** — demande de masse, très « flashcards + quiz » (concepts, ratios, définitions), études de cas (budget, allocation). Fort intérêt grand public, faible concurrence de qualité en FR.
-5. **Data & Python pour l'analyse** — modèle DataCamp éprouvé (vidéo courte → exercice code), débouché pro clair. Track « analyste data » monétisable.
-6. **Productivité & systèmes personnels (deep work, GTD, outils IA)** — court, actionnable, parfait pour micro-leçons + checklists-checkpoints ; faible coût de production, bon pour l'acquisition top-of-funnel.
-7. **Design UX/UI & no-code** — visuel, projets concrets, demande reconversion forte ; se prête aux unités d'appariement/glisser-déposer et à l'étude de cas.
-8. **Anglais professionnel / communication** (bonus, si on vise le bilingue) — le terrain de jeu historique de Duolingo : flashcards SM-2 + texte à trous + audio. Marché immense, mais production plus lourde (audio) → à garder pour plus tard.
+1. **Développement web moderne (JS/React/Next.js)** : demande énorme, se prête parfaitement au code auto-corrigé façon Codecademy/Boot.dev, projets de fin (portfolio, app CRUD). Track « de zéro à dev full-stack » = produit d'appel. Monétisation forte (reconversion, freelance).
+2. **IA appliquée & prompt engineering / build avec les LLM** : sujet le plus chaud du marché 2025-26, peu de contenu structuré de qualité. Unités : concept + QCM + exercices « écris/corrige ce prompt » (auto-évaluables) + études de cas. Public large (pas que devs). Excellent potentiel de prix premium.
+3. **Marketing digital & growth (SEO, ads, funnels, analytics)** : demande pro constante, se prête aux études de cas et scénarios de décision. Aligné avec ton propre savoir-faire (réutilisable comme contenu d'autorité pour la LLC).
+4. **Finance personnelle & investissement** : demande de masse, très « flashcards + quiz » (concepts, ratios, définitions), études de cas (budget, allocation). Fort intérêt grand public, faible concurrence de qualité en FR.
+5. **Data & Python pour l'analyse** : modèle DataCamp éprouvé (vidéo courte → exercice code), débouché pro clair. Track « analyste data » monétisable.
+6. **Productivité & systèmes personnels (deep work, GTD, outils IA)** : court, actionnable, parfait pour micro-leçons + checklists-checkpoints ; faible coût de production, bon pour l'acquisition top-of-funnel.
+7. **Design UX/UI & no-code** : visuel, projets concrets, demande reconversion forte ; se prête aux unités d'appariement/glisser-déposer et à l'étude de cas.
+8. **Anglais professionnel / communication** (bonus, si on vise le bilingue) : le terrain de jeu historique de Duolingo : flashcards SM-2 + texte à trous + audio. Marché immense, mais production plus lourde (audio) → à garder pour plus tard.
 
-Ordre de production conseillé pour cette nuit : commencer par **(1) dev web** et **(2) IA/prompt engineering** — ce sont ceux qui exploitent le mieux le code auto-corrigé et le sujet le plus porteur, et ils servent de vitrine à la qualité du moteur. **(3) marketing** et **(4) finance perso** en suivant, car ils tournent surtout sur QCM/flashcards/études de cas (rapides à écrire, pas de sandbox code requise) — donc livrables même avant que l'unité `CODE` soit codée.
+Ordre de production conseillé pour cette nuit : commencer par **(1) dev web** et **(2) IA/prompt engineering**, ce sont ceux qui exploitent le mieux le code auto-corrigé et le sujet le plus porteur, et ils servent de vitrine à la qualité du moteur. **(3) marketing** et **(4) finance perso** en suivant, car ils tournent surtout sur QCM/flashcards/études de cas (rapides à écrire, pas de sandbox code requise), donc livrables même avant que l'unité `CODE` soit codée.
 
 ### Chemin critique de code (ce qu'il faut coder avant d'écrire les cours)
 

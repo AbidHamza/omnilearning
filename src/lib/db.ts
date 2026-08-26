@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
-// Prisma 7 : le runtime ne lit plus l'URL depuis schema.prisma — on passe un
+// Prisma 7 : le runtime ne lit plus l'URL depuis schema.prisma, on passe un
 // "driver adapter" au constructeur. En dev = SQLite (better-sqlite3, zéro setup).
 //
 // PASSAGE EN PROD (Postgres) : installer `@prisma/adapter-pg` + `pg`, passer

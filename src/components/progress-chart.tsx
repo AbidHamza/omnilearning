@@ -1,29 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useT } from "@/i18n/provider";
 
-const series = {
-  Mois: {
-    labels: ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aou", "Sept", "Oct", "Nov", "Dec"],
-    values: [6, 9, 16, 12, 10, 11, 18, 14, 9, 7, 8, 6],
-  },
-  Semaine: {
-    labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
-    values: [4, 8, 6, 11, 9, 13, 5],
-  },
-};
+// Courbe d'XP par jour. Les données viennent du serveur (journal XpEvent,
+// cf. getXpByDay) : rien n'est inventé côté client. Sans données, on affiche
+// un état vide honnête plutôt qu'une fausse courbe.
+
+export interface ChartPoint {
+  label: string;
+  value: number;
+}
 
 const W = 560;
 const H = 200;
 const PAD = 28;
-const MAX = 20;
 
-function buildPath(values: number[]) {
+function buildPath(values: number[], max: number) {
   const n = values.length;
-  const stepX = (W - PAD * 2) / (n - 1);
+  const stepX = n > 1 ? (W - PAD * 2) / (n - 1) : 0;
   const pts = values.map((v, i) => {
     const x = PAD + i * stepX;
-    const y = H - PAD - (v / MAX) * (H - PAD * 2);
+    const y = H - PAD - (v / max) * (H - PAD * 2);
     return [x, y] as const;
   });
   // Courbe lissée (Catmull-Rom -> Bézier)
@@ -42,40 +39,73 @@ function buildPath(values: number[]) {
   return { d, pts };
 }
 
-export default function ProgressChart({ title }: { title?: string }) {
-  const [tab, setTab] = useState<"Mois" | "Semaine">("Mois");
-  const { labels, values } = series[tab];
-  const { d, pts } = buildPath(values);
+/** Arrondit le plafond de l'axe à un palier lisible. */
+function niceMax(raw: number): number {
+  if (raw <= 20) return 20;
+  if (raw <= 50) return 50;
+  if (raw <= 100) return 100;
+  return Math.ceil(raw / 100) * 100;
+}
+
+export default function ProgressChart({
+  title,
+  data,
+  emptyText,
+}: {
+  title?: string;
+  data?: ChartPoint[];
+  emptyText?: string;
+}) {
+  const { chart } = useT();
+  const empty = emptyText ?? chart.empty;
+  const hasData = Boolean(data && data.length >= 2 && data.some((p) => p.value > 0));
+
+  if (!hasData) {
+    return (
+      <div className="rounded-xl bg-bg p-5">
+        {title && <p className="mb-3 text-sm font-semibold">{title}</p>}
+        <div className="grid min-h-[180px] place-items-center rounded-[var(--radius-card)] border border-dashed border-line px-6 text-center">
+          <div>
+            <p className="font-mono text-sm text-muted-soft">
+              <span className="text-primary">$</span> xp --last-14-days
+            </p>
+            <p className="mt-2 text-sm text-muted">{empty}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const points = data as ChartPoint[];
+  const values = points.map((p) => p.value);
+  const max = niceMax(Math.max(...values));
+  const { d, pts } = buildPath(values, max);
   const area = `${d} L ${pts[pts.length - 1][0]} ${H - PAD} L ${pts[0][0]} ${H - PAD} Z`;
+  const gridSteps = [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round(max * f));
+  // Trop de libellés = illisible : on n'en affiche qu'un sur deux au-delà de 8.
+  const labelEvery = points.length > 8 ? 2 : 1;
 
   return (
     <div className="rounded-xl bg-bg p-5">
       {title && <p className="mb-3 text-sm font-semibold">{title}</p>}
-      <div className="flex items-center gap-5 text-sm">
-        {(["Mois", "Semaine"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`pb-1 transition ${
-              tab === t
-                ? "border-b-2 border-ink font-semibold text-ink"
-                : "text-muted-soft hover:text-muted"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <p className="font-mono text-xs text-muted-soft">
+        <span className="text-primary">$</span> xp --last-14-days
+      </p>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-3 w-full" role="img" aria-label={`Progression par ${tab}`}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="mt-3 w-full"
+        role="img"
+        aria-label={chart.ariaLabel}
+      >
         <defs>
           <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-brand)" stopOpacity="0.25" />
             <stop offset="100%" stopColor="var(--color-brand)" stopOpacity="0" />
           </linearGradient>
         </defs>
-        {[0, 5, 10, 15, 20].map((g) => {
-          const y = H - PAD - (g / MAX) * (H - PAD * 2);
+        {gridSteps.map((g) => {
+          const y = H - PAD - (g / max) * (H - PAD * 2);
           return (
             <g key={g}>
               <line x1={PAD} y1={y} x2={W - PAD} y2={y} stroke="var(--color-line)" strokeWidth="1" />
@@ -87,11 +117,13 @@ export default function ProgressChart({ title }: { title?: string }) {
         })}
         <path d={area} fill="url(#chartFill)" />
         <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" />
-        {pts.map((p, i) => (
-          <text key={i} x={p[0]} y={H - 8} textAnchor="middle" className="fill-muted-soft text-[9px]">
-            {labels[i]}
-          </text>
-        ))}
+        {pts.map((p, i) =>
+          i % labelEvery === 0 ? (
+            <text key={i} x={p[0]} y={H - 8} textAnchor="middle" className="fill-muted-soft text-[9px]">
+              {points[i].label}
+            </text>
+          ) : null,
+        )}
       </svg>
     </div>
   );

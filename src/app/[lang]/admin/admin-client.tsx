@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { LocaleLink } from "@/i18n/navigation";
+import { useT } from "@/i18n/provider";
 import { moderateDraftAction } from "@/lib/actions/moderation";
 import type { PendingDraft } from "@/lib/dal";
 import type { PlatformUser } from "@/lib/types";
@@ -24,6 +25,8 @@ export default function AdminClient({
   stats: { online: number; pending: number; instructors: number; learners: number };
   recentUsers: PlatformUser[];
 }) {
+  const t = useT();
+  const m = t.moderation;
   const [queue, setQueue] = useState(pending);
   const [flash, setFlash] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -31,7 +34,8 @@ export default function AdminClient({
   function decide(item: PendingDraft, approved: boolean) {
     // Optimiste : on retire de la file tout de suite.
     setQueue((q) => q.filter((c) => c.id !== item.id));
-    setFlash(`« ${item.title} » ${approved ? "approuvée et publiée" : "refusée"}.`);
+    const tpl = approved ? m.flashApproved : m.flashRefused;
+    setFlash(tpl.replace("{title}", item.title));
     startTransition(async () => {
       const res = await moderateDraftAction(item.id, approved);
       if (!res.ok) {
@@ -43,16 +47,16 @@ export default function AdminClient({
   }
 
   const stats = [
-    { label: "Formations en ligne", value: platformStats.online, icon: LayersIcon },
+    { label: m.statOnline, value: platformStats.online, icon: LayersIcon },
     {
-      label: "En attente",
+      label: m.statPending,
       value: queue.length,
       icon: ClockIcon,
       highlight: true,
     },
-    { label: "Formateurs", value: platformStats.instructors, icon: UserIcon },
+    { label: m.statInstructors, value: platformStats.instructors, icon: UserIcon },
     {
-      label: "Apprenants",
+      label: m.statLearners,
       value: platformStats.learners.toLocaleString("fr-FR"),
       icon: UsersIcon,
     },
@@ -61,8 +65,8 @@ export default function AdminClient({
   return (
     <div className="container-page py-10">
       <span className="rule-accent mb-3" />
-      <p className="text-sm text-muted">Bienvenue Admin</p>
-      <h1 className="mt-1 text-4xl font-semibold">Modération</h1>
+      <p className="text-sm text-muted">{m.welcome}</p>
+      <h1 className="mt-1 text-4xl font-semibold">{m.title}</h1>
 
       {/* Statistiques plateforme */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -103,28 +107,28 @@ export default function AdminClient({
       <section className="mt-6 rounded-[var(--radius-card)] border border-line bg-bg p-6 sm:p-7">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold">
-            Formations en attente de validation
+            {m.queueTitle}
           </h2>
           <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
-            {queue.length} en file
+            {m.queueCount.replace("{n}", String(queue.length))}
           </span>
         </div>
 
         {queue.length === 0 ? (
           <p className="mt-6 rounded-xl bg-surface p-6 text-center text-sm text-muted">
-            Aucune formation en attente. Tout est à jour.
+            {m.queueEmpty}
           </p>
         ) : (
           <div className="mt-5 overflow-x-auto">
             <table className="w-full min-w-[760px] border-collapse text-sm">
               <thead>
                 <tr className="text-left text-xs font-semibold text-muted">
-                  <th className="pb-3 pr-4 font-semibold">Formation</th>
-                  <th className="pb-3 pr-4 font-semibold">Formateur</th>
-                  <th className="pb-3 pr-4 font-semibold">Catégorie</th>
-                  <th className="pb-3 pr-4 font-semibold">Niveau</th>
-                  <th className="pb-3 pr-4 font-semibold">Soumise le</th>
-                  <th className="pb-3 font-semibold">Actions</th>
+                  <th className="pb-3 pr-4 font-semibold">{m.colFormation}</th>
+                  <th className="pb-3 pr-4 font-semibold">{m.colInstructor}</th>
+                  <th className="pb-3 pr-4 font-semibold">{m.colCategory}</th>
+                  <th className="pb-3 pr-4 font-semibold">{m.colLevel}</th>
+                  <th className="pb-3 pr-4 font-semibold">{m.colSubmitted}</th>
+                  <th className="pb-3 font-semibold">{m.colActions}</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,7 +147,7 @@ export default function AdminClient({
                           className="inline-flex items-center gap-1.5 rounded-[3px] bg-success px-3.5 py-1.5 text-xs font-semibold text-[#04130a] transition hover:opacity-90 disabled:opacity-50"
                         >
                           <CheckIcon width={14} height={14} />
-                          Approuver
+                          {m.approve}
                         </button>
                         <button
                           onClick={() => decide(c, false)}
@@ -151,14 +155,14 @@ export default function AdminClient({
                           className="inline-flex items-center gap-1.5 rounded-full border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
                         >
                           <XIcon width={14} height={14} />
-                          Refuser
+                          {m.refuse}
                         </button>
                         <LocaleLink
                           href={`/formations?q=${encodeURIComponent(c.title)}`}
                           className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary"
                         >
                           <EyeIcon width={14} height={14} />
-                          Voir
+                          {t.actions.view}
                         </LocaleLink>
                       </div>
                     </td>
@@ -172,7 +176,7 @@ export default function AdminClient({
 
       {/* Derniers inscrits */}
       <section className="mt-6 rounded-[var(--radius-card)] border border-line bg-bg p-6 sm:p-7">
-        <h2 className="font-display text-xl font-bold">Derniers inscrits</h2>
+        <h2 className="font-display text-xl font-bold">{m.recentTitle}</h2>
         <ul className="mt-5 divide-y divide-line">
           {recentUsers.map((u) => (
             <li key={u.name} className="flex items-center gap-4 py-3.5">

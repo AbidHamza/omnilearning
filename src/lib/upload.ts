@@ -5,7 +5,7 @@ import path from "node:path";
 
 // Abstraction d'upload. Provider par défaut = "local" (écrit dans public/uploads,
 // zéro setup). En prod, mettre UPLOAD_PROVIDER="s3" et implémenter le bloc S3
-// (placeholder ci-dessous) avec les vars AWS_* — voir .env.example.
+// (placeholder ci-dessous) avec les vars AWS_* ; voir .env.example.
 
 export type UploadResult = { url: string; name: string; size: number };
 

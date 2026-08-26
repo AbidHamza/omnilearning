@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="Créer son premier site web : HTML &amp; CSS">
+  <defs>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0 H0 V64" fill="none" stroke="#e34c26" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="4" height="6" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" opacity="0.02"/>
+    </pattern>
+    <radialGradient id="glow" cx="78%" cy="28%" r="60%">
+      <stop offset="0%" stop-color="#e34c26" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#e34c26" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="800" fill="#0b0f0d"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+
+  
+    <g transform="translate(920 120)" stroke="#e34c26" fill="none" stroke-width="3">
+      <path d="M40 40 L0 90 L40 140" opacity="0.85"/>
+      <path d="M120 40 L160 90 L120 140" opacity="0.85"/>
+      <line x1="95" y1="30" x2="65" y2="150" opacity="0.5"/>
+      <rect x="-30" y="200" width="240" height="52" rx="4" opacity="0.35"/>
+      <rect x="0" y="272" width="180" height="52" rx="4" opacity="0.2"/>
+    </g>
+
+  <!-- prompt -->
+  <text x="84" y="128" font-size="30" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#e34c26">$ <tspan fill="#9fb4a8">commencer-le-html</tspan><tspan fill="#e34c26"> ▍</tspan></text>
+
+  <!-- titre -->
+  <text x="84" y="479" font-size="60" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">Créer son premier site web :</text>
+  <text x="84" y="556" font-size="60" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">HTML &amp; CSS</text>
+  <rect x="84" y="582" width="120" height="6" fill="#e34c26"/>
+
+  <!-- pied -->
+  <text x="84" y="736" font-size="22" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#5c6f64">omnilearn<tspan fill="#e34c26">.</tspan>formations</text>
+
+  <rect width="1280" height="800" fill="url(#scan)"/>
+  <rect x="1.5" y="1.5" width="1277" height="797" fill="none" stroke="#e34c26" stroke-opacity="0.28" stroke-width="3"/>
+</svg>

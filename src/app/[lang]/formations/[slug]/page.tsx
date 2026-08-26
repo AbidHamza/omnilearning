@@ -1,15 +1,43 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { contentCourses as seedCourses } from "@/lib/content";
-import { allLessons, getCourse, getReviews } from "@/lib/courses";
+import { allLessons, getCourseOutline, getReviews } from "@/lib/courses";
+import { getCourseViewerState } from "@/lib/dal";
 import CourseReviews from "@/components/course-reviews";
+import Curriculum from "@/components/curriculum";
 import { PlayIcon, UserIcon } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { isLocale, localePath } from "@/i18n/config";
+import { defaultLocale, isLocale, localePath } from "@/i18n/config";
+import { alternatesFor, pageUrl, siteName, siteUrl } from "@/lib/site";
 
 export function generateStaticParams() {
   // Slugs canoniques (seed) pour le pré-rendu ; le contenu est lu en DB au build.
   return seedCourses.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata(
+  props: PageProps<"/[lang]/formations/[slug]">,
+): Promise<Metadata> {
+  const { lang, slug } = await props.params;
+  const locale = isLocale(lang) ? lang : defaultLocale;
+  const course = await getCourseOutline(slug);
+  if (!course) return {};
+
+  const path = `/formations/${course.slug}`;
+  return {
+    title: course.title,
+    description: course.tagline || course.description.slice(0, 160),
+    alternates: alternatesFor(locale, path),
+    openGraph: {
+      type: "article",
+      siteName,
+      title: `${course.title} · ${siteName}`,
+      description: course.tagline || course.description.slice(0, 160),
+      url: pageUrl(locale, path),
+      locale,
+    },
+  };
 }
 
 export default async function CoursePage(
@@ -19,16 +47,81 @@ export default async function CoursePage(
   if (!isLocale(lang)) notFound();
   const t = await getDictionary(lang);
   const lp = (path: string) => localePath(lang, path);
-  const course = await getCourse(slug);
+  // Sommaire seul : cette page n'affiche aucun corps de lecon ni quiz.
+  const course = await getCourseOutline(slug);
   if (!course) notFound();
 
   const lessons = allLessons(course);
   const firstLesson = lessons[0];
   const reviews = await getReviews(course.slug, lang);
-  const reviewsTitle =
-    lang === "en" ? "Reviews" : lang === "ar" ? "التقييمات" : "Avis des apprenants";
+  const viewer = await getCourseViewerState(course.slug);
+  const reviewsTitle = t.reviews.title;
 
   const c = t.course;
+
+  // Données structurées : Course + fil d'Ariane. L'aggregateRating reprend
+  // EXACTEMENT les avis affichés plus bas sur la page (CourseReviews).
+  const courseUrl = `${siteUrl}${localePath(lang, `/formations/${course.slug}`)}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Course",
+        "@id": `${courseUrl}#course`,
+        name: course.title,
+        description: course.description,
+        url: courseUrl,
+        inLanguage: lang,
+        provider: { "@type": "Organization", name: siteName, url: siteUrl },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "EUR",
+          category: "Free",
+        },
+        hasCourseInstance: {
+          "@type": "CourseInstance",
+          courseMode: "Online",
+          courseWorkload: `PT${course.hours}H`,
+          instructor: { "@type": "Person", name: course.instructor },
+        },
+        ...(reviews.count > 0
+          ? {
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: Number(reviews.average.toFixed(1)),
+                reviewCount: reviews.count,
+                bestRating: 5,
+                worstRating: 1,
+              },
+            }
+          : {}),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: t.footer.home,
+            item: `${siteUrl}/${lang}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: t.nav.formations,
+            item: `${siteUrl}${localePath(lang, "/formations")}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: course.title,
+            item: courseUrl,
+          },
+        ],
+      },
+    ],
+  };
   const meta = [
     `${c.durationLabel} : ${course.hours} ${c.hoursUnit}`,
     course.language && `${c.languageLabel} : ${course.language}`,
@@ -38,6 +131,10 @@ export default async function CoursePage(
 
   return (
     <div className="container-page py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link
         href={lp("/formations")}
         className="font-mono text-sm text-muted transition hover:text-primary"
@@ -95,22 +192,19 @@ export default async function CoursePage(
         </button>
       </div>
 
-      {/* Sommaire */}
-      {course.summary && (
+      {/* Programme détaillé (accordéon, cadenas pour les visiteurs, coches
+          de complétion pour les membres) */}
+      {course.parts.length > 0 && (
         <section className="mt-12">
-          <h2 className="text-xl font-bold">{c.summary}</h2>
-          <ul className="mt-4 space-y-2">
-            {course.parts.map((part) => (
-              <li key={part.id}>
-                <Link
-                  href={lp(`/formations/${course.slug}/${part.lessons[0]?.id}`)}
-                  className="text-[15px] text-primary-dark underline-offset-4 hover:underline"
-                >
-                  {part.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-xl font-bold">{c.programLabel}</h2>
+          <div className="mt-5">
+            <Curriculum
+              course={course}
+              locale={lang}
+              isAuthenticated={viewer.isAuthenticated}
+              completedKeys={viewer.completedKeys}
+            />
+          </div>
         </section>
       )}
 
@@ -179,7 +273,11 @@ export default async function CoursePage(
       </section>
 
       {/* Avis */}
-      <CourseReviews summary={reviews} title={reviewsTitle} />
+      <CourseReviews
+        summary={reviews}
+        title={reviewsTitle}
+        countLabel={t.reviews.count}
+      />
 
       {/* CTA */}
       {firstLesson && (

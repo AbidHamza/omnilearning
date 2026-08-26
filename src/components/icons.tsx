@@ -287,6 +287,14 @@ export const UsersIcon = (p: P) => (
   </svg>
 );
 
+export const LockIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
+    <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+    <path d="M12 14.5v2.5" />
+  </svg>
+);
+
 export const EyeIcon = (p: P) => (
   <svg {...base} {...p}>
     <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />

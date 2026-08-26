@@ -246,6 +246,43 @@ export async function getGamification(userId: string): Promise<GamificationView>
   };
 }
 
+export interface XpDayPoint {
+  /** Libellé court du jour (ex. "12/06"). */
+  label: string;
+  value: number;
+}
+
+/**
+ * XP réellement gagnée par jour sur les `days` derniers jours (journal XpEvent),
+ * du plus ancien au plus récent. Jours sans activité = 0.
+ */
+export async function getXpByDay(userId: string, days = 14): Promise<XpDayPoint[]> {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  start.setDate(start.getDate() - (days - 1));
+
+  const events = await prisma.xpEvent.findMany({
+    where: { userId, createdAt: { gte: start } },
+    select: { amount: true, createdAt: true },
+  });
+
+  const byDay = new Map<string, number>();
+  for (const e of events) {
+    const k = dayKey(e.createdAt);
+    byDay.set(k, (byDay.get(k) ?? 0) + e.amount);
+  }
+
+  const out: XpDayPoint[] = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    out.push({ label: `${dd}/${mm}`, value: byDay.get(dayKey(d)) ?? 0 });
+  }
+  return out;
+}
+
 export interface LeaderboardRow {
   rank: number;
   name: string;

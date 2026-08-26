@@ -34,12 +34,12 @@ yarn-error.log*
 .env*
 !.env.example
 
-# database (dev SQLite) — jamais commité
+# database (dev SQLite) : jamais commité
 *.db
 *.db-journal
 prisma/*.db
 
-# uploads locaux (dev) — pas dans le repo
+# uploads locaux (dev) : pas dans le repo
 /public/uploads/*
 !/public/uploads/.gitkeep
 

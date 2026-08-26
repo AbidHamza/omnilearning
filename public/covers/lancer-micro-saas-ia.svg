@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="Lancer un micro-SaaS avec l'IA : de l'idée aux premiers clients">
+  <defs>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0 H0 V64" fill="none" stroke="#38bdf8" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="4" height="6" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" opacity="0.02"/>
+    </pattern>
+    <radialGradient id="glow" cx="78%" cy="28%" r="60%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="800" fill="#0b0f0d"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+
+  
+    <g transform="translate(910 110)" stroke="#38bdf8" fill="none" stroke-width="3">
+      <path d="M0 240 h70 v-60 h70 v-60 h70 v-60 h70" opacity="0.85"/>
+      <circle cx="280" cy="60" r="8" fill="#38bdf8" stroke="none"/>
+      <rect x="0" y="280" width="280" height="44" rx="5" opacity="0.35"/>
+      <path d="M16 302 h60" stroke-width="5" opacity="0.5" stroke-linecap="round"/>
+      <path d="M96 302 h120" stroke-width="5" opacity="0.25" stroke-linecap="round"/>
+    </g>
+
+  <!-- prompt -->
+  <text x="84" y="128" font-size="30" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#38bdf8">$ <tspan fill="#9fb4a8">lancer-micro-saas-ia</tspan><tspan fill="#38bdf8"> ▍</tspan></text>
+
+  <!-- titre -->
+  <text x="84" y="482" font-size="50" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">Lancer un micro-SaaS avec l'IA : de</text>
+  <text x="84" y="546" font-size="50" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">l'idée aux premiers clients</text>
+  <rect x="84" y="572" width="120" height="6" fill="#38bdf8"/>
+
+  <!-- pied -->
+  <text x="84" y="736" font-size="22" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#5c6f64">omnilearn<tspan fill="#38bdf8">.</tspan>formations</text>
+
+  <rect width="1280" height="800" fill="url(#scan)"/>
+  <rect x="1.5" y="1.5" width="1277" height="797" fill="none" stroke="#38bdf8" stroke-opacity="0.28" stroke-width="3"/>
+</svg>

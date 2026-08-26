@@ -36,7 +36,8 @@ npm install --no-audit --no-fund @prisma/adapter-pg pg >/dev/null 2>&1 || npm in
 npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
 
 echo "===> 7. prisma db push + generate"
-npx prisma db push --skip-generate
+# Prisma 7 : `db push` ne prend plus --skip-generate ; generate est appelé juste après.
+npx prisma db push
 npx prisma generate
 
 echo "===> 8. seed"

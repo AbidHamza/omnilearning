@@ -4,22 +4,21 @@ const course: Course = {
   slug: "javascript-cours-expert",
   title: "JavaScript moderne : de solide à expert",
   tagline:
-    "Comprendre ce que fait vraiment le moteur : coercion, closures, this, event loop et async sans zones d'ombre.",
+    "Coercion, closures, this, prototypes, event loop : les règles réelles du moteur, vérifiables dans la spec, pas des recettes de blog.",
   description:
-    "Un cours pour développeurs qui écrivent déjà du JavaScript et veulent arrêter de deviner. On démonte les règles réelles du langage — coercion et égalité, hoisting et TDZ, closures, prototypes et classes, style fonctionnel, puis l'asynchronisme vu depuis l'event loop (microtâches contre macrotâches, Promises, async/await, Promise.all/race/allSettled). On finit par les modules ES, trois patterns qu'on utilise tous les jours (module, observateur, debounce/throttle) et les pièges de performance qui coûtent cher en production. Chaque notion s'appuie sur du code exact, exécutable dans un navigateur récent ou dans Node.",
+    "Un cours pour développeurs qui écrivent déjà du JavaScript et veulent arrêter de deviner. On démonte les règles réelles du langage : coercion et les quatre algorithmes d'égalité, hoisting et TDZ, closures vues depuis les environnements lexicaux, prototypes et classes (champs privés #, static blocks), style fonctionnel avec les apports récents (Object.groupBy d'ES2024, les iterator helpers d'ES2025, toSorted), puis l'asynchronisme depuis l'event loop : microtâches contre macrotâches, cycle de vie d'une Promise, async/await, combinateurs, Promise.withResolvers et AbortSignal.timeout. Chaque affirmation est vérifiable dans la spec ECMAScript ou sur MDN, chaque sortie console est exacte, chaque message d'erreur est celui que V8 affiche vraiment. Testé sur Node 22 et un navigateur de 2025.",
   category: "Développement Web",
   level: "Avancé",
   instructor: "Thomas Lefèvre",
   instructorBio:
     "Développeur JavaScript depuis 2011, il a passé six ans à maintenir des applications front à fort trafic et forme des équipes sur les subtilités du langage et de l'asynchronisme.",
-  hours: 11,
+  hours: 6,
   rating: 4.8,
   learners: 5610,
   accent: "#0ca8d3",
-  image:
-    "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=800&q=80",
+  image: "/covers/javascript-cours-expert.svg",
   language: "Français",
-  software: "Node.js 20+, un navigateur récent, VS Code",
+  software: "Node.js 22+, un navigateur récent, VS Code",
   prerequisites: [
     "Écrire des fonctions et manipuler des objets/tableaux en JavaScript",
     "Avoir déjà utilisé le DOM ou une petite API Node",
@@ -34,19 +33,19 @@ const course: Course = {
     "Partie 6 : Modules, patterns et performance",
   ],
   objectives: [
-    "Prédire le résultat d'une comparaison ou d'une coercion sans lancer le code",
-    "Expliquer et exploiter les closures dans des cas concrets",
-    "Déterminer la valeur de this dans n'importe quel appel de fonction",
-    "Modéliser de l'héritage avec prototypes et classes ES sans confusion",
-    "Dérouler l'ordre d'exécution d'un code asynchrone via l'event loop",
-    "Choisir entre Promise.all, race, allSettled et any selon le besoin",
+    "Prédire le résultat d'une comparaison ou d'une coercion sans lancer le code, en citant la règle de la spec qui s'applique",
+    "Expliquer une closure en termes d'environnements lexicaux et diagnostiquer les fuites mémoire qu'elle peut causer",
+    "Déterminer la valeur de this dans n'importe quel appel, y compris bind sur bind et les fonctions fléchées",
+    "Lire une chaîne de prototypes dans les DevTools et savoir ce que class ajoute vraiment (champs #, static, brand checks)",
+    "Dérouler l'ordre d'exécution exact d'un code mêlant setTimeout, Promises et await via l'event loop",
+    "Choisir entre Promise.all, race, allSettled, any et les API 2024-2025 (withResolvers, AbortSignal.timeout) selon le besoin",
   ],
   skills: [
-    "Coercion et égalité",
-    "Closures",
+    "Coercion et algorithmes d'égalité",
+    "Closures et modèle mémoire",
     "this et binding",
-    "Programmation fonctionnelle",
-    "Promises et async/await",
+    "Programmation fonctionnelle moderne",
+    "Event loop, Promises et async/await",
     "Modules ES et patterns",
   ],
   contentTypes: ["Leçons écrites", "Quiz interactifs", "Études de cas"],
@@ -59,11 +58,24 @@ const course: Course = {
           id: "l1",
           title: "Les types primitifs et le piège de typeof",
           type: "text",
-          duration: "13 min",
+          duration: "17 min",
           body:
-            "## Sept primitifs et un objet\n\n" +
-            "JavaScript a sept types primitifs : `string`, `number`, `bigint`, `boolean`, `undefined`, `symbol`, `null`. Tout le reste est un objet, y compris les tableaux et les fonctions. Un primitif est immuable : quand vous écrivez `\"abc\".toUpperCase()`, la chaîne d'origine ne change pas, une nouvelle est créée.\n\n" +
-            "L'outil qu'on dégaine en premier pour inspecter un type, c'est `typeof`. Il renvoie une chaîne. Et il a des surprises qu'il faut connaître par cœur.\n\n" +
+            "## Un test de panier qui échoue pour 0,00000000000000004\n\n" +
+            "Un test unitaire sur un total de panier qui compare `0.1 + 0.2 === 0.3` échoue. Pas parfois : toujours. Tape-le dans n'importe quelle console :\n\n" +
+            "```js\n" +
+            "0.1 + 0.2            // 0.30000000000000004\n" +
+            "0.1 + 0.2 === 0.3    // false\n" +
+            "```\n\n" +
+            "Ce n'est pas un bug de JavaScript. `number` est un flottant IEEE 754 sur 64 bits, et 0.1 n'a pas de représentation binaire exacte, exactement comme 1/3 n'a pas d'écriture décimale finie. Python et Java font pareil avec leurs doubles. Ce qui est propre à JavaScript, c'est qu'il n'a qu'un seul type numérique flottant pour tout : pas d'entier 32 bits séparé, pas de décimal. D'où l'intérêt de connaître précisément ses types, leurs limites, et l'outil d'inspection `typeof` avec ses mensonges.\n\n" +
+            "## Sept primitifs, et tout le reste est objet\n\n" +
+            "La spec (§6.1) définit sept types primitifs : `string`, `number`, `bigint`, `boolean`, `undefined`, `symbol`, `null`. Tout le reste est un objet, y compris les tableaux, les fonctions, les dates et les regex. Un primitif est immuable : `\"abc\".toUpperCase()` ne modifie pas la chaîne, il en crée une nouvelle.\n\n" +
+            "Détail que peu de gens savent expliquer : si `\"abc\"` est un primitif sans propriétés, pourquoi `\"abc\".length` marche ? Parce que le moteur crée à la volée un objet wrapper `String` temporaire (l'opération ToObject de la spec), lit la propriété dessus, puis le jette. C'est l'auto-boxing. Conséquence mesurable : écrire une propriété sur un primitif ne sert à rien, et en mode strict (donc dans tout module ES) ça lève :\n\n" +
+            "```js\n" +
+            "\"use strict\";\n" +
+            "const s = \"abc\";\n" +
+            "s.foo = 1; // TypeError: Cannot create property 'foo' on string 'abc'\n" +
+            "```\n\n" +
+            "## typeof : sept réponses justes, deux mensonges\n\n" +
             "```js\n" +
             "typeof \"bonjour\"    // \"string\"\n" +
             "typeof 42           // \"number\"\n" +
@@ -73,110 +85,203 @@ const course: Course = {
             "typeof Symbol()     // \"symbol\"\n" +
             "typeof function(){} // \"function\"\n" +
             "typeof null         // \"object\"  <-- le bug historique\n" +
+            "typeof []           // \"object\"  <-- vrai mais inutile\n" +
             "```\n\n" +
-            "### typeof null vaut \"object\"\n\n" +
-            "Ce n'est pas un choix, c'est un bug de la toute première implémentation de 1995 jamais corrigé pour ne pas casser le web existant. Concrètement : pour tester `null`, n'utilisez jamais `typeof`. Comparez directement.\n\n" +
+            "`typeof null === \"object\"` est un bug de la première implémentation de 1995 : les valeurs étaient taguées par leurs bits de poids faible, `null` était un pointeur nul, tag 0, donc « object ». Une correction a été proposée puis rejetée par TC39 parce qu'elle cassait trop de sites. Le comportement est aujourd'hui gravé dans la table de la spec (§13.5.3). Pour tester `null`, compare directement : `x === null`. Pour un tableau : `Array.isArray(v)`, qui traverse même les frontières de realm (iframe), contrairement à `v instanceof Array`.\n\n" +
+            "Curiosité de spécialiste, utile en entretien : dans un navigateur, `typeof document.all` renvoie `\"undefined\"` alors que l'objet existe. C'est la seule valeur du web avec le slot interne [[IsHTMLDDA]], une violation volontaire de la spec ECMAScript inscrite dans la spec HTML pour ne pas casser les détections de vieux Internet Explorer.\n\n" +
+            "## Les limites réelles de number\n\n" +
+            "Un double 64 bits représente exactement les entiers jusqu'à `Number.MAX_SAFE_INTEGER`, soit 9 007 199 254 740 991 (2^53 − 1). Au-delà, les entiers se confondent :\n\n" +
             "```js\n" +
-            "const x = null;\n" +
-            "if (x === null) { /* la seule façon fiable */ }\n" +
+            "2 ** 53 === 2 ** 53 + 1  // true (!)\n" +
             "```\n\n" +
-            "### NaN est un number qui ne s'égale pas lui-même\n\n" +
-            "`typeof NaN` renvoie `\"number\"`. Et `NaN === NaN` est `false`, c'est la seule valeur du langage qui n'est pas égale à elle-même. Pour le détecter, utilisez `Number.isNaN(valeur)`, jamais l'ancien `isNaN()` global qui commence par convertir son argument et donne des faux positifs.\n\n" +
+            "C'est le genre de piège qui explose quand un identifiant de base de données (un id Twitter/X, par exemple) dépasse 2^53 et arrive en JSON : deux ids distincts deviennent le même number. La parade moderne, c'est `bigint` : `42n`, précision entière arbitraire. Mais on ne mélange pas les deux types :\n\n" +
             "```js\n" +
-            "Number.isNaN(NaN)        // true\n" +
-            "Number.isNaN(\"abc\")      // false, ce n'est pas un NaN, c'est une chaîne\n" +
-            "isNaN(\"abc\")            // true, trompeur : \"abc\" est converti en NaN\n" +
+            "1n + 1\n" +
+            "// TypeError: Cannot mix BigInt and other types, use explicit conversions\n" +
+            "1n + BigInt(1)  // 2n\n" +
             "```\n\n" +
-            "### Distinguer un vrai objet\n\n" +
-            "Comme `typeof null` et `typeof []` mentent tous les deux (`\"object\"`), pour reconnaître un tableau on utilise `Array.isArray(v)`. Pour distinguer un objet « nu » d'un `null`, on combine les tests.\n\n" +
-            "> À retenir : `typeof` répond à sept questions correctement et ment sur deux (`null` et les tableaux). Mémorisez les exceptions et vous ne perdrez plus de temps dessus.\n\n" +
-            "Référence complète : [typeof sur MDN](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Operators/typeof).\n",
+            "Pour comparer des flottants, oublie l'égalité stricte et compare à un epsilon : `Math.abs(a - b) < Number.EPSILON` (EPSILON vaut environ 2.22e-16). Pour de l'argent, travaille en centimes entiers, je te déconseille les flottants pour tout ce qui finit sur une facture.\n\n" +
+            "## NaN, le number qui ne s'égale pas lui-même\n\n" +
+            "`typeof NaN` renvoie `\"number\"`, et `NaN === NaN` vaut `false`. C'est la seule valeur du langage non égale à elle-même, un héritage direct d'IEEE 754. Détection fiable : `Number.isNaN(v)`. Jamais le vieux `isNaN()` global, qui convertit d'abord son argument :\n\n" +
+            "```js\n" +
+            "Number.isNaN(NaN)    // true\n" +
+            "Number.isNaN(\"abc\")  // false : c'est une chaîne, pas NaN\n" +
+            "isNaN(\"abc\")         // true : \"abc\" est converti en NaN d'abord, trompeur\n" +
+            "```\n\n" +
+            "Dans la même famille de bizarreries : il existe deux zéros, `0` et `-0`. `0 === -0` vaut `true`, mais `1 / -0` vaut `-Infinity`. La fonction `Object.is` applique un troisième algorithme d'égalité (SameValue) qui distingue les deux cas que `===` traite mal :\n\n" +
+            "```js\n" +
+            "Object.is(NaN, NaN)  // true\n" +
+            "Object.is(0, -0)     // false\n" +
+            "```\n\n" +
+            "On recroisera ces algorithmes à la leçon suivante, parce que `includes`, `Set` et `Map` en utilisent un quatrième.\n\n" +
+            "## symbol, en deux mots\n\n" +
+            "Un `Symbol()` est une clé de propriété garantie unique : `Symbol(\"id\") === Symbol(\"id\")` vaut `false`, la description entre parenthèses n'est qu'une étiquette de debug. On s'en sert pour poser des métadonnées sur un objet sans risquer de collision avec ses clés, et le langage lui-même expose ses points d'extension ainsi (`Symbol.iterator`, `Symbol.hasInstance`). Sache que ça existe et que `typeof` le reconnaît, on le recroisera avec les itérateurs.\n\n" +
+            "## À toi\n\n" +
+            "Sans exécuter : que renvoie `typeof typeof 42` ?\n\n" +
+            "> `\"string\"`. `typeof 42` s'évalue d'abord et produit la chaîne `\"number\"`. Puis `typeof \"number\"` s'applique à cette chaîne : `\"string\"`. L'opérateur renvoie toujours une chaîne, donc `typeof typeof x` vaut `\"string\"` pour absolument n'importe quel `x`, même non déclaré.\n\n" +
+            "Trois choses à garder : `typeof` ment sur `null` et ne distingue pas les tableaux ; les entiers ne sont sûrs que jusqu'à 2^53 − 1, au-delà c'est `bigint` ; `Number.isNaN` et `Object.is` couvrent les cas où `===` trahit. Référence : [typeof sur MDN](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Operators/typeof).\n",
         },
         {
           id: "l2",
           title: "Coercion, == contre === et les comparaisons qui piègent",
           type: "text",
-          duration: "15 min",
+          duration: "18 min",
           body:
-            "## La coercion, ce n'est pas du hasard\n\n" +
-            "Beaucoup de développeurs traitent la coercion comme une loterie et bannissent `==` par peur. C'est dommage, parce que les règles sont peu nombreuses et parfaitement déterministes. Les connaître vous permet de lire n'importe quel code.\n\n" +
-            "### Égalité stricte : ===\n\n" +
-            "`===` ne convertit rien. Types différents ? C'est `false`, point. C'est le comportement que vous voulez dans 95 % des cas.\n\n" +
+            "## null >= 0 est vrai, null == 0 est faux\n\n" +
+            "Vérifie par toi-même :\n\n" +
             "```js\n" +
-            "1 === 1      // true\n" +
-            "1 === \"1\"    // false, number vs string\n" +
-            "null === undefined // false, types différents\n" +
+            "null > 0    // false\n" +
+            "null == 0   // false\n" +
+            "null >= 0   // true (!)\n" +
             "```\n\n" +
-            "### Égalité lâche : ==\n\n" +
-            "`==` tente une conversion avant de comparer. Les règles utiles à retenir :\n\n" +
-            "- `null == undefined` vaut `true`, et ils ne sont lâchement égaux à rien d'autre. C'est même un usage propre : `x == null` teste « null ou undefined » en une expression.\n" +
-            "- Entre un nombre et une chaîne, la chaîne est convertie en nombre.\n" +
-            "- Un booléen est d'abord converti en nombre (`true` → 1, `false` → 0). D'où le classique `[] == false` qui vaut `true`.\n\n" +
+            "Si ta réaction est « ce langage est absurde », cette leçon est pour toi. Ces trois lignes suivent des règles écrites noir sur blanc dans la spec, et elles sont peu nombreuses. Les comparaisons relationnelles (`>`, `>=`, `<`, `<=`) convertissent leurs opérandes en nombre : `null` devient `0`, et `0 >= 0` est vrai. L'égalité lâche `==`, elle, suit un algorithme différent (IsLooselyEqual, §7.2.13) qui dit explicitement que `null` n'est lâchement égal qu'à `undefined`, à rien d'autre. Deux algorithmes, deux réponses. Une fois qu'on sait ça, tout le reste se déduit.\n\n" +
+            "## L'égalité stricte d'abord\n\n" +
+            "`===` (IsStrictlyEqual, §7.2.14) ne convertit rien : types différents, résultat `false`, point. Ses deux seules bizarreries viennent d'IEEE 754, pas de la coercion : `NaN === NaN` est faux, `0 === -0` est vrai. Pour les objets, `===` compare les références : deux objets distincts au contenu identique ne sont jamais égaux.\n\n" +
             "```js\n" +
-            "0 == \"\"        // true : \"\" devient 0\n" +
-            "0 == \"0\"       // true\n" +
-            "\"\" == \"0\"      // false : deux chaînes, pas de conversion, elles diffèrent\n" +
-            "null == 0      // false : null n'est lâchement égal qu'à undefined\n" +
-            "[] == 0        // true : [] -> \"\" -> 0\n" +
+            "{ a: 1 } === { a: 1 }  // false : deux objets distincts en mémoire\n" +
             "```\n\n" +
-            "Ces trois dernières lignes montrent pourquoi `==` n'est pas transitif : `0 == \"\"` et `0 == \"0\"` sont vrais, mais `\"\" == \"0\"` est faux. C'est exactement le genre de bug qui survit trois sprints.\n\n" +
-            "### Le truthy/falsy\n\n" +
-            "Dans un `if`, un `&&` ou un `!`, la valeur est convertie en booléen. Il n'y a que huit valeurs falsy à connaître : `false`, `0`, `-0`, `0n`, `\"\"`, `null`, `undefined`, `NaN`. Tout le reste est truthy, y compris `\"0\"`, `\"false\"`, `[]` et `{}`.\n\n" +
+            "## L'égalité lâche, les vraies règles\n\n" +
+            "`==` compare comme `===` quand les types sont identiques. Sinon, il convertit selon trois règles :\n\n" +
+            "- `null == undefined` vaut `true`, et ces deux-là ne sont lâchement égaux à rien d'autre. C'est même un idiome propre : `x == null` teste « null ou undefined » en une expression.\n" +
+            "- Nombre contre chaîne : la chaîne passe en nombre (`\"1\" == 1` est vrai, `\"\" == 0` aussi car `Number(\"\")` vaut 0).\n" +
+            "- Un booléen est d'abord converti en nombre (`true` → 1, `false` → 0), puis on recommence.\n" +
+            "- Un objet comparé à un primitif passe par ToPrimitive : le moteur appelle `valueOf`, puis `toString`. Pour un tableau, ça donne sa jointure par virgules : `[] → \"\"`, `[5] → \"5\"`.\n\n" +
             "```js\n" +
-            "if ([]) console.log(\"un tableau vide est truthy\"); // s'affiche\n" +
-            "if (\"0\") console.log(\"la chaine \\\"0\\\" est truthy\"); // s'affiche\n" +
+            "0 == \"\"      // true : \"\" -> 0\n" +
+            "0 == \"0\"     // true : \"0\" -> 0\n" +
+            "\"\" == \"0\"    // false : deux chaînes, aucune conversion\n" +
+            "null == 0    // false : null n'est égal qu'à undefined\n" +
+            "[] == 0      // true : [] -> \"\" -> 0\n" +
             "```\n\n" +
-            "### Ma règle en production\n\n" +
-            "Utilisez `===` partout, avec une seule exception assumée : `x == null` pour couvrir null et undefined en même temps. Pour les valeurs par défaut, préférez `??` (nullish) à `||` : `port || 3000` écrase un `0` légitime, alors que `port ?? 3000` ne se déclenche que sur null/undefined.\n\n" +
-            "> À retenir : la coercion suit un algorithme, pas une intuition. Apprenez les huit falsy et la règle null/undefined, le reste se déduit.\n",
+            "Les trois premières lignes prouvent que `==` n'est pas transitif : `0` est égal à `\"\"` et à `\"0\"`, qui ne sont pas égaux entre eux. C'est exactement le genre de bug qui survit trois sprints dans une validation de formulaire.\n\n" +
+            "Le cas d'école des entretiens combine tout :\n\n" +
+            "```js\n" +
+            "[] == ![]   // true\n" +
+            "```\n\n" +
+            "Déroulé : `![]` s'évalue d'abord. Un tableau est truthy, donc `![]` vaut `false`. Reste `[] == false` : le booléen devient `0`, le tableau passe par ToPrimitive et devient `\"\"`, puis `0`. `0 == 0` : vrai. Aucune magie, quatre règles appliquées dans l'ordre.\n\n" +
+            "## Truthy, falsy : la liste ferme\n\n" +
+            "Dans un `if`, un `&&`, un `||` ou un `!`, la valeur passe par ToBoolean. Il y a exactement huit valeurs falsy : `false`, `0`, `-0`, `0n`, `\"\"`, `null`, `undefined`, `NaN`. Tout le reste est truthy, y compris `\"0\"`, `\"false\"`, `[]`, `{}` et `new Boolean(false)` (un objet wrapper est un objet, donc truthy, encore une raison de ne jamais utiliser `new Boolean`).\n\n" +
+            "## Les quatre algorithmes d'égalité, la vue d'ensemble\n\n" +
+            "La spec définit quatre égalités, et tu les utilises toutes les quatre sans le savoir :\n\n" +
+            "| Algorithme | Utilisé par | NaN = NaN ? | 0 = -0 ? |\n" +
+            "| --- | --- | --- | --- |\n" +
+            "| IsLooselyEqual | `==` | non | oui |\n" +
+            "| IsStrictlyEqual | `===`, `switch`, `indexOf` | non | oui |\n" +
+            "| SameValue | `Object.is` | oui | non |\n" +
+            "| SameValueZero | `includes`, `Set`, clés de `Map` | oui | oui |\n\n" +
+            "Conséquence concrète et méconnue :\n\n" +
+            "```js\n" +
+            "[NaN].indexOf(NaN)   // -1 : introuvable (IsStrictlyEqual)\n" +
+            "[NaN].includes(NaN)  // true (SameValueZero)\n" +
+            "```\n\n" +
+            "Si tu cherches des NaN dans un tableau avec `indexOf`, tu ne les trouveras jamais. `includes` (ES2016) a corrigé ça en changeant d'algorithme.\n\n" +
+            "## ?? contre || pour les valeurs par défaut\n\n" +
+            "`port || 3000` remplace toute valeur falsy, donc écrase un `0` légitime. `port ?? 3000` (ES2020) ne se déclenche que sur `null` et `undefined`. Il existe aussi l'affectation `port ??= 3000`. Détail de syntaxe : mélanger `??` avec `||` ou `&&` sans parenthèses est interdit par la grammaire, le moteur lève `SyntaxError: Unexpected token '??'`. Écris `(a || b) ?? c`.\n\n" +
+            "Ma règle en production : `===` partout, une exception assumée pour `x == null`, `??` pour les défauts. Et surtout, savoir lire `==` dans le code des autres, parce qu'il y en a.\n\n" +
+            "## À toi\n\n" +
+            "Sans exécuter : `\"10\" > \"9\"` renvoie quoi ? Et `\"10\" > 9` ?\n\n" +
+            "> `\"10\" > \"9\"` vaut `false` : deux chaînes se comparent lexicographiquement, caractère par caractère, et `\"1\"` vient avant `\"9\"`. `\"10\" > 9` vaut `true` : dès qu'un opérande est un nombre, l'autre est converti en nombre, et 10 > 9. Le même opérateur applique deux logiques selon les types. C'est la cause classique des tris cassés sur des nombres stockés en chaînes.\n",
         },
         {
           id: "l3",
           title: "Portée, hoisting, TDZ et le choix var/let/const",
           type: "text",
-          duration: "14 min",
+          duration: "17 min",
           body:
-            "## Ce que le moteur fait avant d'exécuter\n\n" +
-            "Avant d'exécuter une ligne, le moteur parcourt le scope et réserve la place des déclarations. C'est le hoisting. Mais `var`, `let`, `const` et les fonctions n'y sont pas traités pareil, et c'est la source d'un paquet de bugs.\n\n" +
-            "### var est hissé et initialisé à undefined\n\n" +
+            "## Deux phases, pas une\n\n" +
+            "Le moteur ne lit pas ton code ligne à ligne en partant de zéro. Pour chaque portée (fonction, bloc, module), il fait deux passes : une phase de création où il recense toutes les déclarations et prépare les emplacements mémoire, puis la phase d'exécution. Le « hoisting » n'est pas un déplacement magique du code vers le haut, c'est cette phase de création. Ce qui varie entre `var`, `let`, `const`, `function` et `class`, c'est ce qui se passe entre la création et la ligne de déclaration.\n\n" +
+            "### var : créé ET initialisé à undefined\n\n" +
             "```js\n" +
-            "console.log(a); // undefined, pas une erreur\n" +
+            "console.log(a); // undefined, pas d'erreur\n" +
             "var a = 1;\n" +
             "```\n\n" +
-            "Le moteur lit ça comme « déclare `a` en haut, mets `undefined`, puis assigne `1` à la ligne d'origine ». `var` ignore les blocs : il n'existe qu'à l'échelle de la fonction. Une `var` déclarée dans un `if` fuit hors du `if`.\n\n" +
-            "### let et const : la zone morte temporelle\n\n" +
-            "`let` et `const` sont aussi hissés, mais pas initialisés. Entre le début du bloc et la ligne de déclaration, la variable existe mais y accéder lève une `ReferenceError`. Cette fenêtre s'appelle la Temporal Dead Zone (TDZ).\n\n" +
+            "Pendant la phase de création, `a` existe déjà et vaut `undefined`. Autre propriété de `var` : il ignore les blocs. Sa portée est la fonction englobante (ou le global), donc une `var` déclarée dans un `if` fuit hors du `if`. Deux comportements hérités de 1995 qui transforment des fautes de frappe en bugs silencieux.\n\n" +
+            "### let et const : créés mais NON initialisés\n\n" +
+            "`let` et `const` sont bien recensés pendant la phase de création (ils sont hissés, contrairement à ce qu'on lit souvent), mais l'emplacement reste non initialisé jusqu'à la ligne de déclaration. Cette fenêtre s'appelle la Temporal Dead Zone. Y accéder lève une erreur dont le message est explicite dans V8 :\n\n" +
             "```js\n" +
             "console.log(b); // ReferenceError: Cannot access 'b' before initialization\n" +
             "let b = 1;\n" +
             "```\n\n" +
-            "La TDZ n'est pas une punition, c'est un garde-fou : elle vous force à déclarer avant d'utiliser, ce qui attrape des fautes de frappe et des ordres d'initialisation cassés à l'exécution plutôt qu'en silence.\n\n" +
-            "### const gèle le lien, pas la valeur\n\n" +
-            "`const` interdit de réassigner la variable, mais si elle pointe vers un objet, l'objet reste modifiable.\n\n" +
+            "La preuve que `let` est hissé, et pas simplement « inexistant avant sa ligne » :\n\n" +
+            "```js\n" +
+            "let x = \"dehors\";\n" +
+            "{\n" +
+            "  console.log(x); // ReferenceError: Cannot access 'x' before initialization\n" +
+            "  let x = \"dedans\";\n" +
+            "}\n" +
+            "```\n\n" +
+            "Si le `let x` intérieur n'était pas hissé, le `console.log` afficherait `\"dehors\"`. Au lieu de ça, la déclaration du bloc masque la variable externe dès l'entrée dans le bloc, et la zone morte s'étend du début du bloc à la ligne de déclaration. Autre victime collatérale : `typeof` n'est plus une opération sûre. `typeof variableJamaisDeclaree` renvoie gentiment `\"undefined\"`, mais `typeof x` dans la TDZ de `x` lève la même ReferenceError.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Cycle de vie compare : var est utilisable (a undefined) des l'entree dans la portee, let traverse une zone morte ou tout acces leve une ReferenceError\"}\n" +
+            "<svg viewBox=\"0 0 640 320\" role=\"img\"><title>Hoisting : var contre let et la Temporal Dead Zone</title>\n" +
+            "<text x=\"150\" y=\"30\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\">var a = 1</text>\n" +
+            "<text x=\"490\" y=\"30\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"14\" fill=\"currentColor\">let b = 1</text>\n" +
+            "<line x1=\"36\" y1=\"48\" x2=\"36\" y2=\"296\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<polygon points=\"36,304 31,292 41,292\" fill=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<text x=\"48\" y=\"60\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">entree dans la portee</text>\n" +
+            "<rect x=\"90\" y=\"70\" width=\"120\" height=\"100\" fill=\"currentColor\" opacity=\"0.15\"/>\n" +
+            "<text x=\"150\" y=\"124\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">undefined</text>\n" +
+            "<rect x=\"90\" y=\"186\" width=\"120\" height=\"100\" fill=\"currentColor\" opacity=\"0.35\"/>\n" +
+            "<text x=\"150\" y=\"240\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">1</text>\n" +
+            "<rect x=\"430\" y=\"70\" width=\"120\" height=\"100\" fill=\"none\" stroke-dasharray=\"5 4\" class=\"fig-accent\" stroke-width=\"2\"/>\n" +
+            "<text x=\"490\" y=\"112\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" class=\"fig-accent\">TDZ</text>\n" +
+            "<text x=\"490\" y=\"132\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" class=\"fig-accent\">acces = ReferenceError</text>\n" +
+            "<rect x=\"430\" y=\"186\" width=\"120\" height=\"100\" fill=\"currentColor\" opacity=\"0.35\"/>\n" +
+            "<text x=\"490\" y=\"240\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">1</text>\n" +
+            "<line x1=\"70\" y1=\"178\" x2=\"580\" y2=\"178\" stroke=\"currentColor\" stroke-dasharray=\"4 4\" opacity=\"0.6\"/>\n" +
+            "<text x=\"320\" y=\"170\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">ligne de declaration</text>\n" +
+            "</svg>\n" +
+            "```\n\n" +
+            "La TDZ n'est pas une punition, c'est un garde-fou : elle transforme un ordre d'initialisation cassé en erreur franche à l'exécution, au lieu d'un `undefined` qui se propage trois couches plus loin.\n\n" +
+            "### const gèle la liaison, pas la valeur\n\n" +
             "```js\n" +
             "const user = { nom: \"Ada\" };\n" +
             "user.nom = \"Grace\"; // autorisé : on mute l'objet\n" +
-            "user = {};           // TypeError : on réassigne le lien\n" +
+            "user = {};          // TypeError: Assignment to constant variable.\n" +
             "```\n\n" +
-            "### Le piège de la boucle var\n\n" +
-            "Le cas d'école qui a fait souffrir une génération de développeurs :\n\n" +
+            "`const` interdit la réassignation de la variable, rien d'autre. Pour rendre l'objet lui-même intouchable, il faut `Object.freeze`, on y revient dans la partie 4.\n\n" +
+            "## Le piège de la boucle, et pourquoi let le règle vraiment\n\n" +
             "```js\n" +
             "for (var i = 0; i < 3; i++) {\n" +
             "  setTimeout(() => console.log(i), 0);\n" +
             "}\n" +
-            "// affiche 3, 3, 3\n" +
+            "// 3, 3, 3\n" +
             "```\n\n" +
-            "Il n'existe qu'un seul `i`, partagé, et il vaut 3 quand les callbacks s'exécutent. Remplacez `var` par `let` : chaque tour de boucle crée une nouvelle liaison de `i`, et vous obtenez `0, 1, 2`. Ce détail à lui seul justifie d'abandonner `var`.\n\n" +
-            "### Les fonctions déclarées sont entièrement hissées\n\n" +
-            "Une déclaration `function f(){}` est disponible avant sa ligne. Une fonction stockée dans une `const` ne l'est pas (elle suit la règle de la TDZ). D'où la règle simple.\n\n" +
-            "> À retenir : `const` par défaut, `let` quand vous devez réassigner, `var` jamais. Vous éliminez la fuite de bloc, le piège de boucle et les undefined silencieux d'un coup.\n\n" +
-            "Détails sur [let (MDN)](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Statements/let).\n",
+            "Un seul `i`, partagé par les trois callbacks, qui vaut 3 quand ils s'exécutent enfin. Avec `let`, on obtient `0, 1, 2`, et ce n'est pas un hasard d'implémentation : la spec impose de créer un nouvel environnement de liaison à chaque itération (l'opération s'appelle CreatePerIterationEnvironment) et d'y recopier la valeur courante de `i`. Trois itérations, trois `i` distincts, chaque closure capture le sien. Ce mécanisme précis nourrit la leçon sur les closures.\n\n" +
+            "Corollaire : `for (const x of liste)` est parfaitement légal, chaque tour crée une nouvelle liaison. En revanche `for (const i = 0; i < 3; i++)` plante au premier `i++` avec le TypeError vu plus haut.\n\n" +
+            "## Fonctions et classes\n\n" +
+            "Une déclaration `function f() {}` est entièrement hissée : corps compris, utilisable avant sa ligne. C'est pratique pour organiser un module avec les fonctions d'aide en bas. Une `class`, non : elle suit la règle de la TDZ, comme `let`. Et une fonction stockée dans une `const` suit la règle de la `const`.\n\n" +
+            "Dernier terrain miné : déclarer une `function` à l'intérieur d'un `if` a des sémantiques différentes en mode strict et non strict (l'annexe B de la spec existe uniquement pour documenter ces horreurs de compatibilité). Ne le fais jamais ; affecte une fonction fléchée à une `const` si tu as besoin de conditionnel.\n\n" +
+            "## Les paramètres par défaut ont leur propre TDZ\n\n" +
+            "La TDZ n'est pas une bizarrerie réservée à `let` : c'est la règle générale d'initialisation des liaisons, et elle s'applique aussi aux paramètres. Les défauts s'évaluent de gauche à droite, chaque paramètre naissant l'un après l'autre dans une portée intermédiaire :\n\n" +
+            "```js\n" +
+            "function creerRect(largeur = hauteur, hauteur = 10) {\n" +
+            "  return largeur * hauteur;\n" +
+            "}\n" +
+            "creerRect();\n" +
+            "// ReferenceError: Cannot access 'hauteur' before initialization\n" +
+            "creerRect(5); // 50 : le defaut de largeur n'est jamais evalue\n" +
+            "```\n\n" +
+            "Dans l'autre sens, `function f(largeur = 10, hauteur = largeur * 2)` fonctionne : `largeur` est déjà initialisée quand `hauteur` en a besoin. Retiens le principe plutôt que le cas particulier : toute liaison (`let`, `const`, `class`, paramètre) existe dès l'entrée dans sa portée mais reste inaccessible jusqu'à son initialisation, et l'erreur porte toujours le même message.\n\n" +
+            "## À toi\n\n" +
+            "Que fait ce code ?\n\n" +
+            "```js\n" +
+            "function demo() {\n" +
+            "  console.log(valeur);\n" +
+            "  if (true) {\n" +
+            "    var valeur = 10;\n" +
+            "  }\n" +
+            "}\n" +
+            "demo();\n" +
+            "```\n\n" +
+            "> Il affiche `undefined`, sans erreur. Le `var` est hissé à l'échelle de la fonction entière, bloc `if` ou pas : `valeur` existe dès la première ligne de `demo`, initialisée à `undefined`. Remplace `var` par `let` et tu obtiens `ReferenceError: valeur is not defined`, car le `let` reste confiné au bloc `if` : au moment du `console.log`, aucune variable `valeur` n'existe dans la portée.\n\n" +
+            "Règle finale, sans nuance : `const` par défaut, `let` quand tu réassignes, `var` jamais. Détails sur [let (MDN)](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Statements/let).\n",
         },
         {
           id: "l4",
           title: "Quiz : types, coercion et portée",
           type: "quiz",
-          duration: "6 min",
+          duration: "8 min",
           questions: [
             {
               id: "q1",
@@ -210,7 +315,7 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "Avec var il n'existe qu'un seul i partagé par tous les callbacks. Les setTimeout s'exécutent après la boucle, quand i vaut déjà 3. Remplacer var par let crée une liaison par itération et donne 0, 1, 2.",
+                "Avec var il n'existe qu'un seul i partagé par tous les callbacks. Les setTimeout s'exécutent après la boucle, quand i vaut déjà 3. Avec let, la spec impose une liaison neuve par itération (CreatePerIterationEnvironment) et on obtient 0, 1, 2.",
             },
             {
               id: "q4",
@@ -223,7 +328,7 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "let et const sont hissés comme var, mais ils ne sont pas pré-initialisés à undefined. Entre le début du bloc et la ligne de déclaration, la variable est dans la TDZ : elle existe, mais y accéder lève une ReferenceError. C'est un garde-fou volontaire.",
+                "let et const sont recensés à la phase de création comme var, mais sans être pré-initialisés à undefined. Entre le début du bloc et la ligne de déclaration, tout accès lève ReferenceError: Cannot access 'x' before initialization. Même typeof n'est plus sûr dans cette zone.",
             },
             {
               id: "q5",
@@ -236,7 +341,20 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "const gèle la liaison, pas la valeur pointée. Réassigner config est interdit (TypeError), mais muter une propriété de l'objet est parfaitement permis. Pour figer réellement l'objet, il faut Object.freeze.",
+                "const gèle la liaison, pas la valeur pointée. Réassigner config lève TypeError: Assignment to constant variable., mais muter une propriété de l'objet est permis. Pour figer l'objet lui-même, il faut Object.freeze.",
+            },
+            {
+              id: "q27",
+              prompt: "Un tableau contient des NaN. Lequel de ces appels les trouve ?",
+              options: [
+                "tableau.indexOf(NaN) !== -1",
+                "tableau.includes(NaN)",
+                "tableau.find((x) => x === NaN)",
+                "Aucun, NaN est introuvable dans un tableau",
+              ],
+              correctIndex: 1,
+              explanation:
+                "indexOf utilise l'égalité stricte, pour laquelle NaN n'est jamais égal à NaN : il renvoie -1. Le prédicat x === NaN est toujours faux pour la même raison. includes utilise l'algorithme SameValueZero, qui considère NaN égal à NaN : il renvoie true.",
             },
           ],
         },
@@ -250,10 +368,10 @@ const course: Course = {
           id: "l5",
           title: "Closures : la mécanique et les vrais cas d'usage",
           type: "text",
-          duration: "15 min",
+          duration: "17 min",
           body:
             "## Une fonction se souvient d'où elle est née\n\n" +
-            "Une closure, c'est une fonction qui garde l'accès aux variables de la portée dans laquelle elle a été définie, même après que cette portée a fini de s'exécuter. Ce n'est pas une fonctionnalité qu'on active, c'est le comportement par défaut du langage. Chaque fonction JavaScript est une closure.\n\n" +
+            "Une closure, c'est une fonction qui garde l'accès aux variables de la portée où elle a été définie, même après que cette portée a fini de s'exécuter. Ce n'est pas une option qu'on active : chaque fonction JavaScript porte, dans un slot interne que la spec appelle [[Environment]], une référence vers l'environnement lexical de sa naissance. Quand le moteur cherche une variable, il regarde dans l'environnement de la fonction, puis remonte de parent en parent jusqu'au global. Cette chaîne d'environnements, c'est toute la mécanique. Tu peux d'ailleurs la voir : dans Chrome, `console.dir(maFonction)` affiche une entrée `[[Scopes]]` avec le contenu exact de ce que la fonction retient.\n\n" +
             "### Un compteur privé\n\n" +
             "```js\n" +
             "function creerCompteur() {\n" +
@@ -264,13 +382,39 @@ const course: Course = {
             "  };\n" +
             "}\n" +
             "const c = creerCompteur();\n" +
-            "c.incr(); // 1\n" +
-            "c.incr(); // 2\n" +
-            "c.n;      // undefined : n est inaccessible de l'extérieur\n" +
+            "c.incr();   // 1\n" +
+            "c.incr();   // 2\n" +
+            "c.n;        // undefined : n n'est pas une propriété de l'objet\n" +
+            "c.valeur(); // 2 : les deux méthodes partagent le MÊME n\n" +
             "```\n\n" +
-            "La variable `n` a survécu à l'appel de `creerCompteur`. Elle n'est visible que par les deux méthodes retournées. C'est de l'encapsulation réelle, sans convention de nommage ni underscore : personne ne peut lire ou écrire `n` directement.\n\n" +
-            "### Une factory de configuration\n\n" +
-            "Les closures servent à figer un paramètre une fois pour toutes.\n\n" +
+            "`n` a survécu au retour de `creerCompteur` parce que deux fonctions la référencent encore. Et le détail qui compte : `incr` et `valeur` ferment sur le même environnement, donc sur la même variable. C'est de l'encapsulation réelle, garantie par le moteur, pas par une convention d'underscore. Chaque appel de `creerCompteur()` crée un environnement neuf : deux compteurs créés séparément sont totalement indépendants.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Apres le return, l'environnement de creerCompteur survit parce que incr et valeur le referencent encore ; c ne voit que les deux fonctions, jamais n\"}\n" +
+            "<svg viewBox=\"0 0 640 300\" role=\"img\"><title>Closure : deux fonctions retiennent l'environnement de leur naissance</title>\n" +
+            "<rect x=\"20\" y=\"20\" width=\"420\" height=\"260\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.4\" rx=\"3\"/>\n" +
+            "<text x=\"32\" y=\"42\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">portee du module</text>\n" +
+            "<rect x=\"44\" y=\"58\" width=\"370\" height=\"200\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.6\" rx=\"3\"/>\n" +
+            "<text x=\"56\" y=\"80\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">environnement de creerCompteur()</text>\n" +
+            "<text x=\"56\" y=\"96\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.6\">(appel termine, environnement vivant)</text>\n" +
+            "<rect x=\"66\" y=\"140\" width=\"100\" height=\"40\" fill=\"none\" class=\"fig-accent\" stroke-width=\"2\" rx=\"3\"/>\n" +
+            "<text x=\"116\" y=\"165\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" class=\"fig-accent\">n = 2</text>\n" +
+            "<rect x=\"250\" y=\"116\" width=\"140\" height=\"36\" fill=\"currentColor\" opacity=\"0.15\" rx=\"3\"/>\n" +
+            "<text x=\"320\" y=\"139\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">incr()</text>\n" +
+            "<rect x=\"250\" y=\"190\" width=\"140\" height=\"36\" fill=\"currentColor\" opacity=\"0.15\" rx=\"3\"/>\n" +
+            "<text x=\"320\" y=\"213\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">valeur()</text>\n" +
+            "<line x1=\"250\" y1=\"134\" x2=\"176\" y2=\"156\" stroke=\"currentColor\" opacity=\"0.7\"/>\n" +
+            "<polygon points=\"170,158 181,151 183,161\" fill=\"currentColor\" opacity=\"0.7\"/>\n" +
+            "<line x1=\"250\" y1=\"208\" x2=\"176\" y2=\"170\" stroke=\"currentColor\" opacity=\"0.7\"/>\n" +
+            "<polygon points=\"170,167 182,166 178,176\" fill=\"currentColor\" opacity=\"0.7\"/>\n" +
+            "<rect x=\"500\" y=\"140\" width=\"110\" height=\"44\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"555\" y=\"167\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">const c</text>\n" +
+            "<line x1=\"500\" y1=\"150\" x2=\"394\" y2=\"134\" stroke=\"currentColor\" opacity=\"0.7\"/>\n" +
+            "<polygon points=\"388,133 400,130 399,140\" fill=\"currentColor\" opacity=\"0.7\"/>\n" +
+            "<line x1=\"500\" y1=\"174\" x2=\"394\" y2=\"204\" stroke=\"currentColor\" opacity=\"0.7\"/>\n" +
+            "<polygon points=\"388,206 398,199 401,209\" fill=\"currentColor\" opacity=\"0.7\"/>\n" +
+            "</svg>\n" +
+            "```\n\n" +
+            "### Figer un paramètre : la factory\n\n" +
             "```js\n" +
             "function multiplicateur(facteur) {\n" +
             "  return (x) => x * facteur;\n" +
@@ -280,9 +424,19 @@ const course: Course = {
             "doubler(10); // 20\n" +
             "tripler(10); // 30\n" +
             "```\n\n" +
-            "`doubler` et `tripler` partagent le même code mais capturent chacun leur propre `facteur`. C'est la base de la fonction partiellement appliquée.\n\n" +
-            "### Le piège classique et son correctif\n\n" +
-            "Une closure capture la variable, pas une copie de sa valeur à l'instant T. C'est exactement pourquoi la boucle `var` de la partie 1 échouait : les trois callbacks fermaient sur le même `i`. La solution moderne, `let`, crée une liaison par itération. Avant `let`, on isolait la valeur avec une IIFE.\n\n" +
+            "Même code, deux environnements : chaque fonction retournée capture son propre `facteur`. C'est le principe de l'application partielle, et c'est aussi comme ça que fonctionnent la mémoïsation ou le `debounce` de la partie 6.\n\n" +
+            "```js\n" +
+            "function memoise(fn) {\n" +
+            "  const cache = new Map();\n" +
+            "  return (arg) => {\n" +
+            "    if (!cache.has(arg)) cache.set(arg, fn(arg));\n" +
+            "    return cache.get(arg);\n" +
+            "  };\n" +
+            "}\n" +
+            "```\n\n" +
+            "Le `cache` est invisible de l'extérieur et survit entre les appels. Trois lignes, un vrai outil.\n\n" +
+            "### Le piège : on capture la variable, pas sa valeur\n\n" +
+            "Une closure ne photographie pas une valeur à l'instant T, elle garde un lien vers la variable. La boucle `var` de la leçon précédente échouait exactement pour ça : trois callbacks fermés sur le même `i`. Avant `let`, on isolait la valeur avec une IIFE :\n\n" +
             "```js\n" +
             "for (var i = 0; i < 3; i++) {\n" +
             "  (function (copie) {\n" +
@@ -291,20 +445,49 @@ const course: Course = {
             "}\n" +
             "// 0, 1, 2\n" +
             "```\n\n" +
-            "### Le coût mémoire, à connaître\n\n" +
-            "Tant qu'une closure vit, les variables qu'elle capture ne peuvent pas être libérées par le ramasse-miettes. Si vous fermez sur un gros tableau et que la fonction reste attachée à un écouteur d'événement jamais retiré, vous tenez une fuite mémoire. Ce n'est pas une raison d'éviter les closures, c'est une raison de retirer vos `addEventListener` quand ils ne servent plus.\n\n" +
-            "> À retenir : la closure est l'outil d'encapsulation natif de JavaScript. Elle donne des variables privées, de la configuration figée et de la mémoïsation, à condition de se rappeler qu'elle capture la variable elle-même.\n",
+            "Aujourd'hui, `let` fait ce travail tout seul. Mais le principe reste valable dès que tu fermes sur une variable qui change : gestionnaires d'événements dans une boucle, callbacks asynchrones dans un `while`, etc.\n\n" +
+            "### Le coût mémoire, version précise\n\n" +
+            "Tant qu'une closure vit, l'environnement capturé ne peut pas être libéré par le ramasse-miettes. Et il y a un raffinement V8 qui surprend même des seniors : toutes les closures nées dans une même portée partagent un unique objet Context. Si UNE fonction capture une grosse donnée, TOUTES les fonctions nées dans cette portée maintiennent le Context en vie, donc la grosse donnée avec.\n\n" +
+            "```js\n" +
+            "function initialiser() {\n" +
+            "  const gros = new Array(1_000_000).fill(\"x\"); // ~8 Mo\n" +
+            "  const log = () => console.log(gros.length);   // capture gros\n" +
+            "  const ping = () => \"pong\";                    // ne capture rien... en apparence\n" +
+            "  document.addEventListener(\"click\", ping);\n" +
+            "  return ping;\n" +
+            "}\n" +
+            "```\n\n" +
+            "Ici `log` meurt à la fin de l'appel, mais `ping` reste accroché au listener, `ping` référence le Context partagé, et le Context retient `gros` parce que `log` en avait besoin. Résultat : 8 Mo bloqués par une fonction qui renvoie `\"pong\"`. Le correctif est toujours le même : retirer les listeners devenus inutiles (`removeEventListener`, ou l'option `{ signal }` d'un AbortController), et éviter de fermer sur de gros objets quand un champ suffit (`const taille = gros.length` puis fermer sur `taille`).\n\n" +
+            "### Détacher une méthode-closure : ça marche, et ce n'est pas un hasard\n\n" +
+            "```js\n" +
+            "const { incr, valeur } = creerCompteur();\n" +
+            "incr();\n" +
+            "incr();\n" +
+            "valeur(); // 2, aucun contexte perdu\n" +
+            "```\n\n" +
+            "Extrais comme ça les méthodes d'une instance de classe et tu récoltes un `this` cassé (leçon suivante) ; ici, rien ne casse. La raison tient en une phrase : ces fonctions atteignent leur état par la chaîne d'environnements, figée à leur création, et non par `this`, décidé à chaque appel. C'est ce qui rend les objets à base de closures si agréables à passer en callback : `setTimeout(c.incr, 1000)` fonctionne tel quel, sans `bind`. La contrepartie : chaque appel de la factory fabrique un jeu complet de fonctions, là où une classe partage les siennes via le prototype. Ma règle : closures pour les objets rares à état réellement privé (stores, connexions), classes pour les objets en grande série.\n\n" +
+            "## À toi\n\n" +
+            "Sans exécuter, que renvoie ce code ?\n\n" +
+            "```js\n" +
+            "const fns = [];\n" +
+            "let mot = \"un\";\n" +
+            "fns.push(() => mot);\n" +
+            "mot = \"deux\";\n" +
+            "fns.push(() => mot);\n" +
+            "console.log(fns[0](), fns[1]());\n" +
+            "```\n\n" +
+            "> `deux deux`. Les deux fonctions ferment sur la même variable `mot`, pas sur sa valeur au moment du `push`. Quand on les appelle, `mot` vaut `\"deux\"`, donc les deux renvoient `\"deux\"`. Pour figer `\"un\"`, il aurait fallu une liaison distincte : `const capture = mot; fns.push(() => capture);`.\n\n" +
+            "Trois points : chaque fonction retient son environnement de naissance via [[Environment]] ; plusieurs fonctions nées ensemble partagent les mêmes variables (et le même Context V8, gare aux fuites) ; on capture des variables, jamais des valeurs.\n",
         },
         {
           id: "l6",
           title: "this : quatre règles et le cas des fonctions fléchées",
           type: "text",
-          duration: "16 min",
+          duration: "18 min",
           body:
-            "## this dépend de l'appel, pas de la définition\n\n" +
-            "La confusion sur `this` vient d'une fausse intuition héritée d'autres langages : on croit que `this` désigne « l'objet courant ». En JavaScript, pour une fonction classique, `this` est déterminé au moment de l'appel, par la façon dont la fonction est appelée. Quatre règles couvrent tout.\n\n" +
+            "## this dépend du site d'appel, pas de la définition\n\n" +
+            "La confusion sur `this` vient d'une intuition importée de Java ou C# : « this désigne l'objet courant ». Faux en JavaScript. Pour une fonction classique, `this` est un paramètre implicite, fixé au moment de l'appel par la forme syntaxique de cet appel. La même fonction, appelée de quatre façons, reçoit quatre `this` différents. Quatre règles couvrent tout, plus une exception (les flèches) qui les ignore toutes.\n\n" +
             "### Règle 1 : appel de méthode\n\n" +
-            "Si la fonction est appelée via un objet, `this` est cet objet.\n\n" +
             "```js\n" +
             "const user = {\n" +
             "  nom: \"Ada\",\n" +
@@ -312,42 +495,88 @@ const course: Course = {
             "};\n" +
             "user.direBonjour(); // \"Bonjour, Ada\" : this === user\n" +
             "```\n\n" +
+            "Ce qui compte, c'est ce qu'il y a à gauche du point AU MOMENT de l'appel. Pas où la fonction a été écrite.\n\n" +
             "### Règle 2 : appel simple\n\n" +
-            "Appelée toute seule, sans objet devant, `this` vaut `undefined` en mode strict (le cas des modules ES et des classes) ou l'objet global en mode non strict. C'est ce qui casse quand on détache une méthode.\n\n" +
+            "Appelée sans objet devant, une fonction reçoit `undefined` comme `this` en mode strict (donc dans tout module ES et toute classe), ou l'objet global en mode non strict. C'est la règle qui casse les méthodes détachées :\n\n" +
             "```js\n" +
             "const f = user.direBonjour;\n" +
-            "f(); // this est undefined -> TypeError sur this.nom\n" +
+            "f(); // TypeError: Cannot read properties of undefined (reading 'nom')\n" +
             "```\n\n" +
-            "La méthode a perdu son objet en cours de route. Ce bug apparaît tout le temps quand on passe une méthode en callback.\n\n" +
+            "Ce message V8 exact, tu le rencontreras dès que tu passes une méthode en callback : `setTimeout(user.direBonjour, 100)` détache la fonction exactement pareil. Le point de la ligne du `setTimeout` ne compte pas ; ce qui compte, c'est que le timer l'appellera plus tard en appel simple.\n\n" +
+            "Variante sournoise que j'aime poser en entretien : `(0, user.direBonjour)()` plante aussi. L'opérateur virgule évalue et renvoie la fonction seule, débarrassée de son objet ; il ne reste qu'un appel simple.\n\n" +
             "### Règle 3 : call, apply, bind\n\n" +
-            "Vous pouvez imposer `this`. `call` et `apply` appellent immédiatement (l'un prend les arguments séparés, l'autre un tableau). `bind` renvoie une nouvelle fonction avec `this` figé pour toujours.\n\n" +
             "```js\n" +
-            "f.call(user);            // \"Bonjour, Ada\"\n" +
+            "f.call(user);              // \"Bonjour, Ada\" : this impose, appel immediat\n" +
+            "f.apply(user);             // idem, arguments en tableau\n" +
             "const lie = f.bind(user);\n" +
-            "lie();                   // \"Bonjour, Ada\", quoi qu'il arrive\n" +
+            "lie();                     // \"Bonjour, Ada\", quel que soit l'appel futur\n" +
+            "lie.call({ nom: \"X\" });    // \"Bonjour, Ada\" : bind gagne contre call\n" +
+            "f.bind(user).bind({ nom: \"X\" })(); // \"Bonjour, Ada\" : le premier bind gagne\n" +
             "```\n\n" +
+            "Un `bind` est définitif : la fonction retournée a son `this` scellé, un second `bind` ou un `call` ultérieur ne peuvent plus le changer. La spec décrit ça via les fonctions « bound » qui court-circuitent la résolution normale de `this`.\n\n" +
             "### Règle 4 : new\n\n" +
-            "Avec `new`, `this` est le nouvel objet fraîchement créé. On y revient dans la partie sur les prototypes.\n\n" +
+            "`new F()` crée un objet neuf et l'installe comme `this` pendant l'exécution de `F`. Et dans l'ordre de priorité, `new` bat même `bind` : `new (F.bind(obj))()` ignore `obj` et utilise l'objet fraîchement créé. La hiérarchie complète, de la plus forte à la plus faible : `new`, puis `bind`, puis `call`/`apply`, puis l'appel de méthode, puis l'appel simple.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Resolution de this pour une fonction classique : on regarde la forme de l'appel, dans cet ordre de priorite ; la fleche court-circuite tout\"}\n" +
+            "<svg viewBox=\"0 0 640 340\" role=\"img\"><title>Arbre de decision : quelle valeur pour this selon le site d'appel</title>\n" +
+            "<rect x=\"220\" y=\"16\" width=\"200\" height=\"38\" fill=\"currentColor\" opacity=\"0.15\" rx=\"3\"/>\n" +
+            "<text x=\"320\" y=\"40\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">comment est-elle appelee ?</text>\n" +
+            "<line x1=\"320\" y1=\"54\" x2=\"85\" y2=\"110\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<line x1=\"320\" y1=\"54\" x2=\"245\" y2=\"110\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<line x1=\"320\" y1=\"54\" x2=\"400\" y2=\"110\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<line x1=\"320\" y1=\"54\" x2=\"556\" y2=\"110\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<rect x=\"20\" y=\"110\" width=\"130\" height=\"36\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"85\" y=\"133\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">new F()</text>\n" +
+            "<rect x=\"175\" y=\"110\" width=\"140\" height=\"36\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"245\" y=\"133\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">bind / call</text>\n" +
+            "<rect x=\"340\" y=\"110\" width=\"120\" height=\"36\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"400\" y=\"133\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">obj.f()</text>\n" +
+            "<rect x=\"486\" y=\"110\" width=\"140\" height=\"36\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"556\" y=\"133\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">f() tout seul</text>\n" +
+            "<line x1=\"85\" y1=\"146\" x2=\"85\" y2=\"186\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<line x1=\"245\" y1=\"146\" x2=\"245\" y2=\"186\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<line x1=\"400\" y1=\"146\" x2=\"400\" y2=\"186\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<line x1=\"556\" y1=\"146\" x2=\"556\" y2=\"186\" stroke=\"currentColor\" opacity=\"0.5\"/>\n" +
+            "<text x=\"85\" y=\"208\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">l'objet cree</text>\n" +
+            "<text x=\"245\" y=\"208\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">l'objet impose</text>\n" +
+            "<text x=\"400\" y=\"208\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">obj</text>\n" +
+            "<text x=\"556\" y=\"208\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">undefined (strict)</text>\n" +
+            "<text x=\"320\" y=\"244\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">priorite : new &gt; bind &gt; call/apply &gt; obj.f() &gt; f()</text>\n" +
+            "<rect x=\"70\" y=\"268\" width=\"500\" height=\"48\" fill=\"none\" class=\"fig-accent\" stroke-width=\"2\" stroke-dasharray=\"5 4\" rx=\"3\"/>\n" +
+            "<text x=\"320\" y=\"288\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" class=\"fig-accent\">fonction flechee : pas de this propre</text>\n" +
+            "<text x=\"320\" y=\"306\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" class=\"fig-accent\">elle prend celui du scope englobant, l'appel ne compte pas</text>\n" +
+            "</svg>\n" +
+            "```\n\n" +
             "### Les fonctions fléchées n'ont pas de this\n\n" +
-            "Voilà le point qui change tout. Une fonction fléchée n'a pas son propre `this` : elle emprunte celui de la portée où elle est écrite (this lexical). Elle ignore complètement la façon dont on l'appelle.\n\n" +
+            "Une flèche n'a pas de liaison `this` du tout : quand son corps mentionne `this`, la résolution remonte lexicalement, comme pour n'importe quelle variable capturée par closure. Les deux leçons de cette partie décrivent donc le même mécanisme.\n\n" +
             "```js\n" +
             "const compteur = {\n" +
             "  n: 0,\n" +
             "  demarrer() {\n" +
             "    setInterval(() => { this.n += 1; }, 1000);\n" +
-            "    // la flèche garde le this de demarrer(), donc compteur\n" +
+            "    // la fleche emprunte le this de demarrer(), donc compteur\n" +
             "  },\n" +
             "};\n" +
             "```\n\n" +
-            "Si on avait écrit `function () { this.n += 1; }` dans le `setInterval`, `this` aurait été `undefined` (règle 2) et ça aurait planté. La flèche règle le problème sans `bind`. En contrepartie, n'utilisez jamais de fonction fléchée pour définir une méthode d'objet qui doit accéder à l'objet via `this`, ni comme constructeur.\n\n" +
-            "> À retenir : demandez-vous toujours « comment cette fonction est-elle appelée ? ». Pour une fonction classique, la réponse donne `this`. Pour une flèche, il n'y a rien à se demander : elle prend le `this` du dessus.\n\n" +
-            "Détails sur [this (MDN)](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Operators/this).\n",
+            "Avec une `function` classique dans le `setInterval`, `this` aurait été `undefined` (règle 2). La flèche règle le problème sans `bind`. Les contreparties sont nettes : jamais de flèche comme méthode d'objet littéral (son `this` serait celui du module, pas l'objet), jamais comme constructeur (`new (() => {})()` lève `TypeError: ... is not a constructor`), et `call`/`bind` sur une flèche n'ont aucun effet sur son `this`.\n\n" +
+            "Dans une classe, le champ-flèche est l'idiome standard pour les handlers : `onClick = () => { this.compteur++ }` capture le `this` de l'instance. Coût réel à connaître : une fonction par instance, au lieu d'une seule méthode partagée sur le prototype. Sur dix boutons, on s'en fiche ; sur cent mille objets, ça se mesure.\n\n" +
+            "Dernier cas concret : `addEventListener(\"click\", function () { ... })` reçoit comme `this` l'élément écouté (le DOM appelle ton handler avec `handleEvent`-style binding). La même chose avec une flèche reçoit le `this` du scope englobant. Les deux sont utiles, à condition de choisir en connaissance de cause ; moi je préfère `event.currentTarget`, qui dit ce qu'il fait.\n\n" +
+            "## À toi\n\n" +
+            "```js\n" +
+            "const obj = {\n" +
+            "  valeur: 42,\n" +
+            "  lire: () => this.valeur,\n" +
+            "};\n" +
+            "console.log(obj.lire());\n" +
+            "```\n\n" +
+            "> Dans un module ES : `TypeError: Cannot read properties of undefined (reading 'valeur')`, et dans un script non-module au niveau global : `undefined`. Piège dans le piège : la règle 1 (appel de méthode) ne s'applique pas, car une flèche ignore son site d'appel. Son `this` est celui du scope où l'objet littéral a été écrit : `undefined` dans un module, `window`/`globalThis` dans un script classique. Un objet littéral ne crée jamais de scope pour `this`. Méthode d'objet = syntaxe raccourcie `lire() { ... }`, flèche = callbacks.\n\n" +
+            "La question à te poser devant n'importe quel `this` : « comment cette fonction sera-t-elle appelée ? ». Fonction classique : la réponse donne `this` via les quatre règles. Flèche : mauvaise question, regarde une ligne au-dessus. Détails sur [this (MDN)](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Operators/this).\n",
         },
         {
           id: "l7",
           title: "Quiz : closures et this",
           type: "quiz",
-          duration: "6 min",
+          duration: "7 min",
           questions: [
             {
               id: "q6",
@@ -360,7 +589,7 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "n vit dans la portée de creerCompteur. Seules les fonctions définies à l'intérieur (incr, valeur) ferment dessus et y accèdent. Rien de l'extérieur n'a de référence vers n : c'est de l'encapsulation par closure, indépendante de const ou let.",
+                "n vit dans l'environnement lexical de creerCompteur. Seules les fonctions définies à l'intérieur (incr, valeur) le référencent via leur slot [[Environment]]. Rien de l'extérieur n'a de chemin vers n : c'est de l'encapsulation par closure, indépendante de const ou let.",
             },
             {
               id: "q7",
@@ -373,20 +602,20 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "En affectant la méthode à f puis en l'appelant seule, on perd le lien avec user. C'est l'appel qui fixe this : appel simple en mode strict donne this = undefined, et lire this.nom lève un TypeError. f.call(user) ou user.direBonjour() corrigent.",
+                "En affectant la méthode à f puis en l'appelant seule, on perd le lien avec user. C'est l'appel qui fixe this : appel simple en mode strict donne this = undefined, et lire this.nom lève TypeError: Cannot read properties of undefined (reading 'nom'). f.call(user) ou user.direBonjour() corrigent.",
             },
             {
               id: "q8",
-              prompt: "Quelle différence entre f.call(obj) et f.bind(obj) ?",
+              prompt: "Que vaut this dans f.bind(a).bind(b)() ?",
               options: [
-                "Aucune, ce sont des alias",
-                "call appelle f immédiatement avec this = obj ; bind renvoie une nouvelle fonction dont this est figé sur obj",
-                "bind appelle immédiatement, call renvoie une fonction",
-                "call fige this pour toujours, bind seulement une fois",
+                "b, le dernier bind gagne",
+                "a, le premier bind est définitif et les suivants sont sans effet",
+                "undefined",
+                "Une TypeError est levée",
               ],
               correctIndex: 1,
               explanation:
-                "call exécute la fonction tout de suite en imposant this. bind n'exécute rien : il produit une nouvelle fonction qui, quel que soit son mode d'appel futur, aura toujours ce this. apply est comme call mais reçoit les arguments dans un tableau.",
+                "bind produit une fonction dont this est scellé. Re-binder cette fonction ne remplace pas le this déjà fixé : le second bind n'agit que sur une enveloppe qui délègue à la première. Seul new est plus prioritaire que bind.",
             },
             {
               id: "q9",
@@ -399,7 +628,20 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "Une fonction classique passée à setInterval serait appelée en mode simple, avec this = undefined. La fonction fléchée n'a pas de this propre : elle capture lexicalement celui de la méthode, donc l'objet. C'est plus propre qu'un bind manuel.",
+                "Une fonction classique passée à setInterval serait appelée en mode simple, avec this = undefined. La fonction fléchée n'a pas de liaison this : la résolution remonte lexicalement jusqu'à la méthode, donc l'objet. C'est plus propre qu'un bind manuel.",
+            },
+            {
+              id: "q28",
+              prompt: "const obj = { n: 1, lire: () => this.n }. Que renvoie obj.lire() dans un module ES ?",
+              options: [
+                "1, car lire est appelée sur obj",
+                "Une erreur ou undefined : la flèche prend le this du module, pas obj, car un objet littéral ne crée pas de scope",
+                "NaN",
+                "1, car les flèches copient this à la création de l'objet",
+              ],
+              correctIndex: 1,
+              explanation:
+                "La règle de l'appel de méthode ne s'applique qu'aux fonctions classiques. Une flèche résout this lexicalement : ici, le scope du module, où this vaut undefined. L'objet littéral englobant ne compte pas, seul un scope de fonction compte. Pour une méthode, utiliser la syntaxe lire() { return this.n; }.",
             },
           ],
         },
@@ -413,12 +655,11 @@ const course: Course = {
           id: "l8",
           title: "La chaîne de prototypes, le vrai modèle objet",
           type: "text",
-          duration: "15 min",
+          duration: "17 min",
           body:
-            "## JavaScript hérite par délégation\n\n" +
-            "JavaScript n'a pas de classes au sens de C++ ou Java sous le capot. Il a des objets qui pointent vers d'autres objets. Quand vous lisez une propriété sur un objet et qu'il ne l'a pas, le moteur remonte vers son prototype, puis le prototype du prototype, jusqu'à `null`. C'est la chaîne de prototypes, et c'est tout le mécanisme d'héritage du langage.\n\n" +
+            "## Pourquoi [1,2,3].map existe alors que ton tableau ne l'a pas\n\n" +
+            "Ouvre une console et tape `Object.getOwnPropertyNames([1, 2, 3])`. Tu obtiens `[\"0\", \"1\", \"2\", \"length\"]`. Pas de `map`, pas de `filter`, pas de `push`. Pourtant `[1,2,3].map(x => x * 2)` marche. Ces méthodes vivent ailleurs : sur `Array.prototype`, un objet unique que tous les tableaux du programme référencent. Quand tu lis une propriété qu'un objet n'a pas, le moteur remonte de prototype en prototype jusqu'à `null`. Cette chaîne est TOUT le mécanisme d'héritage de JavaScript : pas de copie, une délégation à la lecture.\n\n" +
             "### Le lien réel : Object.getPrototypeOf\n\n" +
-            "Chaque objet a un prototype interne. On le lit avec `Object.getPrototypeOf(obj)` et on le crée avec `Object.create`.\n\n" +
             "```js\n" +
             "const animal = {\n" +
             "  respirer() { return `${this.nom} respire`; },\n" +
@@ -428,9 +669,9 @@ const course: Course = {
             "chien.respirer(); // \"Rex respire\"\n" +
             "Object.getPrototypeOf(chien) === animal; // true\n" +
             "```\n\n" +
-            "`chien` n'a pas de méthode `respirer`. Le moteur la trouve sur `animal` via la chaîne, et l'appelle avec `this` égal à `chien`. Notez bien : `this` reste l'objet de départ, pas celui où la méthode a été trouvée.\n\n" +
-            "### La fonction constructeur et prototype\n\n" +
-            "Avant `Object.create`, et toujours sous les classes, on utilise des fonctions constructeurs. Toute fonction possède une propriété `prototype` qui devient le prototype des objets créés avec `new`.\n\n" +
+            "`chien` n'a pas de méthode `respirer`. Le moteur la trouve sur `animal`, un cran plus haut, et l'appelle avec `this` égal à `chien` : la règle de l'appel de méthode de la leçon précédente s'applique à l'objet de départ, pas à celui où la méthode a été trouvée. C'est ce détail qui rend la délégation utilisable : une méthode définie une fois travaille sur les données de chaque objet qui la délègue.\n\n" +
+            "Tu croiseras aussi `obj.__proto__`. C'est un accesseur hérité de `Object.prototype`, standardisé a posteriori dans l'annexe B de la spec pour compatibilité web. Ne l'utilise pas en code neuf : `Object.getPrototypeOf` pour lire, `Object.create` pour construire. Quant à `Object.setPrototypeOf` sur un objet existant, MDN le signale sans ambages comme une opération très lente : changer le prototype casse les caches internes du moteur (les inline caches qui rendent les lectures de propriétés rapides). Choisis le prototype à la création, ne le change pas après.\n\n" +
+            "### new et les fonctions constructeurs\n\n" +
             "```js\n" +
             "function Animal(nom) {\n" +
             "  this.nom = nom;\n" +
@@ -441,57 +682,102 @@ const course: Course = {
             "const a = new Animal(\"Mia\");\n" +
             "a.respirer(); // \"Mia respire\"\n" +
             "```\n\n" +
-            "Ce que fait `new` en quatre temps : il crée un objet vide, met son prototype à `Animal.prototype`, exécute `Animal` avec `this` sur ce nouvel objet, et renvoie l'objet. Les méthodes sont sur le prototype, donc partagées par toutes les instances : une seule fonction en mémoire, pas une copie par objet. C'est un vrai gain.\n\n" +
-            "### hasOwnProperty contre in\n\n" +
-            "Comme la lecture remonte la chaîne, il faut savoir distinguer une propriété propre d'une propriété héritée.\n\n" +
-            "```js\n" +
-            "a.hasOwnProperty(\"nom\");     // true, propre à l'instance\n" +
-            "a.hasOwnProperty(\"respirer\"); // false, elle est sur le prototype\n" +
-            "\"respirer\" in a;              // true, l'opérateur in remonte la chaîne\n" +
+            "Ce que fait `new` en quatre temps : créer un objet vide ; poser son prototype sur `Animal.prototype` ; exécuter `Animal` avec `this` sur cet objet ; renvoyer l'objet (sauf si le constructeur renvoie explicitement un autre objet, cas tordu mais légal). Une seule fonction `respirer` existe en mémoire, partagée par toutes les instances. Définir les méthodes dans le constructeur en créerait une copie par objet : c'est le premier gaspillage mémoire des codebases jQuery-era.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"rex.respirer() : introuvable sur rex et sur Chien.prototype, trouvee sur Animal.prototype ; this reste rex. La chaine finit toujours sur null\"}\n" +
+            "<svg viewBox=\"0 0 640 330\" role=\"img\"><title>Chaine de prototypes : lookup de rex.respirer()</title>\n" +
+            "<rect x=\"40\" y=\"20\" width=\"250\" height=\"44\" fill=\"currentColor\" opacity=\"0.15\" rx=\"3\"/>\n" +
+            "<text x=\"165\" y=\"47\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">rex { nom, race }</text>\n" +
+            "<rect x=\"40\" y=\"92\" width=\"250\" height=\"44\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"165\" y=\"119\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">Chien.prototype { aboyer }</text>\n" +
+            "<rect x=\"40\" y=\"164\" width=\"250\" height=\"44\" fill=\"none\" class=\"fig-accent\" stroke-width=\"2\" rx=\"3\"/>\n" +
+            "<text x=\"165\" y=\"191\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" class=\"fig-accent\">Animal.prototype { respirer }</text>\n" +
+            "<rect x=\"40\" y=\"236\" width=\"250\" height=\"44\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"165\" y=\"263\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">Object.prototype { toString... }</text>\n" +
+            "<text x=\"165\" y=\"318\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">null</text>\n" +
+            "<line x1=\"165\" y1=\"64\" x2=\"165\" y2=\"86\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"165,92 160,82 170,82\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<line x1=\"165\" y1=\"136\" x2=\"165\" y2=\"158\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"165,164 160,154 170,154\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<line x1=\"165\" y1=\"208\" x2=\"165\" y2=\"230\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"165,236 160,226 170,226\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<line x1=\"165\" y1=\"280\" x2=\"165\" y2=\"302\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"165,308 160,298 170,298\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<text x=\"330\" y=\"47\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">1. respirer ? non</text>\n" +
+            "<text x=\"330\" y=\"119\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">2. respirer ? non</text>\n" +
+            "<text x=\"330\" y=\"185\" font-family=\"ui-monospace, monospace\" font-size=\"12\" class=\"fig-accent\">3. trouvee ! appel avec this = rex</text>\n" +
+            "<text x=\"330\" y=\"263\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">(jamais atteinte ici)</text>\n" +
+            "<text x=\"330\" y=\"85\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.5\">[[Prototype]]</text>\n" +
+            "</svg>\n" +
             "```\n\n" +
-            "C'est exactement pourquoi on écrit `Object.prototype.hasOwnProperty.call(obj, cle)` dans du code défensif : si un objet a une clé nommée `hasOwnProperty`, l'appel direct casserait.\n\n" +
-            "> À retenir : il n'y a pas de copie à l'héritage, il y a une délégation. Comprendre la chaîne, c'est comprendre pourquoi les classes de la prochaine leçon ne sont qu'une syntaxe posée dessus.\n\n" +
+            "### Masquage : l'écriture ne remonte pas la chaîne\n\n" +
+            "La délégation ne joue qu'à la lecture. Écrire crée toujours une propriété propre sur l'objet de départ :\n\n" +
+            "```js\n" +
+            "const b = new Animal(\"Rex\");\n" +
+            "b.respirer = function () { return \"version locale\"; };\n" +
+            "b.respirer();  // \"version locale\" : masque la version du prototype\n" +
+            "a.respirer();  // \"Mia respire\" : les autres instances rien vu\n" +
+            "delete b.respirer;\n" +
+            "b.respirer();  // \"Rex respire\" : le masque enlevé, la delegation reprend\n" +
+            "```\n\n" +
+            "Et `delete` ne supprime que les propriétés propres : `delete b.respirer` une seconde fois renvoie `true` mais ne touche pas `Animal.prototype.respirer`. Croire que `delete` peut retirer une méthode héritée est une erreur classique de revue de code.\n\n" +
+            "### Propre ou héritée : Object.hasOwn\n\n" +
+            "```js\n" +
+            "Object.hasOwn(a, \"nom\");       // true : propriete propre\n" +
+            "Object.hasOwn(a, \"respirer\");  // false : elle est sur le prototype\n" +
+            "\"respirer\" in a;               // true : l'operateur in remonte la chaine\n" +
+            "```\n\n" +
+            "`Object.hasOwn` (ES2022) remplace l'idiome défensif `Object.prototype.hasOwnProperty.call(obj, cle)`, nécessaire parce qu'un objet peut avoir une clé nommée `hasOwnProperty` ou être créé avec `Object.create(null)`, sans prototype du tout. Ces objets « nus » sont d'ailleurs un outil légitime : un dictionnaire sans aucune clé héritée, insensible aux collisions avec `toString` ou `constructor`. On les recroisera : `Object.groupBy` d'ES2024 en renvoie un.\n\n" +
+            "Pour finir, `instanceof` ne fait que parcourir cette même chaîne : `rex instanceof Animal` vérifie si `Animal.prototype` apparaît quelque part dans les prototypes successifs de `rex`.\n\n" +
+            "### __proto__, l'accesseur zombie\n\n" +
+            "Tu verras encore `obj.__proto__` dans de vieux tutos. C'est un accesseur hérité de `Object.prototype`, standardisé seulement dans l'annexe B de la spec (la section « compatibilité web », legacy assumé). Trois raisons de ne plus l'utiliser : il n'existe pas sur les objets à prototype `null` (`Object.create(null).__proto__` vaut `undefined` au lieu de renvoyer le prototype), il peut être supprimé de `Object.prototype` par n'importe quel code de la page, et écrire dedans coûte la même désoptimisation que `Object.setPrototypeOf`. Les remplaçants : `Object.getPrototypeOf(obj)` en lecture, `Object.create` à la construction.\n\n" +
+            "Exception à connaître : la clé `__proto__` DANS un littéral (`const chien = { __proto__: animal, nom: \"Rex\" }`) est une syntaxe à part entière, dans le corps principal de la spec, sans pénalité de performance, qui fixe le prototype à la création. C'est même la façon la plus directe d'écrire ce que `Object.create` rendrait verbeux.\n\n" +
+            "## À toi\n\n" +
+            "Un collègue écrit `Array.prototype.dernier = function () { return this[this.length - 1]; };` pour pouvoir faire `[1,2,3].dernier()`. Ça marche. Pourquoi est-ce quand même une mauvaise idée ?\n\n" +
+            "> Deux raisons. D'abord la collision : si le langage ajoute un jour `dernier` (c'est arrivé : l'ajout de `Array.prototype.includes` a cassé MooTools, et `flatten` a dû être renommé `flat` à cause du même framework, l'épisode est connu sous le nom SmooshGate). Ensuite la portée : la modification affecte TOUS les tableaux de l'application, y compris ceux des bibliothèques tierces. La forme moderne du besoin existe déjà : `arr.at(-1)` (ES2022). Étendre les prototypes natifs est réservé aux polyfills qui implémentent une spec existante.\n\n" +
             "Détails sur [l'héritage et la chaîne de prototypes (MDN)](https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain).\n",
         },
         {
           id: "l9",
           title: "Classes ES : extends, super, static et champs privés",
           type: "text",
-          duration: "15 min",
+          duration: "17 min",
           body:
-            "## Du sucre, mais du bon sucre\n\n" +
-            "Les classes ES2015 ne remplacent pas les prototypes, elles les habillent. `class` crée une fonction constructeur, et les méthodes atterrissent sur le `prototype`. Mais la syntaxe est plus lisible et apporte de vraies nouveautés utiles : les champs privés et une gestion propre de l'héritage.\n\n" +
-            "### La forme de base\n\n" +
+            "## Du sucre, mais vérifiable\n\n" +
+            "Les classes ES2015 n'introduisent pas un nouveau modèle objet : elles habillent la chaîne de prototypes. La preuve tient en deux lignes :\n\n" +
             "```js\n" +
             "class Animal {\n" +
-            "  constructor(nom) {\n" +
-            "    this.nom = nom;\n" +
-            "  }\n" +
-            "  respirer() {\n" +
-            "    return `${this.nom} respire`;\n" +
-            "  }\n" +
+            "  respirer() { return `${this.nom} respire`; }\n" +
             "}\n" +
-            "const a = new Animal(\"Mia\");\n" +
+            "typeof Animal;                        // \"function\"\n" +
+            "Object.hasOwn(Animal.prototype, \"respirer\"); // true\n" +
             "```\n\n" +
-            "Une classe n'est pas hissée comme une fonction déclarée : l'utiliser avant sa définition lève une erreur (elle est dans la TDZ, comme `let`). Et on ne peut pas l'appeler sans `new`.\n\n" +
+            "Une classe EST une fonction, et ses méthodes atterrissent sur son `prototype`, exactement comme à la leçon précédente. Ce que `class` ajoute, ce sont des garanties : corps toujours en mode strict, méthodes non énumérables (`Object.keys(new Animal())` ne liste pas `respirer`, contrairement à l'époque des constructeurs artisanaux), TDZ comme `let` (pas de hoisting utilisable), et un verrou d'appel :\n\n" +
+            "```js\n" +
+            "Animal(\"Mia\");\n" +
+            "// TypeError: Class constructor Animal cannot be invoked without 'new'\n" +
+            "```\n\n" +
             "### extends et super\n\n" +
             "```js\n" +
             "class Chien extends Animal {\n" +
             "  constructor(nom, race) {\n" +
-            "    super(nom); // appelle le constructeur parent, obligatoire avant this\n" +
+            "    super(nom); // obligatoire avant tout acces a this\n" +
             "    this.race = race;\n" +
             "  }\n" +
-            "  aboyer() {\n" +
-            "    return `${this.nom} aboie`;\n" +
+            "  presenter() {\n" +
+            "    return `${super.respirer()} et aboie`; // super.methode() : version du parent\n" +
             "  }\n" +
             "}\n" +
             "const rex = new Chien(\"Rex\", \"Berger\");\n" +
-            "rex.respirer(); // \"Rex respire\", hérité\n" +
-            "rex.aboyer();   // \"Rex aboie\"\n" +
+            "rex.presenter(); // \"Rex respire et aboie\"\n" +
             "```\n\n" +
-            "Dans une sous-classe, `super(...)` doit être appelé avant tout accès à `this`. C'est une contrainte du langage, pas un style : sans l'appel parent, `this` n'existe pas encore.\n\n" +
-            "### Champs privés avec #\n\n" +
-            "Enfin de la vraie visibilité privée, garantie par le moteur. Un champ préfixé de `#` est inaccessible hors de la classe, y compris depuis une sous-classe.\n\n" +
+            "Dans une classe dérivée, accéder à `this` avant `super()` lève exactement :\n\n" +
+            "```js\n" +
+            "// ReferenceError: Must call super constructor in derived class\n" +
+            "// before accessing 'this' or returning from derived constructor\n" +
+            "```\n\n" +
+            "Ce n'est pas une convention de style : dans une sous-classe, c'est le constructeur parent qui crée réellement l'objet `this` (le mécanisme permet même d'hériter d'`Array` ou d'`Error` proprement). Tant qu'il n'a pas tourné, il n'y a littéralement rien à toucher. `extends` câble deux chaînes d'un coup : `Chien.prototype` délègue à `Animal.prototype` (pour les instances), et `Chien` délègue à `Animal` (pour les statiques).\n\n" +
+            "### Champs privés # : du privé garanti par le moteur\n\n" +
             "```js\n" +
             "class CompteBancaire {\n" +
             "  #solde = 0;\n" +
@@ -506,28 +792,69 @@ const course: Course = {
             "}\n" +
             "const c = new CompteBancaire();\n" +
             "c.deposer(100);\n" +
-            "c.solde;   // 100 via le getter\n" +
-            "c.#solde;  // SyntaxError : champ privé inaccessible dehors\n" +
+            "c.solde;  // 100, via le getter\n" +
+            "c.#solde; // SyntaxError: Private field '#solde' must be declared in an enclosing class\n" +
             "```\n\n" +
-            "Avant `#`, on simulait le privé avec des closures ou un underscore par convention. Le `#` est enfin appliqué par le langage, pas par la discipline de l'équipe.\n\n" +
-            "### static\n\n" +
-            "`static` attache une méthode ou un champ à la classe, pas aux instances. Pratique pour les factories.\n\n" +
+            "Note bien : une erreur de SYNTAXE, pas d'exécution. Le nom `#solde` n'existe tout simplement pas comme clé de propriété accessible ; il n'apparaît ni dans `Object.keys`, ni dans `JSON.stringify`, ni dans une boucle `for...in`. C'est plus fort que la convention `_solde` (qui ne protège rien) et plus fort que la closure (qui ne marche pas avec l'héritage et les méthodes de prototype).\n\n" +
+            "ES2022 ajoute le « brand check », le test d'appartenance ergonomique :\n\n" +
+            "```js\n" +
+            "class CompteBancaire {\n" +
+            "  #solde = 0;\n" +
+            "  static estUnCompte(obj) {\n" +
+            "    return #solde in obj; // true seulement pour une vraie instance\n" +
+            "  }\n" +
+            "}\n" +
+            "```\n\n" +
+            "Contrairement à `instanceof`, ce test ne peut pas être trompé en bricolant la chaîne de prototypes : soit l'objet est passé par ce constructeur, soit non.\n\n" +
+            "### static, et les static blocks\n\n" +
+            "`static` attache membre ou méthode à la classe elle-même. L'usage type, la factory nommée :\n\n" +
             "```js\n" +
             "class Temperature {\n" +
             "  constructor(celsius) { this.celsius = celsius; }\n" +
             "  static depuisFahrenheit(f) {\n" +
             "    return new Temperature((f - 32) * 5 / 9);\n" +
             "  }\n" +
+            "  static ZERO_ABSOLU = -273.15;\n" +
             "}\n" +
-            "const t = Temperature.depuisFahrenheit(212); // 100 °C\n" +
+            "Temperature.depuisFahrenheit(212).celsius; // 100\n" +
             "```\n\n" +
-            "> À retenir : préférez les classes pour leur lisibilité et pour `#`, mais gardez en tête que dessous, c'est toujours la chaîne de prototypes de la leçon précédente.\n",
+            "ES2022 ajoute aussi les blocs d'initialisation statique, exécutés une fois au chargement de la classe, pratiques quand un champ statique demande plus qu'une expression :\n\n" +
+            "```js\n" +
+            "class Config {\n" +
+            "  static valeurs;\n" +
+            "  static {\n" +
+            "    const brut = lireFichierConfig();\n" +
+            "    Config.valeurs = Object.freeze(brut);\n" +
+            "  }\n" +
+            "}\n" +
+            "```\n\n" +
+            "### Mon avis sur l'usage\n\n" +
+            "Une classe se justifie quand tu as un état ET des invariants à protéger (le `#solde` qui ne doit jamais devenir négatif), ou une vraie hiérarchie (des erreurs métier qui étendent `Error`). Pour un simple sac de fonctions, un module suffit ; pour un simple sac de données, un objet littéral suffit. Les codebases qui enrobent tout dans des classes par réflexe Java produisent des singletons déguisés et des `this` perdus dans les callbacks.\n\n" +
+            "### Étendre Error proprement\n\n" +
+            "Le cas où `extends` est indiscutable : les erreurs métier.\n\n" +
+            "```js\n" +
+            "class ErreurApi extends Error {\n" +
+            "  constructor(message, options) {\n" +
+            "    super(message, options);\n" +
+            "    this.name = \"ErreurApi\";\n" +
+            "  }\n" +
+            "}\n" +
+            "try {\n" +
+            "  await appelerApi();\n" +
+            "} catch (err) {\n" +
+            "  throw new ErreurApi(\"Synchronisation impossible\", { cause: err });\n" +
+            "}\n" +
+            "```\n\n" +
+            "Deux détails font la différence entre une hiérarchie utile et du bruit. `this.name` d'abord : sans lui, l'erreur s'affiche `Error: Synchronisation impossible` dans les logs et tu perds le type au premier coup d'œil. L'option `cause` ensuite (ES2022) : elle chaîne l'erreur d'origine sans l'écraser, `err.cause` te rend la panne réseau initiale sous le message métier, stack comprise. Avant `cause`, on concaténait les messages et on perdait la trace d'origine ; maintenant les deux survivent. Et côté consommateur, `err instanceof ErreurApi` fonctionne, précisément parce que `instanceof` parcourt la chaîne de prototypes vue à la leçon précédente.\n\n" +
+            "## À toi\n\n" +
+            "Pourquoi `JSON.stringify(new CompteBancaire())` renvoie-t-il `\"{}\"` alors que l'objet a bien un solde ?\n\n" +
+            "> Deux mécanismes se cumulent. `#solde` est un champ privé : invisible pour toute API extérieure à la classe, y compris `JSON.stringify`. Et le getter `solde` est défini sur le prototype, or `JSON.stringify` ne sérialise que les propriétés propres et énumérables. Résultat : objet vide. Pour sérialiser proprement, ajoute une méthode `toJSON() { return { solde: this.#solde }; }` : `JSON.stringify` l'appelle automatiquement si elle existe.\n",
         },
         {
           id: "l10",
           title: "Quiz : prototypes et classes",
           type: "quiz",
-          duration: "6 min",
+          duration: "7 min",
           questions: [
             {
               id: "q10",
@@ -566,7 +893,7 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "Dans une classe dérivée, this n'est initialisé que par l'appel à super(). Y accéder avant lève une ReferenceError. C'est pourquoi super(nom) doit précéder toute affectation sur this dans le constructeur enfant.",
+                "Dans une classe dérivée, c'est le constructeur parent qui crée l'objet this. Y accéder avant lève ReferenceError: Must call super constructor in derived class before accessing 'this' or returning from derived constructor. D'où super(nom) en première ligne.",
             },
             {
               id: "q13",
@@ -579,7 +906,20 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "Le préfixe underscore est une simple convention : rien n'empêche d'écrire obj._solde. Le # est appliqué par le langage ; accéder à #solde hors de la classe est une erreur de syntaxe. C'est de l'encapsulation garantie, pas de la discipline.",
+                "Le préfixe underscore est une simple convention : rien n'empêche d'écrire obj._solde. Le # est appliqué par le langage ; accéder à #solde hors de la classe est une erreur de syntaxe, avant même l'exécution. Le champ n'apparaît ni dans Object.keys ni dans JSON.stringify.",
+            },
+            {
+              id: "q29",
+              prompt: "rex hérite de respirer() via son prototype. Que fait delete rex.respirer ?",
+              options: [
+                "Supprime la méthode pour toutes les instances",
+                "Renvoie true mais ne change rien : delete n'agit que sur les propriétés propres, et respirer est héritée",
+                "Lève une TypeError",
+                "Détache rex de son prototype",
+              ],
+              correctIndex: 1,
+              explanation:
+                "delete ne supprime que les propriétés propres de l'objet visé. respirer vit sur le prototype, donc delete rex.respirer renvoie true (rien ne s'y opposait) sans aucun effet : la méthode reste accessible par délégation. Seul delete sur le prototype lui-même la retirerait, pour tout le monde.",
             },
           ],
         },
@@ -593,26 +933,28 @@ const course: Course = {
           id: "l11",
           title: "map, filter, reduce : penser en transformations",
           type: "text",
-          duration: "15 min",
+          duration: "18 min",
           body:
             "## Décrire le résultat plutôt que la boucle\n\n" +
-            "Le trio `map`, `filter`, `reduce` remplace l'immense majorité des boucles `for`. L'intérêt n'est pas la mode : ces méthodes ne mutent pas le tableau d'origine, renvoient une nouvelle valeur, et se lisent comme une phrase. Vous décrivez la transformation, pas la mécanique d'itération.\n\n" +
+            "Le trio `map`, `filter`, `reduce` remplace l'immense majorité des boucles `for`. L'intérêt n'est pas la mode : ces méthodes ne mutent pas le tableau d'origine, renvoient une nouvelle valeur et se lisent comme une phrase. Tu décris la transformation, pas la mécanique d'itération. Et depuis ES2024-2025, deux ajouts du langage rendent obsolètes des patterns entiers de `reduce` : on les voit en fin de leçon.\n\n" +
             "### map : un pour un\n\n" +
-            "`map` applique une fonction à chaque élément et renvoie un tableau de même longueur.\n\n" +
             "```js\n" +
             "const prix = [10, 20, 30];\n" +
             "const ttc = prix.map((p) => p * 1.2);\n" +
             "// [12, 24, 36], prix inchangé\n" +
             "```\n\n" +
+            "Même longueur, chaque élément transformé. Simple, sauf un piège célèbre : le callback de `map` reçoit TROIS arguments (élément, index, tableau). Passer directement une fonction qui a un deuxième paramètre optionnel produit des résultats délirants :\n\n" +
+            "```js\n" +
+            "[\"1\", \"7\", \"11\"].map(parseInt); // [1, NaN, 3]\n" +
+            "```\n\n" +
+            "`parseInt(chaine, base)` reçoit l'index comme base : `parseInt(\"1\", 0)` vaut 1 (base 0 = auto), `parseInt(\"7\", 1)` vaut NaN (base 1 n'existe pas), `parseInt(\"11\", 2)` vaut 3 (11 en binaire). Le correctif : `arr.map(Number)` ou `arr.map((s) => parseInt(s, 10))`. Ce bug précis a son propre folklore sur Stack Overflow.\n\n" +
             "### filter : garder ce qui passe le test\n\n" +
-            "`filter` renvoie un sous-ensemble : les éléments pour lesquels la fonction renvoie une valeur truthy.\n\n" +
             "```js\n" +
             "const nombres = [1, 2, 3, 4, 5, 6];\n" +
-            "const pairs = nombres.filter((n) => n % 2 === 0);\n" +
-            "// [2, 4, 6]\n" +
+            "const pairs = nombres.filter((n) => n % 2 === 0); // [2, 4, 6]\n" +
             "```\n\n" +
+            "Le prédicat est évalué en truthy/falsy, ce qui permet l'idiome compact `arr.filter(Boolean)` pour éliminer `null`, `undefined`, `\"\"` et `0` d'un coup. Compact, mais à double tranchant si le `0` était une donnée légitime.\n\n" +
             "### reduce : tout condenser en une valeur\n\n" +
-            "`reduce` est le plus puissant et le plus mal compris. Il parcourt le tableau en maintenant un accumulateur, et renvoie sa valeur finale. Cette valeur peut être un nombre, un objet, un autre tableau, n'importe quoi.\n\n" +
             "```js\n" +
             "const panier = [\n" +
             "  { nom: \"Livre\", prix: 15 },\n" +
@@ -622,9 +964,9 @@ const course: Course = {
             "const total = panier.reduce((acc, article) => acc + article.prix, 0);\n" +
             "// 43\n" +
             "```\n\n" +
-            "Le second argument, `0`, est la valeur initiale de l'accumulateur. Ne l'oubliez jamais : sans lui, `reduce` prend le premier élément comme valeur de départ, et sur un tableau vide il lève une `TypeError`. Passer une valeur initiale rend aussi le code plus clair sur le type du résultat.\n\n" +
-            "### Grouper avec reduce\n\n" +
-            "Un cas réel : regrouper des objets par une clé.\n\n" +
+            "Le second argument, `0`, est la valeur initiale de l'accumulateur. Ne l'omets jamais : sans lui, `reduce` prend le premier élément comme point de départ et commence à l'indice 1, ce qui donne des bugs de type quand les éléments sont des objets, et sur un tableau vide lève exactement `TypeError: Reduce of empty array with no initial value`. Un tableau vide, c'est ce que renvoie n'importe quel filtre trop strict un vendredi soir : le crash arrive en production, pas en dev.\n\n" +
+            "### Grouper : reduce hier, Object.groupBy aujourd'hui\n\n" +
+            "Le regroupement par clé était LE cas d'école de `reduce` :\n\n" +
             "```js\n" +
             "const gens = [\n" +
             "  { nom: \"Ada\", ville: \"Paris\" },\n" +
@@ -632,134 +974,199 @@ const course: Course = {
             "  { nom: \"Grace\", ville: \"Paris\" },\n" +
             "];\n" +
             "const parVille = gens.reduce((acc, p) => {\n" +
-            "  (acc[p.ville] ||= []).push(p.nom);\n" +
+            "  (acc[p.ville] ??= []).push(p);\n" +
             "  return acc;\n" +
             "}, {});\n" +
-            "// { Paris: [\"Ada\", \"Grace\"], Lyon: [\"Alan\"] }\n" +
             "```\n\n" +
-            "### Chaîner, avec mesure\n\n" +
-            "On enchaîne naturellement : `data.filter(...).map(...).reduce(...)`. C'est lisible, mais chaque maillon crée un tableau intermédiaire. Sur trois éléments, aucune importance. Sur un million, dans une boucle chaude, une seule `for...of` ou un seul `reduce` peut être plus rapide. Écrivez d'abord lisible, optimisez seulement là où un profil le prouve.\n\n" +
-            "> À retenir : `map` transforme, `filter` sélectionne, `reduce` condense. Trois briques qui couvrent presque tout le traitement de données, sans muter vos entrées.\n",
+            "ES2024 intègre le besoin au langage :\n\n" +
+            "```js\n" +
+            "const parVille = Object.groupBy(gens, (p) => p.ville);\n" +
+            "// { Paris: [{...Ada}, {...Grace}], Lyon: [{...Alan}] }\n" +
+            "```\n\n" +
+            "Deux détails d'expert : l'objet renvoyé est créé avec un prototype `null` (pas de `toString` hérité, pas de collision de clés, exactement les objets « nus » de la partie 3), et si ta clé n'est pas une chaîne, `Map.groupBy` fait la même chose avec une `Map`, en comparant les clés par SameValueZero. Disponible dans Node 21+ et tous les navigateurs depuis 2024.\n\n" +
+            "### ES2025 : les iterator helpers, la paresse en natif\n\n" +
+            "Chaque maillon d'une chaîne `filter().map().slice()` matérialise un tableau intermédiaire complet. ES2025 dote les itérateurs des mêmes verbes, en évaluation paresseuse :\n\n" +
+            "```js\n" +
+            "const troisPremiersCarresPairs = nombres.values()\n" +
+            "  .filter((n) => n % 2 === 0)\n" +
+            "  .map((n) => n * n)\n" +
+            "  .take(3)\n" +
+            "  .toArray();\n" +
+            "```\n\n" +
+            "Aucun tableau intermédiaire : chaque élément traverse toute la chaîne un par un, et `take(3)` arrête la consommation dès le troisième résultat, même sur une source d'un million d'éléments. Sur un tableau de 10 éléments, ça ne change rien (et c'est même un poil plus lent, l'infrastructure d'itération a un coût fixe). Sur un flux volumineux ou infini (un générateur), c'est la différence entre O(n) mémoire et O(1). Disponible Node 22+ et Chrome/Firefox/Safari 2024-2025 ; vérifie ta cible avant de t'en servir sans transpilation.\n\n" +
+            "### Ordre de grandeur honnête\n\n" +
+            "Sur 1 million de nombres, une chaîne `filter + map + reduce` fait trois passes et deux allocations intermédiaires ; une boucle `for...of` unique fait une passe et zéro allocation, et sera typiquement 2 à 4 fois plus rapide dans un microbenchmark. Ça semble énorme et ça ne l'est pas : on parle de passer de ~15 ms à ~5 ms, une fois, sur un million d'éléments. Écris lisible d'abord ; ne réécris en boucle que ce qu'un profil désigne comme point chaud exécuté en rafale.\n\n" +
+            "## À toi\n\n" +
+            "Sans exécuter : que renvoie `[1, 2, 3].reduce((acc, x) => acc + x)` (sans valeur initiale) ? Et `[].reduce((acc, x) => acc + x)` ?\n\n" +
+            "> Le premier renvoie `6` : sans initiale, `acc` démarre à 1 (premier élément) et l'itération commence à 2. Le second lève `TypeError: Reduce of empty array with no initial value`. Le contrat de `reduce` change selon la présence du second argument, c'est le seul des trois du trio à avoir ce comportement à double détente. Fournis toujours l'initiale.\n",
         },
         {
           id: "l12",
           title: "Déstructuration, spread et rest",
           type: "text",
-          duration: "14 min",
+          duration: "17 min",
           body:
             "## Extraire et rassembler proprement\n\n" +
-            "La déstructuration et l'opérateur `...` sont partout dans le code moderne. Bien utilisés, ils réduisent le bruit et clarifient les intentions. Mal compris, ils cachent des copies coûteuses.\n\n" +
+            "La déstructuration et l'opérateur `...` sont partout dans le code moderne. Bien utilisés, ils réduisent le bruit et clarifient les intentions. Mal compris, ils produisent deux familles de bugs : le crash de déstructuration sur `undefined`, et la copie superficielle prise pour une copie profonde. On va traiter les deux, avec le modèle mémoire qui explique tout.\n\n" +
             "### Déstructurer un objet\n\n" +
             "```js\n" +
             "const user = { nom: \"Ada\", age: 36, ville: \"Paris\" };\n" +
             "const { nom, ville } = user;\n" +
-            "// nom = \"Ada\", ville = \"Paris\"\n" +
-            "```\n\n" +
-            "On peut renommer et donner une valeur par défaut dans la même expression.\n\n" +
-            "```js\n" +
             "const { nom: prenom, pays = \"France\" } = user;\n" +
-            "// prenom = \"Ada\", pays = \"France\" (absent dans user)\n" +
+            "// prenom = \"Ada\", pays = \"France\" (clé absente)\n" +
             "```\n\n" +
-            "C'est particulièrement propre dans les signatures de fonction, pour nommer des options sans imposer d'ordre aux appelants.\n\n" +
+            "Renommage et défaut dans la même expression. Précision qui piège tout le monde : le défaut ne s'applique QUE sur `undefined`, pas sur `null` :\n\n" +
             "```js\n" +
-            "function creerLien({ href, texte, cible = \"_self\" }) {\n" +
-            "  return `<a href=\"${href}\" target=\"${cible}\">${texte}</a>`;\n" +
-            "}\n" +
-            "creerLien({ texte: \"Doc\", href: \"/doc\" });\n" +
+            "const { a = 5 } = { a: null };      // a === null, pas 5\n" +
+            "const { b = 5 } = { b: undefined }; // b === 5\n" +
             "```\n\n" +
-            "### Déstructurer un tableau, par position\n\n" +
+            "Même sémantique que les paramètres par défaut des fonctions. Si ton API renvoie des `null`, tes défauts de déstructuration ne te protègent pas.\n\n" +
+            "Dans une signature de fonction, la déstructuration donne des options nommées, mais ajoute un défaut global sinon l'appel sans argument crashe avec un message V8 très reconnaissable :\n\n" +
             "```js\n" +
-            "const [premier, deuxieme] = [10, 20, 30];\n" +
-            "const [, , troisieme] = [10, 20, 30]; // on saute des positions\n" +
-            "// échange sans variable temporaire :\n" +
+            "function creerLien({ href, texte } = {}) { /* ... */ }\n" +
+            "// sans le = {} :\n" +
+            "// creerLien() -> TypeError: Cannot destructure property 'href'\n" +
+            "//                of 'undefined' as it is undefined.\n" +
+            "```\n\n" +
+            "### Tableaux, rest, spread\n\n" +
+            "```js\n" +
+            "const [premier, , troisieme] = [10, 20, 30]; // on saute une position\n" +
             "let a = 1, b = 2;\n" +
-            "[a, b] = [b, a]; // a = 2, b = 1\n" +
+            "[a, b] = [b, a]; // échange sans variable temporaire\n" +
+            "const [tete, ...queue] = [1, 2, 3, 4]; // tete = 1, queue = [2, 3, 4]\n" +
+            "function somme(...nombres) { return nombres.reduce((s, n) => s + n, 0); }\n" +
+            "const etendu = [...queue, 5]; // [2, 3, 4, 5]\n" +
+            "const config = { ...defauts, timeout: 5000 }; // fusion, la droite écrase\n" +
             "```\n\n" +
-            "### Rest : rassembler le reste\n\n" +
-            "Dans une déstructuration, `...` collecte ce qui n'a pas été nommé.\n\n" +
-            "```js\n" +
-            "const [tete, ...queue] = [1, 2, 3, 4];\n" +
-            "// tete = 1, queue = [2, 3, 4]\n" +
-            "const { nom: n, ...reste } = user;\n" +
-            "// reste = { age: 36, ville: \"Paris\" }\n" +
-            "```\n\n" +
-            "En paramètre de fonction, rest capture un nombre variable d'arguments dans un vrai tableau, ce que l'ancien objet `arguments` ne faisait pas.\n\n" +
-            "```js\n" +
-            "function somme(...nombres) {\n" +
-            "  return nombres.reduce((a, b) => a + b, 0);\n" +
-            "}\n" +
-            "somme(1, 2, 3, 4); // 10\n" +
-            "```\n\n" +
-            "### Spread : étaler\n\n" +
-            "Le même `...`, à l'inverse, déploie un itérable ou les propriétés d'un objet.\n\n" +
-            "```js\n" +
-            "const base = [1, 2];\n" +
-            "const etendu = [...base, 3, 4]; // [1, 2, 3, 4]\n" +
-            "const config = { ...defauts, timeout: 5000 }; // fusion, timeout écrase\n" +
-            "```\n\n" +
-            "### Le piège de la copie superficielle\n\n" +
-            "Le spread copie sur un seul niveau. Les objets ou tableaux imbriqués restent partagés par référence.\n\n" +
+            "Le même `...` rassemble en position de réception (rest) et déploie en position d'émission (spread). Le spread de tableau fonctionne sur tout itérable, y compris les chaînes, avec une subtilité Unicode : il découpe par points de code, pas par unités UTF-16. `\"👍\".length` vaut 2 (paire de surrogates), mais `[...\"👍\"]` donne `[\"👍\"]`, longueur 1. Pour compter des caractères visibles, le spread est plus juste que `.length` (et pour les cas durs type drapeaux ou accents combinés, il faut `Intl.Segmenter`).\n\n" +
+            "### Le modèle mémoire : références contre valeurs\n\n" +
+            "Une variable ne contient jamais un objet. Elle contient soit un primitif (copié à chaque affectation), soit une référence vers un objet stocké dans le tas. Le spread copie ces contenus de premier niveau : les primitifs sont dupliqués, les références sont recopiées TELLES QUELLES, pointant vers les mêmes objets.\n\n" +
             "```js\n" +
             "const original = { nom: \"Ada\", roles: [\"admin\"] };\n" +
             "const copie = { ...original };\n" +
-            "copie.roles.push(\"user\");\n" +
-            "original.roles; // [\"admin\", \"user\"] : le tableau est partagé !\n" +
+            "copie.nom = \"Grace\";      // sans effet sur original : primitif copié\n" +
+            "copie.roles.push(\"user\"); // original.roles vaut [\"admin\", \"user\"] !\n" +
             "```\n\n" +
-            "Pour une copie profonde ponctuelle, `structuredClone(obj)` est disponible dans les navigateurs récents et Node 17+. C'est la bonne réponse moderne, bien plus sûre que le vieux `JSON.parse(JSON.stringify(...))` qui perd les dates, les fonctions et les undefined.\n\n" +
-            "> À retenir : `...` rassemble en position rest et étale en position spread. Mais souvenez-vous que le spread reste superficiel : au-delà d'un niveau, il partage les références.\n",
+            "```figure\n" +
+            "{\"caption\": \"Apres { ...original } : le primitif nom est duplique, mais les deux proprietes roles referencent LE MEME tableau dans le tas\"}\n" +
+            "<svg viewBox=\"0 0 640 300\" role=\"img\"><title>Copie superficielle : variables, references et tas</title>\n" +
+            "<text x=\"150\" y=\"32\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">variables</text>\n" +
+            "<text x=\"470\" y=\"32\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\" opacity=\"0.7\">tas (objets)</text>\n" +
+            "<rect x=\"40\" y=\"56\" width=\"180\" height=\"40\" fill=\"currentColor\" opacity=\"0.15\" rx=\"3\"/>\n" +
+            "<text x=\"130\" y=\"81\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">original : ref A</text>\n" +
+            "<rect x=\"40\" y=\"120\" width=\"180\" height=\"40\" fill=\"currentColor\" opacity=\"0.15\" rx=\"3\"/>\n" +
+            "<text x=\"130\" y=\"145\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">copie : ref B</text>\n" +
+            "<rect x=\"330\" y=\"48\" width=\"280\" height=\"56\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"470\" y=\"71\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">A { nom: \"Ada\",</text>\n" +
+            "<text x=\"470\" y=\"91\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">roles: ref C }</text>\n" +
+            "<rect x=\"330\" y=\"112\" width=\"280\" height=\"56\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"470\" y=\"135\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">B { nom: \"Ada\" (dupliqué),</text>\n" +
+            "<text x=\"470\" y=\"155\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">roles: ref C }</text>\n" +
+            "<rect x=\"330\" y=\"212\" width=\"280\" height=\"44\" fill=\"none\" class=\"fig-accent\" stroke-width=\"2\" rx=\"3\"/>\n" +
+            "<text x=\"470\" y=\"239\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" class=\"fig-accent\">C [ \"admin\" ]  &lt;- partagé !</text>\n" +
+            "<line x1=\"220\" y1=\"76\" x2=\"324\" y2=\"76\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"330,76 320,71 320,81\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<line x1=\"220\" y1=\"140\" x2=\"324\" y2=\"140\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"330,140 320,135 320,145\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<line x1=\"530\" y1=\"104\" x2=\"490\" y2=\"206\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"488,212 486,200 496,203\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<line x1=\"530\" y1=\"168\" x2=\"505\" y2=\"206\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"502,212 501,200 511,204\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "</svg>\n" +
+            "```\n\n" +
+            "### La copie profonde moderne : structuredClone\n\n" +
+            "`structuredClone(obj)` (navigateurs récents, Node 17+) clone en profondeur, gère les `Date`, `Map`, `Set`, `ArrayBuffer` et même les références circulaires. Ses limites sont franches : une fonction ou un nœud DOM dans l'objet lève une `DataCloneError` (« could not be cloned »). Le vieux `JSON.parse(JSON.stringify(obj))` est pire sur tous les plans : il perd silencieusement les `undefined`, transforme les `Date` en chaînes, les `Map` en `{}`, `NaN` et `Infinity` en `null`, et explose sur les cycles avec `TypeError: Converting circular structure to JSON`. Je te déconseille de l'écrire en 2026 ailleurs que dans un projet legacy.\n\n" +
+            "### Déstructurer sans déclarer : le piège des accolades\n\n" +
+            "Réaffecter des variables EXISTANTES par déstructuration d'objet demande des parenthèses :\n\n" +
+            "```js\n" +
+            "let nom, ville;\n" +
+            "{ nom, ville } = user;   // SyntaxError: Unexpected token '='\n" +
+            "({ nom, ville } = user); // OK\n" +
+            "```\n\n" +
+            "Sans parenthèses, le moteur lit `{` en début d'instruction comme l'ouverture d'un BLOC, pas d'un motif. Les tableaux n'ont pas ce problème, mais ils ont pire : l'insertion automatique de point-virgule. Si la ligne précédente n'est pas terminée, `[a, b] = [b, a]` se colle à elle :\n\n" +
+            "```js\n" +
+            "const total = calculer()\n" +
+            "[a, b] = [b, a];\n" +
+            "// lu comme : const total = calculer()[a, b] = [b, a]\n" +
+            "// TypeError si calculer() renvoie undefined, sinon comportement absurde\n" +
+            "```\n\n" +
+            "Deux instructions parfaitement valides isolément, un désastre une fois juxtaposées : c'est LE cas qui justifie les points-virgules, ou au minimum un formateur qui tranche pour toi.\n\n" +
+            "## À toi\n\n" +
+            "Que vaut `retirerVille(user)` puis `user.ville` après ce code ?\n\n" +
+            "```js\n" +
+            "function retirerVille({ ville, ...reste }) {\n" +
+            "  return reste;\n" +
+            "}\n" +
+            "const user = { nom: \"Ada\", ville: \"Paris\" };\n" +
+            "const sans = retirerVille(user);\n" +
+            "```\n\n" +
+            "> `sans` vaut `{ nom: \"Ada\" }` et `user.ville` vaut toujours `\"Paris\"`. Le rest en déstructuration crée un objet NEUF avec les propriétés restantes : c'est l'idiome standard pour « omettre une clé sans muter », bien plus propre que `delete user.ville` qui modifierait l'original (et dégraderait ses performances d'accès, on y revient en partie 6).\n",
         },
         {
           id: "l13",
           title: "Immutabilité : pourquoi et comment concrètement",
           type: "text",
-          duration: "13 min",
+          duration: "16 min",
           body:
-            "## Ne pas modifier, remplacer\n\n" +
-            "L'immutabilité, c'est la discipline de ne jamais modifier une donnée en place, mais d'en produire une nouvelle version. Ce n'est pas un dogme académique. C'est ce qui rend un état prévisible, ce qui permet à React de détecter un changement par simple comparaison de référence, et ce qui évite la classe de bugs où une fonction lointaine mute un objet que vous croyiez stable.\n\n" +
-            "### Le bug qu'on évite\n\n" +
+            "## Le tri qui a cassé la liste\n\n" +
+            "Symptôme réel, vu en revue de code : un composant affiche un classement trié, et depuis son ajout, un AUTRE écran affiche les mêmes données dans le mauvais ordre. Le coupable :\n\n" +
             "```js\n" +
+            "const classement = scores.sort((a, b) => b.points - a.points);\n" +
+            "```\n\n" +
+            "`sort` trie EN PLACE et renvoie le même tableau : `classement === scores` vaut `true`. L'auteur croyait créer une copie triée ; il a réordonné la donnée partagée de toute l'application. Voilà exactement la classe de bugs que l'immutabilité élimine : l'action à distance, où une mutation ici casse un affichage là-bas.\n\n" +
+            "### La discipline, en deux exemples\n\n" +
+            "```js\n" +
+            "// mutation cachée : l'appelant ne s'y attend pas\n" +
             "function ajouterRole(user, role) {\n" +
-            "  user.roles.push(role); // mutation cachée\n" +
+            "  user.roles.push(role);\n" +
             "  return user;\n" +
             "}\n" +
-            "const ada = { nom: \"Ada\", roles: [\"lecteur\"] };\n" +
-            "const modifie = ajouterRole(ada, \"admin\");\n" +
-            "ada.roles; // [\"lecteur\", \"admin\"] : l'original a changé sans qu'on l'ait demandé\n" +
-            "```\n\n" +
-            "La fonction a des effets de bord sur son entrée. Deux parties du programme partagent maintenant le même tableau, et un changement chez l'une surprend l'autre.\n\n" +
-            "### La version immuable\n\n" +
-            "```js\n" +
+            "// version immuable : on reconstruit chaque niveau modifié\n" +
             "function ajouterRole(user, role) {\n" +
             "  return { ...user, roles: [...user.roles, role] };\n" +
             "}\n" +
-            "const modifie = ajouterRole(ada, \"admin\");\n" +
-            "ada.roles;     // [\"lecteur\"], intact\n" +
-            "modifie.roles; // [\"lecteur\", \"admin\"]\n" +
             "```\n\n" +
-            "On reconstruit l'objet et le tableau modifié. L'original n'est jamais touché. Notez qu'il faut recopier chaque niveau qu'on modifie : le spread superficiel de la leçon précédente est exactement l'outil pour ça.\n\n" +
-            "### Les méthodes qui mutent, à connaître\n\n" +
-            "Certaines méthodes de tableau modifient en place et sont à éviter dans un style immuable : `push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`. Leurs équivalents non destructifs :\n\n" +
-            "- au lieu de `arr.push(x)`, écrire `[...arr, x]`\n" +
-            "- au lieu de `arr.sort()`, écrire `[...arr].sort()` pour trier une copie\n" +
-            "- ES2023 ajoute `toSorted`, `toReversed`, `toSpliced` et `with`, qui renvoient une nouvelle version sans toucher l'original\n\n" +
+            "Deux spreads, et l'original reste intact. Note le point technique hérité de la leçon précédente : on ne copie QUE les niveaux qu'on modifie. Les autres branches de l'objet restent partagées par référence, et c'est voulu : c'est le partage structurel, peu coûteux en mémoire, et sans danger tant que personne ne mute.\n\n" +
+            "C'est aussi ce qui rend l'immutabilité si rentable avec React ou tout système à détection de changement : comparer `ancienEtat === nouvelEtat` coûte une instruction. Si les références diffèrent, quelque chose a changé ; si elles sont égales, rien n'a changé, garanti. Sans immutabilité, il faudrait comparer récursivement chaque champ.\n\n" +
+            "### ES2023 : les versions non destructives natives\n\n" +
+            "Les méthodes qui mutent en place sont à connaître par cœur : `push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`, `fill`, `copyWithin`. Depuis ES2023, quatre équivalents renvoient une copie modifiée sans toucher l'original :\n\n" +
             "```js\n" +
             "const scores = [3, 1, 2];\n" +
-            "const tries = scores.toSorted((a, b) => a - b);\n" +
-            "// tries = [1, 2, 3], scores = [3, 1, 2] intact\n" +
+            "scores.toSorted();          // [1, 2, 3], scores intact\n" +
+            "scores.toReversed();        // [2, 1, 3]\n" +
+            "scores.toSpliced(1, 1);     // [3, 2] : copie sans l'element d'indice 1\n" +
+            "scores.with(0, 99);         // [99, 1, 2] : copie avec l'indice 0 remplace\n" +
             "```\n\n" +
-            "### Object.freeze pour verrouiller\n\n" +
-            "`Object.freeze(obj)` empêche toute modification de premier niveau. En mode strict, une tentative de mutation lève une erreur au lieu d'échouer en silence. Attention, c'est superficiel : les objets imbriqués restent modifiables, il faut geler récursivement pour un vrai gel.\n\n" +
+            "Disponibles partout depuis mi-2023 (Node 20+). Avant, l'idiome était `[...arr].sort(...)`. Le tri du bug d'ouverture s'écrit donc `scores.toSorted((a, b) => b.points - a.points)` et l'histoire s'arrête là.\n\n" +
+            "Piège dans le piège du tri, tant qu'on y est : sans comparateur, `sort` convertit les éléments en CHAÎNES et compare lexicographiquement. `[10, 9, 1].sort()` renvoie `[1, 10, 9]`. Pour des nombres, le comparateur `(a, b) => a - b` n'est pas optionnel.\n\n" +
+            "### Object.freeze : verrou superficiel\n\n" +
             "```js\n" +
-            "const config = Object.freeze({ theme: \"clair\" });\n" +
-            "config.theme = \"sombre\"; // ignoré, ou TypeError en mode strict\n" +
+            "\"use strict\";\n" +
+            "const config = Object.freeze({ theme: \"clair\", limites: { max: 10 } });\n" +
+            "config.theme = \"sombre\";\n" +
+            "// TypeError: Cannot assign to read only property 'theme' of object '#<Object>'\n" +
+            "config.limites.max = 99; // passe ! freeze ne gele que le premier niveau\n" +
             "```\n\n" +
-            "> À retenir : traiter les données comme immuables coûte quelques spreads de plus, et vous rend en échange un état dont l'évolution est traçable et sans surprise à distance. Sur une application avec de l'état partagé, c'est un des meilleurs rapports effort/bugs évités.\n",
+            "En mode non strict, l'écriture échoue en silence, ce qui est pire. Et le gel est superficiel : les objets imbriqués restent mutables, il faut geler récursivement pour un verrou complet. En pratique, je réserve `Object.freeze` aux constantes de configuration au chargement du module ; pour l'état applicatif, la discipline des spreads (ou une bibliothèque comme Immer, qui te laisse écrire du code mutatif et produit des copies immuables) suffit largement.\n\n" +
+            "### Le coût, honnêtement\n\n" +
+            "Chaque mise à jour immuable alloue de nouveaux objets, que le ramasse-miettes devra collecter. Sur des mises à jour d'interface (dizaines par seconde, objets de quelques Ko), c'est indétectable. Sur une boucle serrée qui reconstruit un tableau d'un million d'éléments à chaque frame, c'est un vrai problème, et une structure mutable locale à la fonction est le bon choix : l'immutabilité est un contrat aux frontières (arguments reçus, valeurs retournées, état partagé), pas une interdiction de muter tes propres variables locales.\n\n" +
+            "### const, seal, freeze : trois verrous qui ne ferment pas la même porte\n\n" +
+            "Confusion classique en entretien : `const` ne rend RIEN immuable. Il verrouille la LIAISON (plus de réassignation possible), pas la valeur :\n\n" +
+            "```js\n" +
+            "const scores = [3, 1, 2];\n" +
+            "scores.push(4); // parfaitement legal\n" +
+            "scores = [];    // TypeError: Assignment to constant variable.\n" +
+            "```\n\n" +
+            "À l'étage au-dessus, `Object.seal(obj)` interdit d'ajouter ou de supprimer des propriétés mais laisse modifier les valeurs existantes ; `Object.freeze` interdit les trois. Les tests associés existent : `Object.isSealed`, `Object.isFrozen`. Et aucun des deux ne touche les collections : geler une `Map` gèle l'objet Map lui-même (ses propriétés), pas son contenu interne, et `map.set` continue de fonctionner. Pour une collection réellement immuable, pas d'API native : expose une copie, ou seulement des méthodes de lecture (le pattern closure de la partie 2).\n\n" +
+            "## À toi\n\n" +
+            "Ce code corrige-t-il le bug du classement ? `const classement = [...scores].sort((a, b) => b.points - a.points);`\n\n" +
+            "> Oui, pour le tri : `[...scores]` crée un tableau neuf, `sort` mute la copie, l'original garde son ordre. Mais attention au faux sentiment de sécurité : la copie est superficielle, les OBJETS du classement restent partagés avec `scores`. Trier ne pose pas de problème ; écrire `classement[0].points = 0` modifierait aussi l'objet dans `scores`. Copie de la structure et copie des éléments sont deux décisions distinctes.\n",
         },
         {
           id: "l14",
           title: "Quiz : données, fonctionnel et immutabilité",
           type: "quiz",
-          duration: "6 min",
+          duration: "7 min",
           questions: [
             {
               id: "q14",
@@ -772,7 +1179,7 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "Sans valeur initiale, reduce utilise le premier élément comme accumulateur de départ et commence à l'indice 1 ; sur un tableau vide, il lève une TypeError. Fournir l'initiale sécurise le cas vide et clarifie le type du résultat.",
+                "Sans valeur initiale, reduce utilise le premier élément comme accumulateur et commence à l'indice 1 ; sur un tableau vide, il lève TypeError: Reduce of empty array with no initial value. Fournir l'initiale sécurise le cas vide et clarifie le type du résultat.",
             },
             {
               id: "q15",
@@ -785,7 +1192,7 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "Le spread ne copie qu'un niveau. La propriété roles des deux objets pointe vers le même tableau ; muter via copie.roles affecte donc original.roles. Pour éviter ça, il faut recopier aussi le niveau imbriqué ou utiliser structuredClone.",
+                "Le spread ne copie qu'un niveau : les primitifs sont dupliqués, les références recopiées telles quelles. Les deux propriétés roles pointent vers le même tableau dans le tas. Pour isoler aussi le niveau imbriqué : { ...original, roles: [...original.roles] } ou structuredClone.",
             },
             {
               id: "q16",
@@ -798,7 +1205,7 @@ const course: Course = {
               ],
               correctIndex: 2,
               explanation:
-                "sort, reverse et splice mutent le tableau en place. toSorted, ajouté en ES2023, renvoie un nouveau tableau trié et laisse l'original intact. À défaut, [...arr].sort() trie une copie.",
+                "sort, reverse et splice mutent le tableau en place (et sort renvoie la MÊME référence, piège classique). toSorted, ajouté en ES2023 avec toReversed, toSpliced et with, renvoie un nouveau tableau trié et laisse l'original intact.",
             },
             {
               id: "q17",
@@ -811,7 +1218,20 @@ const course: Course = {
               ],
               correctIndex: 1,
               explanation:
-                "Object.freeze est superficiel : il empêche d'ajouter, supprimer ou réassigner les propriétés directes, mais un objet ou tableau imbriqué peut toujours être muté. Un gel profond demande d'appliquer freeze récursivement.",
+                "Object.freeze est superficiel : il empêche d'ajouter, supprimer ou réassigner les propriétés directes (TypeError en mode strict, échec silencieux sinon), mais un objet ou tableau imbriqué reste mutable. Un gel profond demande d'appliquer freeze récursivement.",
+            },
+            {
+              id: "q30",
+              prompt: "Que renvoie [\"1\", \"7\", \"11\"].map(parseInt) ?",
+              options: [
+                "[1, 7, 11]",
+                "[1, NaN, 3]",
+                "[NaN, NaN, NaN]",
+                "Une SyntaxError",
+              ],
+              correctIndex: 1,
+              explanation:
+                "map passe trois arguments à son callback : élément, index, tableau. parseInt reçoit donc l'index comme base : parseInt(\"1\", 0) = 1, parseInt(\"7\", 1) = NaN (base 1 invalide), parseInt(\"11\", 2) = 3 (binaire). Correctif : map(Number) ou map((s) => parseInt(s, 10)).",
             },
           ],
         },
@@ -819,268 +1239,382 @@ const course: Course = {
     },
     {
       id: "p5",
-      title: "Partie 5 : Asynchronisme en profondeur",
+      title: "Partie 5 : L'asynchrone en profondeur",
       lessons: [
         {
           id: "l15",
-          title: "L'event loop : microtâches contre macrotâches",
+          title: "L'event loop : comprendre enfin l'ordre d'exécution",
           type: "text",
-          duration: "16 min",
+          duration: "19 min",
           body:
-            "## Un seul fil, une file d'attente\n\n" +
-            "JavaScript exécute votre code sur un seul thread. Il ne fait qu'une chose à la fois. Comment, alors, gère-t-il des timers, des requêtes réseau et des clics sans tout bloquer ? Grâce à l'event loop et à des files de tâches. Comprendre leur ordre, c'est pouvoir prédire l'exécution de n'importe quel code asynchrone.\n\n" +
-            "### La pile, puis les files\n\n" +
-            "Le moteur exécute d'abord tout le code synchrone, sur la pile d'appels, jusqu'à ce qu'elle soit vide. Ensuite seulement, l'event loop pioche du travail en attente. Il y a deux files, et leur priorité diffère :\n\n" +
-            "- Les macrotâches : `setTimeout`, `setInterval`, les événements du DOM, les I/O.\n" +
-            "- Les microtâches : les callbacks de Promises (`.then`, `.catch`, `.finally`), `queueMicrotask`, et `await`.\n\n" +
-            "La règle d'or : après chaque macrotâche, l'event loop vide entièrement la file des microtâches avant de reprendre la macrotâche suivante. Les microtâches passent toujours devant.\n\n" +
-            "### Le cas qui départage tout le monde\n\n" +
+            "## Le quiz d'entretien que tout le monde rate\n\n" +
             "```js\n" +
-            "console.log(\"1 synchrone\");\n" +
-            "setTimeout(() => console.log(\"2 macrotache\"), 0);\n" +
-            "Promise.resolve().then(() => console.log(\"3 microtache\"));\n" +
-            "console.log(\"4 synchrone\");\n" +
+            "console.log(\"1\");\n" +
+            "setTimeout(() => console.log(\"2\"), 0);\n" +
+            "Promise.resolve().then(() => console.log(\"3\"));\n" +
+            "console.log(\"4\");\n" +
+            "// 1, 4, 3, 2\n" +
             "```\n\n" +
-            "L'ordre affiché est : `1 synchrone`, `4 synchrone`, `3 microtache`, `2 macrotache`. Décortiquons. Les deux `console.log` synchrones partent d'abord, dans l'ordre. Le `setTimeout` met sa fonction en macrotâche, le `.then` en microtâche. La pile se vide. L'event loop vide alors les microtâches : `3` s'affiche. Puis, seulement, il prend la macrotâche : `2`.\n\n" +
-            "Le `setTimeout(..., 0)` n'est donc pas « exécuter tout de suite ». C'est « exécuter au prochain tour de macrotâche, après tout le synchrone et toutes les microtâches en attente ». Un `.then` planifié plus tard s'exécutera avant lui.\n\n" +
-            "### Pourquoi ça compte en vrai\n\n" +
-            "Une boucle qui empile des microtâches sans jamais rendre la main peut affamer le rendu et geler la page, parce que le navigateur ne repeint qu'entre les macrotâches. À l'inverse, si vous avez besoin d'exécuter du code « juste après le code courant mais avant tout timer », `queueMicrotask` est l'outil précis, plus fiable qu'un `setTimeout(fn, 0)`.\n\n" +
+            "Le `setTimeout` à 0 ms passe APRÈS la promesse. Si tu sais expliquer pourquoi sans réciter, tu comprends l'event loop ; sinon, cette leçon est la plus rentable du cours, parce que ce mécanisme explique la moitié des bugs asynchrones que tu croiseras.\n\n" +
+            "### Le modèle : une pile, des files\n\n" +
+            "JavaScript exécute ton code sur UN seul thread, avec une pile d'appels (call stack). Les opérations lentes (timer, réseau, disque) sont déléguées à l'hôte : les API du navigateur ou les threads internes de Node. Quand elles aboutissent, leurs callbacks ne s'exécutent pas immédiatement : ils sont mis en file d'attente. L'event loop est la boucle qui, dès que la pile est vide, prend le prochain callback en file et l'exécute.\n\n" +
+            "Le point que 90 % des tutoriels survolent : il y a DEUX files, avec des priorités différentes.\n\n" +
+            "- La file des macrotâches : callbacks de `setTimeout`/`setInterval`, événements DOM, I/O.\n" +
+            "- La file des microtâches : callbacks de `.then`/`.catch`/`.finally`, `queueMicrotask`, `MutationObserver`.\n\n" +
+            "La règle de la spec HTML : après chaque macrotâche (y compris le script initial), la file des microtâches est vidée ENTIÈREMENT avant de passer à la macrotâche suivante. Une microtâche qui planifie une microtâche prolonge cette vidange ; c'est pour ça qu'une chaîne de promesses peut affamer les timers.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"L'event loop : la pile execute, l'hote delegue, et les microtaches passent TOUJOURS avant la prochaine macrotache\"}\n" +
+            "<svg viewBox=\"0 0 640 340\" role=\"img\"><title>Event loop : call stack, API hote, files macro et micro</title>\n" +
+            "<rect x=\"30\" y=\"40\" width=\"170\" height=\"130\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"115\" y=\"28\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">call stack</text>\n" +
+            "<rect x=\"42\" y=\"130\" width=\"146\" height=\"28\" fill=\"currentColor\" opacity=\"0.15\" rx=\"3\"/>\n" +
+            "<text x=\"115\" y=\"149\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">script en cours</text>\n" +
+            "<rect x=\"440\" y=\"40\" width=\"170\" height=\"70\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"525\" y=\"28\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">API hote</text>\n" +
+            "<text x=\"525\" y=\"68\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">setTimeout, fetch,</text>\n" +
+            "<text x=\"525\" y=\"88\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">evenements DOM</text>\n" +
+            "<rect x=\"360\" y=\"170\" width=\"250\" height=\"44\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"485\" y=\"197\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">macrotaches : [ timeout cb ]</text>\n" +
+            "<rect x=\"360\" y=\"240\" width=\"250\" height=\"44\" fill=\"none\" class=\"fig-accent\" stroke-width=\"2\" rx=\"3\"/>\n" +
+            "<text x=\"485\" y=\"267\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" class=\"fig-accent\">microtaches : [ then cb ]</text>\n" +
+            "<text x=\"485\" y=\"310\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" class=\"fig-accent\">videe ENTIEREMENT d'abord</text>\n" +
+            "<line x1=\"200\" y1=\"70\" x2=\"434\" y2=\"70\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"440,70 430,65 430,75\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<text x=\"310\" y=\"60\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">delegue</text>\n" +
+            "<line x1=\"470\" y1=\"110\" x2=\"470\" y2=\"164\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"470,170 465,160 475,160\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<line x1=\"360\" y1=\"262\" x2=\"120\" y2=\"180\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"115,178 127,177 122,187\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<text x=\"210\" y=\"245\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">event loop : pile vide ?</text>\n" +
+            "<text x=\"210\" y=\"263\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">micro d'abord, puis macro</text>\n" +
+            "</svg>\n" +
+            "```\n\n" +
+            "Relis le quiz d'ouverture avec ce modèle : `1` et `4` s'affichent pendant la macrotâche « script ». À la fin du script, la pile se vide ; l'event loop vide les microtâches, donc `3`. Ensuite seulement, la macrotâche du timer : `2`.\n\n" +
+            "### async/await dans ce modèle\n\n" +
+            "Une fonction `async` s'exécute de façon SYNCHRONE jusqu'au premier `await`, puis rend la main ; la suite est replanifiée en microtâche :\n\n" +
             "```js\n" +
-            "queueMicrotask(() => console.log(\"après le synchrone, avant les timers\"));\n" +
+            "async function f() {\n" +
+            "  console.log(\"A\");\n" +
+            "  await null;\n" +
+            "  console.log(\"C\");\n" +
+            "}\n" +
+            "f();\n" +
+            "console.log(\"B\");\n" +
+            "// A, B, C\n" +
             "```\n\n" +
-            "> À retenir : synchrone d'abord, puis toutes les microtâches, puis une macrotâche, puis de nouveau toutes les microtâches, et ainsi de suite. Gardez ce cycle en tête et l'asynchronisme cesse d'être magique.\n\n" +
-            "Explication détaillée : [la boucle d'événements (MDN)](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Execution_model).\n",
+            "`await` n'endort rien : il découpe ta fonction en deux, et la seconde moitié devient une microtâche.\n\n" +
+            "### Les pièges de timing à connaître\n\n" +
+            "- `setTimeout(fn, 0)` ne garantit pas 0 ms : c'est un délai MINIMUM, exécuté quand la pile est vide et les microtâches épuisées. Dans les navigateurs, les timeouts imbriqués au-delà de 5 niveaux sont de plus clampés à 4 ms minimum (spec HTML), et les onglets en arrière-plan sont throttlés à 1 s ou plus.\n" +
+            "- Une tâche synchrone longue bloque TOUT : timers, rendus, clics. Si un calcul prend 800 ms, l'interface gèle 800 ms. Aucune promesse ne « parallélise » du calcul pur ; pour ça il faut un Worker (partie 6).\n" +
+            "- Sous Node, `process.nextTick` passe encore avant les microtâches de promesses : réserve-le aux bibliothèques, `queueMicrotask` est l'équivalent standard.\n" +
+            "- La famine de microtâches est réelle : une boucle qui fait `Promise.resolve().then(boucle)` ne rend JAMAIS la main aux macrotâches. Le même code avec `setTimeout(boucle, 0)` laisse respirer le rendu.\n\n" +
+            "## À toi\n\n" +
+            "Dans quel ordre s'affichent les lettres ?\n\n" +
+            "```js\n" +
+            "setTimeout(() => console.log(\"a\"), 0);\n" +
+            "Promise.resolve()\n" +
+            "  .then(() => console.log(\"b\"))\n" +
+            "  .then(() => console.log(\"c\"));\n" +
+            "queueMicrotask(() => console.log(\"d\"));\n" +
+            "console.log(\"e\");\n" +
+            "```\n\n" +
+            "> `e, b, d, c, a`. Le script affiche `e`. Vidange des microtâches dans l'ordre d'enfilement : `b` (déjà planifié), puis `d` ; le `.then` de `c` n'est enfilé QUE quand `b` se termine, donc il passe après `d`, mais toujours dans la même vidange. Le timer `a` ferme la marche. Si tu as mis `d` après `c`, tu viens d'apprendre que chaque maillon d'une chaîne `.then` est une microtâche distincte, pas un bloc.\n",
         },
         {
           id: "l16",
-          title: "Des callbacks aux Promises",
+          title: "Les Promises : états, chaînage et cycle de vie",
           type: "text",
-          duration: "15 min",
+          duration: "18 min",
           body:
-            "## Le problème que les Promises résolvent\n\n" +
-            "Avant les Promises, l'asynchronisme passait par des callbacks : on passait une fonction à appeler « quand ce sera prêt ». Ça marche, mais ça se dégrade vite dès qu'on enchaîne des étapes.\n\n" +
-            "### L'enfer des callbacks\n\n" +
-            "```js\n" +
-            "chargerUser(id, (err, user) => {\n" +
-            "  if (err) return gerer(err);\n" +
-            "  chargerCommandes(user, (err, commandes) => {\n" +
-            "    if (err) return gerer(err);\n" +
-            "    chargerDetails(commandes, (err, details) => {\n" +
-            "      if (err) return gerer(err);\n" +
-            "      afficher(details);\n" +
-            "    });\n" +
-            "  });\n" +
-            "});\n" +
-            "```\n\n" +
-            "Trois niveaux d'imbrication, la gestion d'erreur répétée à chaque étage, une lecture qui part vers la droite. Ajoutez une quatrième étape et ça devient ingérable.\n\n" +
-            "### Une Promise, trois états\n\n" +
-            "Une Promise représente une valeur future. Elle est dans un de trois états : `pending` (en attente), `fulfilled` (résolue avec une valeur), ou `rejected` (échouée avec une raison). Une fois résolue ou rejetée, elle est figée : elle ne change plus.\n\n" +
+            "## Un objet, trois états, aucune magie\n\n" +
+            "Une Promise n'est ni un thread ni un callback amélioré : c'est un objet qui représente une valeur future, avec une machine à états minuscule. Elle naît `pending`, puis passe UNE seule fois soit à `fulfilled` (avec une valeur), soit à `rejected` (avec une raison). Une fois settled, plus rien ne la change : les `resolve` ou `reject` suivants sont ignorés en silence.\n\n" +
             "```js\n" +
             "const p = new Promise((resolve, reject) => {\n" +
-            "  setTimeout(() => resolve(42), 1000);\n" +
+            "  setTimeout(() => resolve(\"donnees\"), 1000);\n" +
             "});\n" +
-            "p.then((valeur) => console.log(valeur)); // 42 après une seconde\n" +
             "```\n\n" +
-            "Dans la pratique, vous créez rarement une Promise à la main. Les API modernes en renvoient déjà, comme `fetch`.\n\n" +
-            "### Chaîner à plat\n\n" +
-            "Le vrai gain, c'est le chaînage. Chaque `.then` renvoie une nouvelle Promise, et ce que vous retournez dedans devient la valeur du maillon suivant. L'imbrication disparaît.\n\n" +
+            "Détail que peu de gens savent : l'executor (la fonction passée au constructeur) s'exécute de façon SYNCHRONE, immédiatement. Seuls les callbacks de `.then` sont différés :\n\n" +
             "```js\n" +
-            "chargerUser(id)\n" +
-            "  .then((user) => chargerCommandes(user))\n" +
-            "  .then((commandes) => chargerDetails(commandes))\n" +
-            "  .then((details) => afficher(details))\n" +
-            "  .catch((err) => gerer(err));\n" +
+            "console.log(\"avant\");\n" +
+            "new Promise((resolve) => {\n" +
+            "  console.log(\"executor\");\n" +
+            "  resolve();\n" +
+            "}).then(() => console.log(\"then\"));\n" +
+            "console.log(\"apres\");\n" +
+            "// avant, executor, apres, then\n" +
             "```\n\n" +
-            "Un seul `.catch` en fin de chaîne attrape l'erreur de n'importe quelle étape précédente. C'est le point crucial : une rejection saute par-dessus tous les `.then` restants et file directement au premier `.catch`. Fini le `if (err)` répété.\n\n" +
-            "### Le piège à éviter\n\n" +
-            "Retournez toujours la Promise dans un `.then` qui en produit une, sinon vous cassez la chaîne et perdez la gestion d'erreur.\n\n" +
+            "Même sur une promesse déjà résolue, `.then` passe par la file des microtâches. La spec garantit ainsi qu'un callback est TOUJOURS asynchrone : pas de code « parfois sync, parfois async », la source de bugs que Node appelait « releasing Zalgo » à l'époque des callbacks.\n\n" +
+            "```figure\n" +
+            "{\"caption\": \"Cycle de vie : pending se fixe UNE fois ; then/catch reagissent, finally passe dans les deux cas\"}\n" +
+            "<svg viewBox=\"0 0 640 280\" role=\"img\"><title>Cycle de vie d'une Promise</title>\n" +
+            "<rect x=\"40\" y=\"110\" width=\"140\" height=\"48\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"110\" y=\"139\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">pending</text>\n" +
+            "<rect x=\"300\" y=\"40\" width=\"160\" height=\"48\" fill=\"none\" class=\"fig-accent\" stroke-width=\"2\" rx=\"3\"/>\n" +
+            "<text x=\"380\" y=\"69\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" class=\"fig-accent\">fulfilled</text>\n" +
+            "<rect x=\"300\" y=\"180\" width=\"160\" height=\"48\" fill=\"none\" stroke=\"currentColor\" opacity=\"0.7\" rx=\"3\"/>\n" +
+            "<text x=\"380\" y=\"209\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"13\" fill=\"currentColor\">rejected</text>\n" +
+            "<line x1=\"180\" y1=\"120\" x2=\"294\" y2=\"70\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"300,68 289,72 293,80\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<text x=\"225\" y=\"78\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">resolve(v)</text>\n" +
+            "<line x1=\"180\" y1=\"148\" x2=\"294\" y2=\"198\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"300,200 289,196 293,188\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<text x=\"225\" y=\"196\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">reject(e)</text>\n" +
+            "<line x1=\"460\" y1=\"64\" x2=\"554\" y2=\"64\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"560,64 550,59 550,69\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<text x=\"595\" y=\"69\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">then</text>\n" +
+            "<line x1=\"460\" y1=\"204\" x2=\"554\" y2=\"204\" stroke=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<polygon points=\"560,204 550,199 550,209\" fill=\"currentColor\" opacity=\"0.6\"/>\n" +
+            "<text x=\"595\" y=\"209\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\">catch</text>\n" +
+            "<text x=\"380\" y=\"144\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">settled : ne change plus</text>\n" +
+            "<text x=\"380\" y=\"262\" text-anchor=\"middle\" font-family=\"ui-monospace, monospace\" font-size=\"12\" fill=\"currentColor\" opacity=\"0.7\">finally : execute dans les deux cas</text>\n" +
+            "</svg>\n" +
+            "```\n\n" +
+            "### Le chaînage : chaque then crée une promesse neuve\n\n" +
             "```js\n" +
-            "// mauvais : la Promise interne n'est pas retournée\n" +
-            ".then((user) => { chargerCommandes(user); }) // le maillon suivant reçoit undefined\n" +
-            "// bon\n" +
-            ".then((user) => chargerCommandes(user))\n" +
+            "fetch(\"/api/user\")\n" +
+            "  .then((res) => res.json())\n" +
+            "  .then((user) => fetch(\"/api/commandes/\" + user.id))\n" +
+            "  .then((res) => res.json())\n" +
+            "  .catch((err) => console.error(\"Echec :\", err.message))\n" +
+            "  .finally(() => cacherSpinner());\n" +
             "```\n\n" +
-            "### finally\n\n" +
-            "`.finally(fn)` s'exécute quel que soit le résultat, résolu ou rejeté. Idéal pour couper un indicateur de chargement.\n\n" +
+            "Trois règles font tout le système :\n\n" +
+            "- `.then` renvoie une NOUVELLE promesse, résolue avec la valeur de retour du callback. Retourner une valeur la propage ; retourner une promesse insère son attente dans la chaîne (c'est l'aplatissement automatique : jamais de promesse de promesse).\n" +
+            "- Un `throw` dans un callback rejette la promesse renvoyée. Le rejet saute tous les `.then` suivants jusqu'au premier `.catch`, qui, s'il retourne normalement, REMET la chaîne sur la voie fulfilled.\n" +
+            "- `.finally` ne reçoit rien et transmet le règlement tel quel ; parfait pour le nettoyage (spinner, verrou), inutilisable pour transformer la valeur.\n\n" +
+            "Le bug de débutant à bannir : oublier le `return`. `p.then((v) => { traiter(v); })` renvoie une promesse résolue avec `undefined`, et le maillon suivant reçoit `undefined` au lieu du résultat. Une heure de debug garantie la première fois.\n\n" +
+            "### ES2024 : Promise.withResolvers\n\n" +
+            "Quand la résolution vient d'AILLEURS (un événement, un message WebSocket), on sortait `resolve` de l'executor à la main. C'est maintenant du langage :\n\n" +
             "```js\n" +
-            "montrerSpinner();\n" +
-            "charger().then(afficher).catch(gerer).finally(cacherSpinner);\n" +
+            "const { promise, resolve, reject } = Promise.withResolvers();\n" +
+            "socket.addEventListener(\"message\", (e) => resolve(e.data), { once: true });\n" +
+            "const premierMessage = await promise;\n" +
             "```\n\n" +
-            "> À retenir : la Promise remplace l'imbrication par une chaîne plate et centralise les erreurs dans un `.catch`. C'est la fondation sur laquelle async/await, à la leçon suivante, ajoute juste une syntaxe.\n",
+            "Node 22+, tous les navigateurs 2024. Ne t'en sers pas pour envelopper du code qui pourrait être une simple chaîne : c'est l'outil des ponts entre monde événementiel et monde promesse.\n\n" +
+            "Dernier réflexe d'hygiène : une promesse rejetée sans aucun `.catch` (ni `await` dans un `try`) finit en rejet non géré. Le navigateur émet l'événement `unhandledrejection` ; Node, lui, TERMINE le processus par défaut avec un rapport `UnhandledPromiseRejection`. Toute chaîne qui part « dans le vide » doit se terminer par un `.catch`, même minimal.\n\n" +
+            "## À toi\n\n" +
+            "Que logge ce code ?\n\n" +
+            "```js\n" +
+            "Promise.reject(new Error(\"boom\"))\n" +
+            "  .catch((e) => 42)\n" +
+            "  .then((v) => console.log(\"valeur :\", v));\n" +
+            "```\n\n" +
+            "> `valeur : 42`. Le `.catch` a géré le rejet et a retourné normalement : la promesse qu'il renvoie est FULFILLED avec 42, et le `.then` suivant s'exécute. Un `catch` n'est pas une fin de chaîne, c'est un aiguillage : pour re-signaler l'erreur au reste de la chaîne, il faudrait relancer avec `throw e`.\n",
         },
         {
           id: "l17",
-          title: "async/await et la gestion d'erreurs asynchrones",
+          title: "async/await : le confort et ses pièges",
           type: "text",
-          duration: "15 min",
+          duration: "17 min",
           body:
-            "## Écrire de l'asynchrone qui se lit comme du synchrone\n\n" +
-            "`async/await` est du sucre syntaxique posé sur les Promises. Aucune nouvelle capacité, mais un code bien plus lisible. Une fonction `async` renvoie toujours une Promise. À l'intérieur, `await` met en pause la fonction jusqu'à ce que la Promise attendue se résolve, et renvoie sa valeur.\n\n" +
-            "### La même chaîne, en linéaire\n\n" +
+            "## Le sucre le plus utile du langage\n\n" +
+            "`async/await` ne remplace pas les promesses : il les habille. Une fonction `async` renvoie TOUJOURS une promesse (même `async function f() { return 42; }` renvoie une promesse de 42), et `await` suspend la fonction jusqu'au règlement, en rendant la main à l'event loop pendant l'attente (leçon 15). Le gain, c'est que le flux de contrôle normal fonctionne à nouveau : `try/catch`, boucles, retours anticipés.\n\n" +
             "```js\n" +
-            "async function afficherDetails(id) {\n" +
-            "  const user = await chargerUser(id);\n" +
-            "  const commandes = await chargerCommandes(user);\n" +
-            "  const details = await chargerDetails(commandes);\n" +
-            "  afficher(details);\n" +
-            "}\n" +
-            "```\n\n" +
-            "On lit ça de haut en bas comme du code classique. Mais souvenez-vous de la leçon sur l'event loop : chaque `await` rend la main au moteur, qui va traiter d'autres tâches pendant l'attente. Rien n'est bloqué, malgré l'apparence séquentielle.\n\n" +
-            "### La gestion d'erreurs : try/catch\n\n" +
-            "Avec `await`, une Promise rejetée devient une exception qu'on attrape avec `try/catch` ordinaire. C'est le grand confort de la syntaxe.\n\n" +
-            "```js\n" +
-            "async function chargerProfil(id) {\n" +
+            "async function chargerCommandes(userId) {\n" +
             "  try {\n" +
-            "    const reponse = await fetch(`/api/users/${id}`);\n" +
-            "    if (!reponse.ok) {\n" +
-            "      throw new Error(`HTTP ${reponse.status}`);\n" +
+            "    const res = await fetch(\"/api/commandes/\" + userId);\n" +
+            "    if (!res.ok) {\n" +
+            "      throw new Error(\"HTTP \" + res.status);\n" +
             "    }\n" +
-            "    return await reponse.json();\n" +
+            "    return await res.json();\n" +
             "  } catch (err) {\n" +
-            "    console.error(\"Chargement échoué\", err);\n" +
-            "    return null;\n" +
+            "    console.error(\"Chargement impossible :\", err.message);\n" +
+            "    return [];\n" +
             "  }\n" +
             "}\n" +
             "```\n\n" +
-            "Attention à un piège classique de `fetch` : il ne rejette que sur une erreur réseau. Une réponse 404 ou 500 est considérée comme réussie, avec `ok` à `false`. Il faut donc tester `reponse.ok` explicitement et lever soi-même, comme ci-dessus. Beaucoup de bugs viennent de ce détail.\n\n" +
-            "### Le piège de la séquence inutile\n\n" +
-            "Chaîner des `await` indépendants les met en série sans raison, et vous payez la somme des attentes.\n\n" +
+            "Deux pièges dans ces dix lignes. D'abord `fetch` : il ne rejette QUE sur erreur réseau. Un 404 ou un 500 est une promesse FULFILLED, avec `res.ok` à false. Sans le test `res.ok`, tu parses joyeusement une page d'erreur HTML et tu récoltes un `SyntaxError` de JSON trois lignes plus loin, loin de la vraie cause.\n\n" +
+            "Ensuite `return await` : hors `try/catch`, `return maPromesse` suffit (l'appelant attendra pareil). Mais DANS un `try`, la différence est fonctionnelle : avec `return res.json()` sans `await`, si le parsing rejette, le rejet se produit APRÈS la sortie du `try` et échappe à ton `catch`. `return await` garde l'erreur attrapable localement. La règle ESLint `no-return-await` déconseillait `return await` partout ; elle a été dépréciée précisément parce que dans un `try`, il est correct.\n\n" +
+            "### Séquentiel ou parallèle : le choix qui coûte des secondes\n\n" +
             "```js\n" +
-            "// lent : 300 ms + 300 ms = 600 ms\n" +
-            "const a = await fetchA();\n" +
-            "const b = await fetchB();\n" +
+            "// sequentiel : ~400 ms si chaque appel prend 200 ms\n" +
+            "const user = await fetchUser();\n" +
+            "const meteo = await fetchMeteo();\n" +
+            "// parallele : ~200 ms, les deux partent immediatement\n" +
+            "const [user2, meteo2] = await Promise.all([fetchUser(), fetchMeteo()]);\n" +
             "```\n\n" +
-            "Si `fetchB` ne dépend pas de `a`, lancez les deux d'abord, attendez ensuite. On y revient avec `Promise.all` à la prochaine leçon.\n\n" +
+            "`await` en série additionne les latences. Quand les requêtes sont indépendantes, lance-les d'abord (l'appel crée la promesse et démarre le travail), attends ensuite. Sur une page qui fait 5 appels API à 200 ms, c'est 1 s contre 200 ms : la différence est visible à l'œil nu, aucun benchmark nécessaire.\n\n" +
+            "### Le piège forEach, en entretien et en prod\n\n" +
             "```js\n" +
-            "// rapide : les deux en parallèle, ~300 ms\n" +
-            "const [a, b] = await Promise.all([fetchA(), fetchB()]);\n" +
+            "const ids = [1, 2, 3];\n" +
+            "ids.forEach(async (id) => {\n" +
+            "  const data = await fetchDetail(id);\n" +
+            "  console.log(data);\n" +
+            "});\n" +
+            "console.log(\"fini\");\n" +
+            "// \"fini\" s'affiche AVANT le moindre detail\n" +
             "```\n\n" +
-            "### Ne pas oublier le await\n\n" +
-            "Oublier un `await` sur un appel `async` est sournois : la fonction continue avec une Promise en attente au lieu de la valeur, et une erreur devient une rejection non gérée, silencieuse. Un linter avec la règle `no-floating-promises` attrape ça.\n\n" +
-            "> À retenir : `async/await` ne remplace pas les Promises, il les rend lisibles. `try/catch` pour les erreurs, `reponse.ok` à vérifier sur `fetch`, et `Promise.all` dès que des attentes sont indépendantes.\n",
+            "`forEach` ignore la valeur de retour de son callback : les trois promesses partent, personne ne les attend, et les erreurs éventuelles deviennent des rejets non gérés. Les correctifs, selon l'intention :\n\n" +
+            "```js\n" +
+            "// sequentiel, ordre garanti\n" +
+            "for (const id of ids) {\n" +
+            "  console.log(await fetchDetail(id));\n" +
+            "}\n" +
+            "// parallele, on attend tout\n" +
+            "const details = await Promise.all(ids.map((id) => fetchDetail(id)));\n" +
+            "```\n\n" +
+            "`map` + `Promise.all` est l'idiome standard du parallèle. Nuance d'expert : sur 500 ids, ça ouvre 500 requêtes simultanées, et ton API va répondre 429. Pour un vrai volume, il faut limiter la concurrence (une bibliothèque comme `p-limit`, ou des lots de 10) ; le langage ne fournit pas encore de limiteur natif.\n\n" +
+            "### Les erreurs qu'on laisse fuir\n\n" +
+            "Une fonction `async` appelée sans `await` ni `.catch` est une bombe silencieuse. Sous Node, un rejet non géré affiche un rapport `UnhandledPromiseRejection` précisant « This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled » et termine le processus. Les endroits classiques où ça arrive : un handler d'événement (`button.addEventListener(\"click\", async () => ...)`), un callback de `setInterval`, le top-level d'un script. Dans ces positions « fire and forget », mets un `try/catch` interne : personne d'autre ne rattrapera.\n\n" +
+            "## À toi\n\n" +
+            "Combien de temps prend `principale()`, si chaque tache prend 100 ms ?\n\n" +
+            "```js\n" +
+            "async function principale() {\n" +
+            "  const a = tache(\"a\");\n" +
+            "  const b = tache(\"b\");\n" +
+            "  return [await a, await b];\n" +
+            "}\n" +
+            "```\n\n" +
+            "> Environ 100 ms, pas 200. Les deux appels `tache(...)` démarrent AVANT le premier `await` : les promesses courent déjà en parallèle, les `await` successifs ne font qu'encaisser les résultats. C'est le pattern « lance d'abord, attends ensuite » sans `Promise.all`. Sa limite : si `a` rejette pendant que `b` n'est pas encore attendue, on peut se retrouver avec un rejet non géré sur `b` ; `Promise.all([tache(\"a\"), tache(\"b\")])` gère ce cas proprement, c'est pour ça qu'on le préfère.\n",
         },
         {
           id: "l18",
-          title: "Promise.all, race, allSettled et any",
+          title: "Orchestrer : all, allSettled, race, any",
           type: "text",
-          duration: "14 min",
+          duration: "17 min",
           body:
-            "## Combiner plusieurs opérations asynchrones\n\n" +
-            "Dès qu'on manipule plusieurs Promises à la fois, quatre combinateurs couvrent les besoins. Les confondre mène à des bugs subtils, notamment sur la gestion d'échec. Voici quand utiliser chacun.\n\n" +
-            "### Promise.all : tout ou rien\n\n" +
-            "`Promise.all` attend que toutes les Promises réussissent et renvoie un tableau de résultats, dans l'ordre d'entrée. Mais si une seule échoue, l'ensemble rejette immédiatement avec cette erreur, sans attendre les autres.\n\n" +
+            "## Quatre combinateurs, quatre contrats\n\n" +
+            "Le langage fournit quatre fonctions statiques pour coordonner plusieurs promesses. Elles se ressemblent et ne sont PAS interchangeables : chacune a un contrat de succès et d'échec différent, et choisir la mauvaise donne des bugs subtils, pas des erreurs franches.\n\n" +
+            "| Combinateur | Réussit quand | Échoue quand | Cas d'usage |\n" +
+            "| --- | --- | --- | --- |\n" +
+            "| `Promise.all` | toutes réussissent | UNE échoue (fail-fast) | données interdépendantes |\n" +
+            "| `Promise.allSettled` | toujours (jamais de rejet) | jamais | lot d'opérations indépendantes |\n" +
+            "| `Promise.race` | la 1re SETTLED gagne | si la 1re settled est un rejet | timeout, course simple |\n" +
+            "| `Promise.any` | la 1re FULFILLED gagne | toutes échouent (AggregateError) | premier miroir qui répond |\n\n" +
+            "### all : tout ou rien\n\n" +
             "```js\n" +
-            "const [user, config, stats] = await Promise.all([\n" +
-            "  fetchUser(),\n" +
-            "  fetchConfig(),\n" +
-            "  fetchStats(),\n" +
+            "const [user, commandes, avis] = await Promise.all([\n" +
+            "  fetchUser(id), fetchCommandes(id), fetchAvis(id),\n" +
             "]);\n" +
             "```\n\n" +
-            "C'est le bon choix quand vous avez besoin de tous les résultats pour continuer, et qu'un échec doit tout interrompre. Le fait qu'il rejette à la première erreur est une fonctionnalité, pas un défaut : inutile d'afficher une page à moitié chargée.\n\n" +
-            "### Promise.allSettled : ne jamais rejeter\n\n" +
-            "`allSettled` attend que toutes les Promises se terminent, réussite ou échec, et renvoie un tableau d'objets décrivant chaque issue. Il ne rejette jamais.\n\n" +
+            "Résultats dans l'ORDRE des promesses passées, pas dans l'ordre d'arrivée. Fail-fast : au premier rejet, `all` rejette immédiatement avec CETTE erreur. Les autres promesses ne sont pas annulées pour autant, elles continuent en arrière-plan : une promesse, une fois lancée, ne s'annule pas de l'extérieur.\n\n" +
+            "### allSettled : le rapport complet\n\n" +
             "```js\n" +
-            "const resultats = await Promise.allSettled([fetchA(), fetchB(), fetchC()]);\n" +
+            "const resultats = await Promise.allSettled(urls.map((u) => fetch(u)));\n" +
             "for (const r of resultats) {\n" +
-            "  if (r.status === \"fulfilled\") console.log(\"OK\", r.value);\n" +
-            "  else console.warn(\"KO\", r.reason);\n" +
+            "  if (r.status === \"fulfilled\") { traiter(r.value); }\n" +
+            "  else { console.warn(\"echec :\", r.reason.message); }\n" +
             "}\n" +
             "```\n\n" +
-            "C'est le choix pour des opérations indépendantes dont vous voulez le bilan complet : envoyer trois notifications, en réussir deux, et savoir laquelle a échoué sans perdre les autres.\n\n" +
-            "### Promise.race : le premier qui arrive\n\n" +
-            "`race` se règle dès qu'une Promise se termine, réussie ou rejetée, et adopte son issue. L'usage type est le timeout.\n\n" +
+            "Jamais de rejet : chaque entrée devient `{ status: \"fulfilled\", value }` ou `{ status: \"rejected\", reason }`. C'est le bon choix quand un échec partiel est acceptable, l'envoi de 20 notifications par exemple : perdre les 19 autres parce que la 7e a échoué (ce que ferait `all`) serait absurde.\n\n" +
+            "### race et le timeout\n\n" +
+            "`race` règle sur la PREMIÈRE promesse settled, succès ou échec. Son usage historique, le timeout :\n\n" +
             "```js\n" +
-            "function avecTimeout(promesse, ms) {\n" +
-            "  const limite = new Promise((_, reject) =>\n" +
-            "    setTimeout(() => reject(new Error(\"Timeout\")), ms)\n" +
-            "  );\n" +
-            "  return Promise.race([promesse, limite]);\n" +
-            "}\n" +
-            "await avecTimeout(fetch(\"/lent\"), 3000);\n" +
-            "```\n\n" +
-            "Si la vraie requête n'a pas répondu en 3 secondes, la Promise de timeout gagne la course et rejette.\n\n" +
-            "### Promise.any : le premier qui réussit\n\n" +
-            "`any` se règle dès qu'une Promise réussit, en ignorant les échecs. Il ne rejette que si toutes échouent, avec une `AggregateError` qui rassemble les raisons.\n\n" +
-            "```js\n" +
-            "// interroge trois miroirs, garde la première réponse valable\n" +
-            "const rapide = await Promise.any([\n" +
-            "  fetch(\"https://miroir1/data\"),\n" +
-            "  fetch(\"https://miroir2/data\"),\n" +
-            "  fetch(\"https://miroir3/data\"),\n" +
+            "const res = await Promise.race([\n" +
+            "  fetch(\"/api/lente\"),\n" +
+            "  new Promise((_, reject) =>\n" +
+            "    setTimeout(() => reject(new Error(\"Timeout 3s\")), 3000)),\n" +
             "]);\n" +
             "```\n\n" +
-            "### Le tableau récapitulatif\n\n" +
-            "- `all` : toutes réussissent, sinon rejette à la première erreur.\n" +
-            "- `allSettled` : attend tout le monde, ne rejette jamais, renvoie le bilan.\n" +
-            "- `race` : la première terminée gagne, réussite comme échec.\n" +
-            "- `any` : la première réussie gagne, ne rejette que si toutes échouent.\n\n" +
-            "> À retenir : le piège numéro un est d'utiliser `all` là où `allSettled` était voulu, et de perdre tous les résultats à cause d'un seul échec. Choisissez selon ce qu'un échec doit provoquer.\n",
+            "Honnêteté technique : perdre la course n'ANNULE pas la requête, elle continue de consommer le réseau. La version moderne annule vraiment :\n\n" +
+            "```js\n" +
+            "const res = await fetch(\"/api/lente\", { signal: AbortSignal.timeout(3000) });\n" +
+            "// au-dela de 3 s : rejet avec une DOMException nommee TimeoutError\n" +
+            "```\n\n" +
+            "`AbortSignal.timeout` est disponible partout depuis 2022-2023 (Node 17.3+). Je te déconseille le pattern `race` + timer pour les requêtes HTTP en 2026 : il laisse fuir des connexions.\n\n" +
+            "### any et AggregateError\n\n" +
+            "`any` veut UN succès, n'importe lequel : les rejets sont ignorés tant qu'il reste de l'espoir. Si TOUTES échouent :\n\n" +
+            "```js\n" +
+            "await Promise.any([\n" +
+            "  Promise.reject(new Error(\"a\")),\n" +
+            "  Promise.reject(new Error(\"b\")),\n" +
+            "]);\n" +
+            "// AggregateError: All promises were rejected\n" +
+            "// err.errors -> [Error: a, Error: b]\n" +
+            "```\n\n" +
+            "L'`AggregateError` porte le tableau `errors` avec chaque échec individuel : logge-le, sinon tu ne sauras jamais pourquoi les miroirs sont tous tombés.\n\n" +
+            "### Les cas limites qui trahissent en production\n\n" +
+            "- `Promise.all([])` : fulfilled immédiatement avec `[]`. Sain.\n" +
+            "- `Promise.any([])` : rejette immédiatement (AggregateError), personne ne peut gagner.\n" +
+            "- `Promise.race([])` : reste PENDING pour toujours. Un `await` dessus ne revient jamais, sans erreur ni log. Si ta liste de promesses peut être vide (résultat d'un filtre), teste-la avant.\n\n" +
+            "Et une nouveauté ES2025 pour fiabiliser les frontières : `Promise.try(fn)` exécute `fn` immédiatement et capture aussi bien un `throw` synchrone qu'un rejet asynchrone dans la même chaîne `.catch`. Avant, une fonction qui lançait AVANT de renvoyer sa promesse échappait au `.catch` ; `Promise.try` uniformise les deux mondes (Node 23+, navigateurs 2024-2025).\n\n" +
+            "## À toi\n\n" +
+            "Tu envoies 50 emails via `envoyer(email)` qui renvoie une promesse. Cahier des charges : tous doivent être tentés, et tu veux la liste des échecs à la fin. Quel combinateur, et pourquoi pas `Promise.all` ?\n\n" +
+            "> `Promise.allSettled(emails.map(envoyer))`, puis un filtre sur `status === \"rejected\"` pour collecter les `reason`. `Promise.all` rejette au PREMIER échec : ton code de compte rendu ne s'exécuterait pas et tu perdrais le rapport des 49 autres (déjà parties, mais leurs résultats deviennent inobservables par cette voie). `all` répond à « tout doit réussir », `allSettled` à « tente tout, rapporte tout » : ici c'est le second contrat.\n",
         },
         {
           id: "l19",
-          title: "Quiz : asynchronisme",
+          title: "Quiz : l'asynchrone",
           type: "quiz",
-          duration: "7 min",
+          duration: "8 min",
           questions: [
             {
               id: "q18",
-              prompt: "Dans quel ordre s'affichent ces lignes : console.log('A'); setTimeout(() => console.log('B'), 0); Promise.resolve().then(() => console.log('C')); console.log('D'); ?",
-              options: ["A B C D", "A D C B", "A D B C", "A C D B"],
+              prompt: "Que garantit la file des microtâches par rapport aux macrotâches ?",
+              options: [
+                "Les microtâches s'exécutent en parallèle sur un autre thread",
+                "La file des microtâches est vidée entièrement après chaque macrotâche, avant la macrotâche suivante",
+                "Les macrotâches sont toujours prioritaires",
+                "Les deux files alternent une tâche chacune",
+              ],
               correctIndex: 1,
               explanation:
-                "A et D sont synchrones, affichés en premier. Puis l'event loop vide les microtâches avant les macrotâches : le .then (C, microtâche) passe avant le setTimeout (B, macrotâche). D'où A, D, C, B.",
+                "Après chaque macrotâche (y compris le script initial), l'event loop vide TOUTE la file des microtâches (.then, queueMicrotask) avant de prendre la macrotâche suivante (setTimeout, événements). C'est pour ça que Promise.resolve().then(...) passe avant setTimeout(..., 0).",
             },
             {
               id: "q19",
-              prompt: "Pourquoi fetch ne déclenche-t-il pas le catch sur une réponse HTTP 404 ?",
+              prompt: "Que renvoie une fonction déclarée async function f() { return 42; } ?",
               options: [
-                "C'est un bug de fetch",
-                "fetch ne rejette que sur erreur réseau ; une réponse 404 est une requête réussie avec ok à false",
-                "Il faut passer une option throwOnError",
-                "404 déclenche bien le catch",
-              ],
-              correctIndex: 1,
-              explanation:
-                "fetch considère qu'obtenir une réponse du serveur est un succès, quel que soit le code HTTP. Seule une panne réseau rejette. Pour traiter un 404 ou 500 comme une erreur, il faut tester response.ok et lever soi-même.",
-            },
-            {
-              id: "q20",
-              prompt: "Vous lancez trois envois de notifications indépendants et voulez le bilan complet même si l'un échoue. Quel combinateur ?",
-              options: [
-                "Promise.all",
-                "Promise.race",
-                "Promise.allSettled",
-                "Promise.any",
+                "Le nombre 42 directement",
+                "undefined",
+                "Une promesse qui se résout avec 42",
+                "Une erreur : return est interdit dans une fonction async",
               ],
               correctIndex: 2,
               explanation:
-                "Promise.all rejetterait à la première erreur et vous perdriez les résultats des autres. allSettled attend tout le monde, ne rejette jamais, et renvoie pour chaque Promise son status fulfilled/rejected avec la valeur ou la raison.",
+                "Une fonction async renvoie TOUJOURS une promesse. Une valeur retournée devient la valeur de résolution ; un throw devient un rejet. L'appelant doit await ou .then pour obtenir 42.",
+            },
+            {
+              id: "q20",
+              prompt: "Pourquoi vérifier res.ok après un await fetch(url) ?",
+              options: [
+                "Parce que fetch renvoie null en cas d'erreur HTTP",
+                "Parce que fetch ne rejette pas sur un statut 404 ou 500, seulement sur une erreur réseau",
+                "Parce que res.ok contient les données JSON",
+                "C'est inutile, le catch suffit",
+              ],
+              correctIndex: 1,
+              explanation:
+                "Un 404 ou un 500 est une réponse HTTP valide : la promesse de fetch est fulfilled et le catch ne se déclenche pas. res.ok vaut true seulement pour les statuts 200-299 ; sans ce test, on tente de parser une page d'erreur et le vrai problème est masqué.",
             },
             {
               id: "q21",
-              prompt: "const a = await fetchA(); const b = await fetchB(); où fetchB ne dépend pas de a. Quel est le problème ?",
+              prompt: "Quelle différence entre Promise.all et Promise.allSettled ?",
               options: [
-                "Aucun, c'est optimal",
-                "Les deux requêtes sont mises en série alors qu'elles pourraient être parallèles, doublant l'attente",
-                "await ne peut pas être utilisé deux fois",
-                "Il manque un try/catch",
+                "Aucune, allSettled est un alias moderne",
+                "all rejette dès le premier échec ; allSettled attend tout et décrit chaque résultat sans jamais rejeter",
+                "allSettled est plus rapide",
+                "all limite la concurrence à 6 promesses",
               ],
               correctIndex: 1,
               explanation:
-                "Chaque await bloque la suite de la fonction jusqu'à sa résolution. Comme fetchB est indépendant de a, les enchaîner additionne inutilement les durées. Promise.all([fetchA(), fetchB()]) les lance ensemble et attend la plus lente.",
+                "all est fail-fast : un seul rejet fait rejeter l'ensemble avec cette erreur. allSettled attend toutes les promesses et renvoie des objets { status, value } ou { status, reason } : le bon choix quand les opérations sont indépendantes et qu'un échec partiel est acceptable.",
             },
             {
               id: "q22",
-              prompt: "Que fait Promise.race([promesse, timeoutQuiRejetteApres3s]) ?",
+              prompt: "Dans quel ordre s'affiche : console.log(\"1\"); setTimeout(() => console.log(\"2\"), 0); Promise.resolve().then(() => console.log(\"3\")); console.log(\"4\"); ?",
               options: [
-                "Attend les deux et renvoie un tableau",
-                "Adopte l'issue de la première Promise terminée : si promesse répond avant 3 s elle gagne, sinon le timeout rejette",
-                "Renvoie toujours la promesse la plus rapide même si elle échoue plus tard",
-                "Ignore les rejets",
+                "1, 2, 3, 4",
+                "1, 4, 3, 2",
+                "1, 4, 2, 3",
+                "1, 3, 4, 2",
               ],
               correctIndex: 1,
               explanation:
-                "race se règle sur la première Promise à se terminer, réussite ou échec. Si la vraie promesse se résout avant le délai, on obtient sa valeur ; sinon le timeout se déclenche en premier et rejette avec l'erreur Timeout. C'est le motif standard de délai maximal.",
+                "Le script (macrotâche en cours) affiche 1 puis 4. La pile se vide, les microtâches passent d'abord : 3. Puis la macrotâche du timer : 2. Microtâches avant macrotâches, toujours.",
+            },
+            {
+              id: "q31",
+              prompt: "Que se passe-t-il avec ids.forEach(async (id) => { await traiter(id); }) suivi de console.log(\"fini\") ?",
+              options: [
+                "Les traitements sont attendus un par un, puis \"fini\" s'affiche",
+                "\"fini\" s'affiche avant les traitements : forEach ignore les promesses renvoyées par son callback",
+                "Une SyntaxError : async est interdit dans forEach",
+                "forEach attend automatiquement chaque callback async",
+              ],
+              correctIndex: 1,
+              explanation:
+                "forEach ne fait rien de la valeur de retour du callback : les promesses partent sans être attendues et \"fini\" s'affiche immédiatement. Pour du séquentiel : for...of avec await. Pour du parallèle contrôlé : await Promise.all(ids.map(traiter)).",
             },
           ],
         },
@@ -1092,239 +1626,256 @@ const course: Course = {
       lessons: [
         {
           id: "l20",
-          title: "Modules ES : import, export et ce qu'ils changent",
+          title: "Les modules ES : import, export et live bindings",
           type: "text",
-          duration: "14 min",
+          duration: "17 min",
           body:
-            "## Un fichier, un module, une portée\n\n" +
-            "Les modules ES sont le système d'organisation standard de JavaScript, dans le navigateur comme dans Node moderne. Chaque fichier module a sa propre portée : ses variables ne fuient pas dans le global, et on choisit explicitement ce qu'on expose et ce qu'on importe.\n\n" +
-            "### Export nommé\n\n" +
-            "On exporte plusieurs valeurs par leur nom. L'appelant importe exactement celles qu'il veut, entre accolades.\n\n" +
+            "## Un fichier = un module = une portée\n\n" +
+            "Avant 2015, tout script partageait le même espace global : deux bibliothèques qui déclaraient chacune un `utils` s'écrasaient mutuellement, et l'ordre des balises `<script>` était un château de cartes. Les modules ES règlent ça structurellement : chaque fichier a sa propre portée, n'expose QUE ce qu'il exporte, et déclare ses dépendances explicitement.\n\n" +
             "```js\n" +
             "// maths.js\n" +
-            "export const PI = 3.14159;\n" +
-            "export function aire(r) {\n" +
-            "  return PI * r * r;\n" +
-            "}\n" +
-            "```\n\n" +
-            "```js\n" +
+            "export const TVA = 1.2;\n" +
+            "export function ttc(prix) { return prix * TVA; }\n" +
+            "export default function arrondir(n) { return Math.round(n * 100) / 100; }\n" +
+            "\n" +
             "// app.js\n" +
-            "import { aire, PI } from \"./maths.js\";\n" +
-            "aire(2); // 12.56636\n" +
+            "import arrondir, { ttc, TVA as tauxTva } from \"./maths.js\";\n" +
             "```\n\n" +
-            "Les noms doivent correspondre. On peut renommer à l'import avec `as` : `import { aire as calculerAire } from \"./maths.js\"`.\n\n" +
-            "### Export par défaut\n\n" +
-            "Un module peut avoir un seul export par défaut, pour sa valeur principale. À l'import, on lui donne le nom qu'on veut, sans accolades.\n\n" +
+            "Exports nommés : autant que tu veux, importés entre accolades avec le nom EXACT (renommable via `as`). Export default : un seul, importé sous le nom que tu veux. Mon avis tranché, partagé par pas mal d'équipes (et par la doc TypeScript) : préfère les exports nommés. Ils cassent à la compilation si le nom change, l'auto-import de l'éditeur les trouve, et ils empêchent le même composant de s'appeler `Button` ici et `Btn` là-bas.\n\n" +
+            "Trois propriétés des modules qu'on découvre trop tard :\n\n" +
+            "- Ils sont TOUJOURS en mode strict, sans le déclarer.\n" +
+            "- Les `import` statiques sont hoistés et résolus avant l'exécution : tu peux utiliser une fonction importée « au-dessus » de la ligne d'import, et un import inexistant casse au chargement, pas au premier appel.\n" +
+            "- Un module est un SINGLETON : évalué une seule fois, mis en cache, tous les importeurs partagent la même instance. Un `const cache = new Map()` au top-level d'un module est partagé par toute l'application, c'est un pattern d'état global assumé.\n\n" +
+            "### Les live bindings : la subtilité qui surprend\n\n" +
+            "Un import n'est PAS une copie de la valeur : c'est une vue en lecture seule sur la variable du module exportateur.\n\n" +
             "```js\n" +
-            "// bouton.js\n" +
-            "export default function Bouton(props) { /* ... */ }\n" +
+            "// compteur.js\n" +
+            "export let n = 0;\n" +
+            "export function incr() { n++; }\n" +
+            "\n" +
+            "// app.js\n" +
+            "import { n, incr } from \"./compteur.js\";\n" +
+            "console.log(n); // 0\n" +
+            "incr();\n" +
+            "console.log(n); // 1 : la liaison est vivante, pas copiee\n" +
+            "n = 5; // TypeError: Assignment to constant variable.\n" +
             "```\n\n" +
-            "```js\n" +
-            "import Bouton from \"./bouton.js\"; // le nom est libre\n" +
-            "```\n\n" +
-            "Ma préférence en équipe : privilégier les exports nommés. Ils rendent les imports cohérents d'un fichier à l'autre, facilitent le renommage automatique par l'outillage et évitent qu'un même module soit importé sous cinq noms différents.\n\n" +
-            "### Les imports sont statiques et hissés\n\n" +
-            "Un `import` est analysé avant l'exécution : il ne peut pas être conditionnel ni dépendre d'une variable, et il est hissé en haut du module. C'est ce qui permet à un bundler de savoir, sans exécuter le code, quels modules sont liés, et d'éliminer le code mort (le tree-shaking).\n\n" +
-            "```js\n" +
-            "// interdit : import n'est pas une instruction ordinaire\n" +
-            "if (condition) import { x } from \"./m.js\"; // erreur de syntaxe\n" +
-            "```\n\n" +
-            "### import() dynamique\n\n" +
-            "Pour charger un module à la demande, il existe la forme fonction `import()`, qui renvoie une Promise. Utile pour ne charger un gros module que lorsqu'il sert vraiment.\n\n" +
+            "La lecture suit la variable d'origine en temps réel ; l'écriture est interdite côté importeur (V8 signale l'affectation comme sur une constante). C'est différent d'un `module.exports` CommonJS, qui copiait les valeurs primitives au moment du `require`.\n\n" +
+            "### import() dynamique et top-level await\n\n" +
+            "L'import statique charge tout, tout de suite. `import()` (la forme fonction) renvoie une promesse du module, et ne le charge que quand la ligne s'exécute :\n\n" +
             "```js\n" +
             "bouton.addEventListener(\"click\", async () => {\n" +
             "  const { genererPdf } = await import(\"./pdf.js\");\n" +
-            "  genererPdf();\n" +
+            "  genererPdf(document.title);\n" +
             "});\n" +
             "```\n\n" +
-            "Le module PDF n'est téléchargé qu'au premier clic, ce qui allège le chargement initial de la page. C'est le fractionnement de code, un levier de performance concret.\n\n" +
-            "### Les modules sont en mode strict et exécutés une fois\n\n" +
-            "Un module est toujours en mode strict, sans le déclarer. Et il n'est évalué qu'une seule fois, même s'il est importé par dix fichiers : ils partagent la même instance. C'est ce qui fait qu'un module exportant un objet de configuration se comporte comme un singleton naturel.\n\n" +
-            "> À retenir : un module isole sa portée, expose l'essentiel par export nommé, et se charge statiquement pour permettre le tree-shaking, ou dynamiquement via `import()` pour alléger le démarrage.\n\n" +
-            "Détails sur [les modules JavaScript (MDN)](https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide/Modules).\n",
+            "C'est le mécanisme derrière le code-splitting des bundlers : la bibliothèque PDF de 300 Ko n'est téléchargée que si l'utilisateur clique. Depuis ES2022, le top-level await complète le tableau : un module peut attendre au niveau racine (`const config = await chargerConfig();`), et ses importeurs attendent automatiquement qu'il soit prêt.\n\n" +
+            "ES2025 ajoute les attributs d'import, qui sécurisent l'import de non-JavaScript :\n\n" +
+            "```js\n" +
+            "import config from \"./config.json\" with { type: \"json\" };\n" +
+            "```\n\n" +
+            "Sans l'attribut, un serveur compromis pourrait servir du JS exécutable à la place du JSON attendu ; avec, le moteur refuse tout autre type MIME. Support : Node 22+ (stable dans les 22.x récents), Chrome 123+, Safari 17.2+.\n\n" +
+            "### Le piège structurel : les dépendances circulaires\n\n" +
+            "`a.js` importe `b.js` qui importe `a.js`. Les modules ES gèrent le cycle sans exploser (grâce aux live bindings), MAIS l'un des deux s'exécutera avec des liaisons pas encore initialisées : utiliser au top-level une valeur venue de l'autre module du cycle donne `ReferenceError: Cannot access 'x' before initialization`, la TDZ de la partie 1 qui revient par la fenêtre. Le symptôme classique : « ça marche si j'inverse deux imports ». Le vrai correctif n'est jamais d'inverser les imports, c'est d'extraire la partie commune dans un troisième module dont les deux dépendent.\n\n" +
+            "## À toi\n\n" +
+            "`config.js` exporte `export let mode = \"dev\";` et `export function setMode(m) { mode = m; }`. Dans `app.js`, après `import { mode, setMode } from \"./config.js\"; setMode(\"prod\");`, que vaut `mode` ? Et que ferait `mode = \"prod\";` à la place ?\n\n" +
+            "> `mode` vaut `\"prod\"` : l'import est une liaison vivante, la mutation faite PAR le module exportateur est visible immédiatement chez tous les importeurs. En revanche `mode = \"prod\";` côté importeur lève `TypeError: Assignment to constant variable.` : la liaison est en lecture seule de l'extérieur. Si tu veux de l'état modifiable partagé, expose une fonction (comme `setMode`) ou un objet dont tu mutes les propriétés.\n",
         },
         {
           id: "l21",
-          title: "Trois patterns utiles : module, observateur, debounce/throttle",
+          title: "Patterns utiles : observer, pub/sub et encapsulation",
           type: "text",
-          duration: "16 min",
+          duration: "17 min",
           body:
-            "## Des solutions rodées à des problèmes récurrents\n\n" +
-            "Un pattern, c'est une réponse éprouvée à un problème qui revient. En voici trois qu'on utilise vraiment, avec du code exécutable, pas de la théorie.\n\n" +
-            "### Le pattern module : état privé, interface publique\n\n" +
-            "Avant les modules ES, on isolait de l'état avec une IIFE renvoyant un objet. Le principe reste éclairant et sert encore pour créer une instance unique à état encapsulé.\n\n" +
+            "## Découpler ce qui n'a pas à se connaître\n\n" +
+            "Un panier e-commerce, trois zones d'interface : le badge du header, le total du panier, un toast de confirmation. Version naïve : la fonction `ajouterAuPanier` connaît les trois et les met à jour elle-même. Chaque nouvelle zone = une modification de la fonction, qui finit par dépendre de la moitié du DOM. Le pattern observer inverse la dépendance : le panier annonce « j'ai changé », et quiconque veut réagir s'abonne.\n\n" +
             "```js\n" +
-            "const compteur = (() => {\n" +
-            "  let n = 0; // privé, invisible dehors\n" +
-            "  return {\n" +
-            "    incr() { n += 1; return n; },\n" +
-            "    reset() { n = 0; },\n" +
-            "  };\n" +
-            "})();\n" +
-            "compteur.incr(); // 1\n" +
-            "compteur.n;      // undefined\n" +
-            "```\n\n" +
-            "C'est la closure de la partie 2 mise au service de l'architecture : une frontière nette entre le dedans et le dehors.\n\n" +
-            "### Le pattern observateur : prévenir des abonnés\n\n" +
-            "Un sujet tient une liste d'abonnés et les notifie quand quelque chose change. C'est le cœur des systèmes d'événements et de la réactivité.\n\n" +
-            "```js\n" +
-            "function creerSujet() {\n" +
+            "function creerPanier() {\n" +
+            "  const articles = [];\n" +
             "  const abonnes = new Set();\n" +
+            "  function notifier() {\n" +
+            "    for (const cb of abonnes) {\n" +
+            "      try { cb(articles); }\n" +
+            "      catch (e) { console.error(\"abonne en erreur :\", e); }\n" +
+            "    }\n" +
+            "  }\n" +
             "  return {\n" +
-            "    abonner(fn) {\n" +
-            "      abonnes.add(fn);\n" +
-            "      return () => abonnes.delete(fn); // fonction de désabonnement\n" +
-            "    },\n" +
-            "    emettre(donnee) {\n" +
-            "      for (const fn of abonnes) fn(donnee);\n" +
+            "    ajouter(article) { articles.push(article); notifier(); },\n" +
+            "    abonner(cb) {\n" +
+            "      abonnes.add(cb);\n" +
+            "      return () => abonnes.delete(cb); // desabonnement\n" +
             "    },\n" +
             "  };\n" +
             "}\n" +
-            "const sujet = creerSujet();\n" +
-            "const stop = sujet.abonner((v) => console.log(\"recu\", v));\n" +
-            "sujet.emettre(42); // \"recu 42\"\n" +
-            "stop();            // se désabonne\n" +
+            "const panier = creerPanier();\n" +
+            "const stop = panier.abonner((a) => majBadge(a.length));\n" +
             "```\n\n" +
-            "Renvoyer la fonction de désabonnement dès l'abonnement est le détail qui évite les fuites mémoire : l'abonné sait comment se retirer.\n\n" +
-            "### debounce : attendre le calme\n\n" +
-            "`debounce` retarde l'exécution jusqu'à ce que les déclenchements se calment. Cas typique : une barre de recherche qui n'interroge l'API qu'une fois que l'utilisateur a arrêté de taper.\n\n" +
+            "Quatre décisions dans ce code, chacune apprise à la dure :\n\n" +
+            "- `articles` et `abonnes` sont des variables de closure (partie 2) : aucun code extérieur ne peut les corrompre. C'est le module pattern, la façon la plus simple d'encapsuler en JS sans classe.\n" +
+            "- Un `Set` plutôt qu'un tableau d'abonnés : abonner deux fois le même callback est neutre, et `delete` est O(1).\n" +
+            "- `abonner` RETOURNE la fonction de désabonnement. Un abonnement sans désabonnement, c'est la fuite mémoire type des single-page apps : le composant est détruit, son callback reste dans le `Set`, et la closure retient tout ce qu'il capture. React impose ce contrat dans `useEffect` pour cette raison exacte.\n" +
+            "- Le `try/catch` autour de chaque callback : sans lui, UN abonné qui lance une exception empêche les suivants d'être notifiés. Un bug du toast ne doit pas casser le badge.\n\n" +
+            "### La version plateforme : EventTarget\n\n" +
+            "Tu n'es pas obligé d'écrire le bus toi-même, le navigateur (et Node 15+) en fournit un :\n\n" +
+            "```js\n" +
+            "class Panier extends EventTarget {\n" +
+            "  #articles = [];\n" +
+            "  ajouter(article) {\n" +
+            "    this.#articles.push(article);\n" +
+            "    this.dispatchEvent(new CustomEvent(\"change\", { detail: this.#articles }));\n" +
+            "  }\n" +
+            "}\n" +
+            "const panier = new Panier();\n" +
+            "panier.addEventListener(\"change\", (e) => majBadge(e.detail.length));\n" +
+            "```\n\n" +
+            "Même sémantique que les événements DOM, donc mêmes options : `{ once: true }` pour un abonnement à usage unique, et surtout `{ signal }` :\n\n" +
+            "```js\n" +
+            "const ctrl = new AbortController();\n" +
+            "panier.addEventListener(\"change\", majBadge, { signal: ctrl.signal });\n" +
+            "panier.addEventListener(\"change\", majTotal, { signal: ctrl.signal });\n" +
+            "ctrl.abort(); // TOUS les listeners lies au signal sont retires d'un coup\n" +
+            "```\n\n" +
+            "Un seul `abort()` nettoie tous les abonnements d'un composant. C'est devenu mon réglage par défaut : plus aucun `removeEventListener` oublié, plus besoin de garder une référence sur chaque callback.\n\n" +
+            "### Debounce et throttle : le duo des événements bavards\n\n" +
+            "Un champ de recherche déclenche `input` à chaque frappe ; « javascript » tapé vite = 10 événements en une seconde, donc 10 requêtes API si tu ne fais rien.\n\n" +
             "```js\n" +
             "function debounce(fn, delai) {\n" +
             "  let timer;\n" +
-            "  return (...args) => {\n" +
+            "  return function (...args) {\n" +
             "    clearTimeout(timer);\n" +
-            "    timer = setTimeout(() => fn(...args), delai);\n" +
+            "    timer = setTimeout(() => fn.apply(this, args), delai);\n" +
             "  };\n" +
             "}\n" +
-            "const rechercher = debounce((q) => console.log(\"requete\", q), 300);\n" +
-            "// tape vite : une seule requête, 300 ms après la dernière frappe\n" +
+            "champ.addEventListener(\"input\", debounce(rechercher, 300));\n" +
             "```\n\n" +
-            "### throttle : cadencer\n\n" +
-            "`throttle` limite la fréquence : au plus un appel par intervalle, même si l'événement se déclenche en continu. Cas typique : un gestionnaire de `scroll` ou de `resize`, qui sinon tire des dizaines de fois par seconde.\n\n" +
-            "```js\n" +
-            "function throttle(fn, intervalle) {\n" +
-            "  let pret = true;\n" +
-            "  return (...args) => {\n" +
-            "    if (!pret) return;\n" +
-            "    pret = false;\n" +
-            "    fn(...args);\n" +
-            "    setTimeout(() => { pret = true; }, intervalle);\n" +
-            "  };\n" +
-            "}\n" +
-            "```\n\n" +
-            "La distinction est nette et souvent confondue : debounce attend la fin de la rafale et n'exécute qu'une fois ; throttle exécute régulièrement pendant la rafale. Recherche au clavier, c'est debounce. Suivi de scroll, c'est throttle.\n\n" +
-            "> À retenir : le module encapsule, l'observateur diffuse, debounce et throttle domptent les événements trop fréquents. Ces quatre-là couvrent une grande part du code utilitaire d'une application réelle.\n",
+            "Le debounce attend le SILENCE : chaque événement annule le timer précédent, seule la dernière frappe suivie de 300 ms de calme déclenche `rechercher`. Note la closure sur `timer` et le `fn.apply(this, args)` qui préserve `this` et les arguments : tout le cours dans six lignes. Le throttle, lui, garantit AU PLUS une exécution par fenêtre de temps, pendant que les événements continuent : c'est le bon choix pour `scroll` ou `mousemove`, où tu veux réagir en continu mais à fréquence bornée. Retiens : debounce = « quand il a fini », throttle = « pas plus d'une fois toutes les X ms ». Les inverser se voit tout de suite : une barre de progression de scroll debouncée ne bouge qu'à l'arrêt du scroll, effet garanti en démo client.\n\n" +
+            "## À toi\n\n" +
+            "Dans `creerPanier`, remplace mentalement `abonner(cb)` par une version qui ne retourne rien. Quel scénario concret produit une fuite mémoire dans une single-page app ?\n\n" +
+            "> Un composant (une vue « produit » par exemple) s'abonne à son affichage. L'utilisateur navigue ailleurs : le composant est retiré du DOM, mais son callback reste dans le `Set` du panier, et la closure du callback retient le composant et tout son sous-arbre. Après 50 navigations, 50 composants morts sont encore en mémoire et notifiés à chaque changement. Sans fonction de désabonnement (ou un `AbortController`), il n'existe AUCUN moyen de retirer le callback : la fuite est structurelle, pas accidentelle.\n",
         },
         {
           id: "l22",
-          title: "Pièges de performance à connaître",
+          title: "Performance : mesurer d'abord, optimiser ensuite",
           type: "text",
-          duration: "15 min",
+          duration: "17 min",
           body:
-            "## Là où ça coûte vraiment cher\n\n" +
-            "La plupart des problèmes de performance en JavaScript ne viennent pas d'un algorithme mal choisi, mais de quelques réflexes évitables. En voici les plus fréquents, avec le correctif.\n\n" +
-            "### Le layout thrashing dans le DOM\n\n" +
-            "Lire une propriété géométrique du DOM (`offsetWidth`, `getBoundingClientRect`, `scrollTop`) force le navigateur à recalculer la mise en page. Si vous alternez lecture et écriture dans une boucle, vous déclenchez ce recalcul à chaque tour. C'est le layout thrashing, et il fait chuter le nombre d'images par seconde.\n\n" +
+            "## La règle qui économise des semaines\n\n" +
+            "L'erreur de performance la plus chère n'est pas un algorithme lent : c'est optimiser au hasard. On réécrit trois jours durant une fonction qui pesait 2 % du temps total, pendant que le vrai goulot (une boucle qui touche le DOM) reste intact. Donc, avant tout : mesurer.\n\n" +
             "```js\n" +
-            "// mauvais : lit puis écrit à chaque itération, force N reflows\n" +
-            "for (const el of elements) {\n" +
-            "  el.style.height = el.offsetHeight + 10 + \"px\";\n" +
+            "const t0 = performance.now();\n" +
+            "traiterCommandes(commandes);\n" +
+            "console.log(\"traitement :\", (performance.now() - t0).toFixed(1), \"ms\");\n" +
+            "```\n\n" +
+            "`performance.now()` donne des millisecondes fractionnaires, monotones (jamais perturbées par un changement d'heure système). `console.time(\"x\")` / `console.timeEnd(\"x\")` font pareil en plus court. Et pour trouver le goulot sans instrumenter à la main : l'onglet Performance des DevTools enregistre un profil et te montre QUELLE fonction consomme, à la ligne près. Dix minutes de profil valent trois jours d'intuition.\n\n" +
+            "### Goulot n°1 en front : le DOM, pas le JavaScript\n\n" +
+            "Le JS pur est rapide : additionner un million de nombres prend quelques millisecondes. Ce qui est lent, c'est la frontière avec le rendu. Chaque écriture dans le DOM invalide la mise en page ; chaque LECTURE de géométrie (`offsetHeight`, `getBoundingClientRect`) force le navigateur à recalculer immédiatement le layout invalidé. Alterner les deux dans une boucle s'appelle le layout thrashing :\n\n" +
+            "```js\n" +
+            "// force un reflow PAR ITERATION : lecture apres ecriture\n" +
+            "for (const el of items) {\n" +
+            "  el.style.width = el.parentElement.offsetWidth / 2 + \"px\";\n" +
             "}\n" +
-            "// bon : on lit tout d'abord, on écrit tout ensuite\n" +
-            "const hauteurs = elements.map((el) => el.offsetHeight);\n" +
-            "elements.forEach((el, i) => {\n" +
-            "  el.style.height = hauteurs[i] + 10 + \"px\";\n" +
-            "});\n" +
+            "// lire d'abord, ecrire ensuite : un seul layout\n" +
+            "const largeurs = items.map((el) => el.parentElement.offsetWidth);\n" +
+            "items.forEach((el, i) => { el.style.width = largeurs[i] / 2 + \"px\"; });\n" +
             "```\n\n" +
-            "Regrouper les lectures puis les écritures laisse le navigateur ne recalculer qu'une fois.\n\n" +
-            "### Manipuler le DOM dans une boucle\n\n" +
-            "Insérer des éléments un par un fait travailler le navigateur à chaque insertion. Construisez hors du document, puis insérez d'un coup avec un `DocumentFragment`.\n\n" +
+            "Sur 200 éléments, la première version peut prendre 50 à 200 ms (200 reflows), la seconde 2 à 5 ms. C'est l'ordre de grandeur le plus rentable de toute cette leçon. Même logique pour les insertions : 100 `appendChild` dans une boucle déclenchent des mises à jour en rafale ; accumule dans un `DocumentFragment` et insère UNE fois.\n\n" +
+            "### Choisir la bonne structure de données\n\n" +
             "```js\n" +
-            "const fragment = document.createDocumentFragment();\n" +
-            "for (const item of donnees) {\n" +
-            "  const li = document.createElement(\"li\");\n" +
-            "  li.textContent = item;\n" +
-            "  fragment.appendChild(li);\n" +
-            "}\n" +
-            "liste.appendChild(fragment); // une seule insertion dans le DOM\n" +
+            "// verifier l'appartenance de 1000 ids dans une liste de 100 000\n" +
+            "ids.filter((id) => grosTableau.includes(id));   // O(n*m) : ~100 M comparaisons\n" +
+            "const ensemble = new Set(grosTableau);          // construction O(m), une fois\n" +
+            "ids.filter((id) => ensemble.has(id));            // O(n) : 1000 lookups\n" +
             "```\n\n" +
-            "### Le mauvais outil de recherche\n\n" +
-            "Chercher répétitivement dans un grand tableau avec `includes` ou `indexOf` est en temps linéaire. Si vous testez l'appartenance des milliers de fois, un `Set` fait la même chose en temps quasi constant.\n\n" +
+            "`includes` parcourt le tableau à chaque appel ; `Set.has` est en temps quasi constant. Sur ces volumes, on passe de plusieurs secondes à quelques millisecondes, pas 10 % de mieux : des ordres de grandeur. Réflexe associé : des recherches répétées par clé = une `Map` construite une fois, pas des `find` en boucle.\n\n" +
+            "Pendant qu'on parle structures : évite `delete obj.prop` sur des objets manipulés en masse. Les moteurs optimisent les objets dont la forme est stable (V8 leur donne des hidden classes) ; `delete` fait basculer l'objet en mode dictionnaire, plus lent sur TOUS les accès suivants. Si les clés vont et viennent, c'est le signal qu'il te fallait une `Map` : `map.delete(cle)` est fait pour ça, sans pénalité.\n\n" +
+            "### Quand le calcul est vraiment lourd : sortir du thread\n\n" +
+            "Rappel de la partie 5 : un thread unique, donc 2 secondes de calcul = 2 secondes d'interface gelée. Aucune promesse n'y change rien, `await` ne découpe pas du calcul pur. La solution plateforme, c'est le Web Worker :\n\n" +
             "```js\n" +
-            "// lent sur de gros volumes : O(n) par recherche\n" +
-            "if (grandTableau.includes(id)) { /* ... */ }\n" +
-            "// rapide : O(1) en moyenne\n" +
-            "const index = new Set(grandTableau);\n" +
-            "if (index.has(id)) { /* ... */ }\n" +
+            "// worker.js\n" +
+            "self.onmessage = (e) => {\n" +
+            "  self.postMessage(analyseLourde(e.data));\n" +
+            "};\n" +
+            "// app.js\n" +
+            "const worker = new Worker(\"./worker.js\");\n" +
+            "worker.onmessage = (e) => afficher(e.data);\n" +
+            "worker.postMessage(donnees);\n" +
             "```\n\n" +
-            "### Bloquer le fil principal\n\n" +
-            "Une boucle lourde et synchrone gèle l'interface : rien ne se repeint tant qu'elle tourne, puisque JavaScript est mono-thread. Pour un calcul long, un Web Worker l'exécute sur un autre fil et laisse la page réactive. À défaut, découpez le travail en morceaux rendus entre deux macrotâches.\n\n" +
-            "### La micro-optimisation prématurée\n\n" +
-            "Le plus grand piège reste d'optimiser à l'aveugle. Remplacer un `map` lisible par une boucle `for` illisible pour gagner un temps que personne ne mesure, c'est du temps perdu et de la dette ajoutée. La bonne démarche : écrire clair, mesurer avec l'onglet Performance des DevTools ou `console.time`, et n'optimiser que le point chaud identifié.\n\n" +
-            "```js\n" +
-            "console.time(\"traitement\");\n" +
-            "traiter(donnees);\n" +
-            "console.timeEnd(\"traitement\"); // traitement: 12.4 ms\n" +
-            "```\n\n" +
-            "> À retenir : groupez les accès au DOM, insérez par lots, choisissez `Set`/`Map` pour les recherches répétées, sortez le calcul lourd du fil principal, et surtout, mesurez avant d'optimiser. L'intuition se trompe souvent sur ce qui est lent.\n",
+            "Le worker tourne sur un VRAI thread séparé, sans accès au DOM ; la communication passe par messages, sérialisés avec le même algorithme que `structuredClone` (mêmes limites : pas de fonctions). Le seuil de rentabilité honnête : en dessous de ~50 ms de calcul, l'aller-retour de messages coûte plus qu'il ne rapporte ; au-delà de 100-200 ms de blocage répété, le worker change la vie de l'utilisateur.\n\n" +
+            "Trois réflexes pour finir, du plus au moins rentable : profile avant de toucher (DevTools Performance), sépare lectures et écritures DOM, choisis Set/Map dès que « chercher dedans » se répète. Et méfie-toi des microbenchmarks trouvés en ligne : un `for` 1,5 fois plus rapide qu'un `map` sur 10 millions d'itérations ne justifie pas de sacrifier la lisibilité d'un code qui en traite 200.\n\n" +
+            "## À toi\n\n" +
+            "Une page affiche 5 000 lignes de log et propose un champ de filtre. À chaque frappe, le code fait `lignes.filter((l) => l.texte.includes(saisie))` puis reconstruit les 5 000 `<div>` avec `innerHTML +=` dans une boucle. La frappe est poussive. Quelles sont les DEUX optimisations prioritaires, dans l'ordre ?\n\n" +
+            "> 1) Le DOM d'abord : `innerHTML +=` dans une boucle re-parse et reconstruit le HTML accumulé à chaque itération, c'est quadratique et catastrophique. Construire la chaîne complète puis une SEULE affectation `innerHTML`, ou un `DocumentFragment`, et ne rendre que les résultats visibles. 2) Débouncer la frappe (leçon précédente, ~200 ms) pour ne filtrer qu'au calme. Le `filter` lui-même, 5 000 `includes`, se mesure en 1 ou 2 ms : le remplacer par un index serait de l'optimisation au hasard, exactement ce que le profil aurait montré d'emblée.\n",
         },
         {
           id: "l23",
-          title: "Quiz : modules, patterns et performance",
+          title: "Quiz final : modules, patterns et performance",
           type: "quiz",
           duration: "7 min",
           questions: [
             {
               id: "q23",
-              prompt: "Pourquoi ne peut-on pas écrire import { x } from \"./m.js\" à l'intérieur d'un if ?",
+              prompt: "Quelle affirmation sur les modules ES est vraie ?",
               options: [
-                "C'est autorisé, l'exemple est faux",
-                "Parce que les imports statiques sont analysés et hissés avant l'exécution, ce qui permet le tree-shaking ; pour du conditionnel il faut import() dynamique",
-                "Parce que les modules sont désactivés dans les blocs",
-                "Parce que x n'existe pas",
+                "Un module est ré-exécuté à chaque import",
+                "Un module est évalué une seule fois puis mis en cache : tous les importeurs partagent la même instance",
+                "Les modules partagent toutes leurs variables globalement",
+                "Il faut déclarer \"use strict\" pour activer le mode strict dans un module",
               ],
               correctIndex: 1,
               explanation:
-                "Un import statique est résolu avant que le code ne s'exécute : il ne peut être ni conditionnel ni dynamique, et il est hissé. C'est cette staticité qui permet aux bundlers d'éliminer le code mort. Pour charger à la demande, on utilise la forme fonction import() qui renvoie une Promise.",
+                "Un module ES est un singleton : première évaluation au premier import, puis cache. Un état au top-level (une Map, une config) est partagé par toute l'application. Et les modules sont toujours en mode strict, sans le déclarer.",
             },
             {
               id: "q24",
-              prompt: "Un utilisateur tape dans une barre de recherche et on veut n'interroger l'API qu'une fois qu'il s'arrête. Quel outil ?",
+              prompt: "À quoi sert import() avec des parenthèses, par rapport à un import statique ?",
               options: [
-                "throttle",
-                "debounce",
-                "Promise.race",
-                "Object.freeze",
+                "C'est une syntaxe équivalente plus ancienne",
+                "Il charge le module à la demande et renvoie une promesse : c'est la base du code-splitting",
+                "Il importe plus rapidement",
+                "Il permet d'importer plusieurs fichiers d'un coup",
               ],
               correctIndex: 1,
               explanation:
-                "debounce reporte l'exécution jusqu'à ce que les déclenchements cessent pendant le délai fixé : la requête ne part qu'après la dernière frappe. throttle, lui, exécute à cadence régulière pendant la rafale, ce qui conviendrait plutôt à un événement de scroll.",
+                "L'import statique est résolu au chargement, avant l'exécution. import(\"./module.js\") ne télécharge et n'évalue le module que quand la ligne s'exécute, et renvoie une promesse du module : idéal pour différer une grosse dépendance jusqu'au clic qui en a besoin.",
             },
             {
               id: "q25",
-              prompt: "Pourquoi une boucle qui alterne lecture de offsetHeight et écriture de style.height est-elle lente ?",
+              prompt: "Pourquoi la fonction abonner d'un observer doit-elle retourner une fonction de désabonnement ?",
               options: [
-                "offsetHeight n'existe pas",
-                "Chaque lecture après une écriture force le navigateur à recalculer la mise en page (layout thrashing)",
-                "Les styles sont en lecture seule",
-                "La boucle for est intrinsèquement lente",
+                "Pour des raisons purement stylistiques",
+                "Sans désabonnement, les callbacks de composants détruits restent référencés : fuite mémoire structurelle",
+                "Pour accélérer les notifications",
+                "Parce que Set l'exige",
               ],
               correctIndex: 1,
               explanation:
-                "Écrire un style invalide la mise en page ; lire ensuite une propriété géométrique force un recalcul immédiat pour donner une valeur à jour. Alterner les deux dans la boucle déclenche N reflows. Regrouper toutes les lectures puis toutes les écritures n'en provoque qu'un.",
+                "Un callback resté dans le Set après la destruction de son composant retient (via sa closure) le composant entier : la mémoire ne peut pas être libérée et le callback continue d'être notifié. Retourner () => abonnes.delete(cb), ou utiliser addEventListener avec { signal }, rend le nettoyage possible.",
             },
             {
               id: "q26",
-              prompt: "Vous testez des milliers de fois si un identifiant appartient à une grande collection. Quel choix est le plus performant ?",
+              prompt: "Un champ de recherche déclenche une requête API à chaque frappe. Quel remède est le plus adapté ?",
               options: [
-                "tableau.includes(id) à chaque test",
-                "tableau.indexOf(id) !== -1",
-                "Construire un Set une fois et utiliser set.has(id)",
-                "Trier le tableau puis includes",
+                "Un throttle sur le scroll",
+                "Un debounce : attendre ~300 ms de silence après la dernière frappe avant de requêter",
+                "Passer la requête en synchrone",
+                "Un Web Worker",
               ],
-              correctIndex: 2,
+              correctIndex: 1,
               explanation:
-                "includes et indexOf parcourent le tableau à chaque appel, en O(n). Un Set offre une recherche en temps moyen constant, O(1). Sur des milliers de tests contre une grande collection, construire le Set une fois puis interroger has est nettement plus rapide.",
+                "Le debounce annule le timer à chaque frappe et ne déclenche qu'après un silence : une seule requête pour \"javascript\" tapé vite, au lieu de dix. Le throttle (au plus une exécution par fenêtre) convient mieux à scroll/mousemove où on veut réagir en continu.",
+            },
+            {
+              id: "q32",
+              prompt: "compteur.js exporte export let n = 0 et export function incr() { n++; }. Dans app.js, après import { n, incr } puis incr(), que vaut n ?",
+              options: [
+                "0 : l'import a copié la valeur au moment du chargement",
+                "1 : un import est une liaison vivante vers la variable du module exportateur",
+                "undefined",
+                "Une TypeError est levée par incr()",
+              ],
+              correctIndex: 1,
+              explanation:
+                "Les imports ES sont des live bindings : une vue en lecture seule sur la variable d'origine, pas une copie. La mutation faite par le module exportateur est visible immédiatement. En revanche, écrire n = 5 côté importeur lève TypeError: Assignment to constant variable.",
             },
           ],
         },
