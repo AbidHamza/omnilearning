@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { alternatesFor, pageUrl, siteName } from "@/lib/site";
+import { alternatesFor, pageUrl, shareCard, siteName } from "@/lib/site";
 
 // Page cliente : les métadonnées ne peuvent venir que d'ici. Voir le layout de
 // /connexion pour la raison.
@@ -25,6 +25,7 @@ export async function generateMetadata(
       description,
       url: pageUrl(locale, "/creer-compte"),
       locale,
+      images: [shareCard(locale)],
     },
   };
 }

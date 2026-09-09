@@ -6,6 +6,7 @@ import { UploadIcon, PlusIcon, TrashIcon } from "@/components/icons";
 import { useLocaleRouter } from "@/i18n/navigation";
 import { useT } from "@/i18n/provider";
 import { saveDraftAction } from "@/lib/actions/draft";
+import { DEFAULT_REVENUE_SHARE_PCT } from "@/lib/pricing";
 
 interface Upload {
   field: string;
@@ -38,6 +39,9 @@ export default function CreerFormationClient() {
   const [level, setLevel] = useState("");
   const [skills, setSkills] = useState("");
   const [prereq, setPrereq] = useState("");
+  // Le formateur saisit des euros, la base stocke des centimes. La conversion
+  // se fait une seule fois, ici, au moment de l'envoi.
+  const [priceEuros, setPriceEuros] = useState("");
 
   const [structure, setStructure] = useState("");
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -74,6 +78,7 @@ export default function CreerFormationClient() {
       structure,
       activities: activities.map((a) => ({ type: a.type, instruction: a.instruction })),
       uploads,
+      priceCents: Math.round((Number(priceEuros.replace(",", ".")) || 0) * 100),
       submit: true,
     });
     setSubmitting(false);
@@ -173,6 +178,22 @@ export default function CreerFormationClient() {
                   <option>{c.levelIntermediate}</option>
                   <option>{c.levelAdvanced}</option>
                 </select>
+              </div>
+              <div>
+                <label className={labelCls}>{c.priceLabel}</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputMode="decimal"
+                  value={priceEuros}
+                  onChange={(e) => setPriceEuros(e.target.value)}
+                  placeholder={c.pricePlaceholder}
+                  className={inputCls}
+                />
+                <p className="mt-1.5 text-xs text-muted">
+                  {c.priceHint.replace("{pct}", String(DEFAULT_REVENUE_SHARE_PCT))}
+                </p>
               </div>
             </section>
 
@@ -329,6 +350,14 @@ export default function CreerFormationClient() {
               <Recap label={c.recapCategory} value={category} />
               <Recap label={c.recapName} value={name} />
               <Recap label={c.recapLevel} value={level} />
+              <Recap
+                label={c.recapPrice}
+                value={
+                  Number(priceEuros.replace(",", ".")) > 0
+                    ? `${priceEuros} EUR`
+                    : c.priceFree
+                }
+              />
               <Recap label={c.recapDesc} value={description} />
               <Recap label={c.recapSkills} value={skills} />
               <Recap label={c.recapPrereq} value={prereq} />

@@ -10,11 +10,13 @@ const publicPaths = [
   "",
   "/formations",
   "/soutenir",
+  "/devenir-formateur",
   "/a-propos",
   "/contact",
   "/mentions-legales",
   "/cgu",
   "/confidentialite",
+  "/conditions-formateurs",
 ];
 
 function languagesFor(path: string): Record<string, string> {

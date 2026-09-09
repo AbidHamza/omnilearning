@@ -1,5 +1,5 @@
 import { isLocale, defaultLocale } from "@/i18n/config";
-import { getInstructorDashboard, requireRole } from "@/lib/dal";
+import { getInstructorDashboard, getInstructorPayouts, requireRole } from "@/lib/dal";
 import FormateurClient from "./formateur-client";
 import type { Metadata } from "next";
 
@@ -9,17 +9,37 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 
-export default async function FormateurDashboard({ params }: PageProps<"/[lang]">) {
+export default async function FormateurDashboard({
+  params,
+  searchParams,
+}: PageProps<"/[lang]">) {
   const { lang } = await params;
+  const sp = await searchParams;
   const locale = isLocale(lang) ? lang : defaultLocale;
 
   // Garde serveur : formateur ou admin réel uniquement.
   const { user } = await requireRole(locale, ["formateur", "admin"]);
 
-  const data = await getInstructorDashboard();
+  const [data, payouts] = await Promise.all([
+    getInstructorDashboard(),
+    getInstructorPayouts(),
+  ]);
   const name = data?.name ?? user.name;
   const created = data?.created ?? [];
   const stats = data?.stats ?? { started: 0, finished: 0, rating: 0 };
 
-  return <FormateurClient name={name} created={created} stats={stats} />;
+  // Stripe renvoie ici après l'onboarding : on le signale au panneau pour
+  // qu'il relise l'état du compte, le webhook pouvant traîner de quelques
+  // secondes.
+  const justBack = sp.connect === "retour";
+
+  return (
+    <FormateurClient
+      name={name}
+      created={created}
+      stats={stats}
+      payouts={payouts}
+      justBack={justBack}
+    />
+  );
 }

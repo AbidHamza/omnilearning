@@ -1,5 +1,5 @@
 import { isLocale, defaultLocale } from "@/i18n/config";
-import { getAdminDashboard, requireRole } from "@/lib/dal";
+import { getAdminDashboard, getPendingInstructors, requireRole } from "@/lib/dal";
 import AdminClient from "./admin-client";
 import type { Metadata } from "next";
 
@@ -17,7 +17,10 @@ export default async function AdminDashboard({ params }: PageProps<"/[lang]">) {
   // /connexion ; autre rôle -> son espace. Plus aucune donnée de démo n'est servie.
   await requireRole(locale, ["admin"]);
 
-  const data = await getAdminDashboard();
+  const [data, applicants] = await Promise.all([
+    getAdminDashboard(),
+    getPendingInstructors(),
+  ]);
   if (!data) {
     // requireRole a déjà filtré, donc on n'arrive ici qu'en cas d'incohérence DB.
     return null;
@@ -28,6 +31,7 @@ export default async function AdminDashboard({ params }: PageProps<"/[lang]">) {
       pending={data.pending}
       stats={data.stats}
       recentUsers={data.recentUsers}
+      applicants={applicants}
     />
   );
 }

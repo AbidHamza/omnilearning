@@ -16,6 +16,7 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import bcrypt from "bcryptjs";
 import { categories } from "../src/lib/data";
 import { contentCourses } from "../src/lib/content";
+import { seedPricing } from "../src/lib/pricing";
 import { badges, ghostLearners } from "./seed-data";
 
 const adapter = new PrismaBetterSqlite3({
@@ -78,6 +79,10 @@ async function main() {
 
   // --- Formations + parties + leçons ---
   for (const course of contentCourses) {
+    // Le prix n'est écrit qu'à la CRÉATION. Le seed rejoue à chaque déploiement
+    // et sa branche update écrase tout : y mettre le prix reviendrait à annuler
+    // le tarif décidé en back-office à la mise en ligne suivante.
+    const pricing = seedPricing(course.slug, course.level);
     const created = await prisma.course.upsert({
       where: { slug: course.slug },
       update: {
@@ -125,9 +130,28 @@ async function main() {
         skills: j(course.skills),
         contentTypes: j(course.contentTypes),
         status: "PUBLISHED",
+        accessType: pricing.accessType,
+        priceCents: pricing.priceCents,
+        currency: pricing.currency,
+        pricingSeededAt: new Date(),
         instructorId: instructor?.id ?? null,
       },
     });
+
+    // Rattrapage des cours créés avant l'ouverture de la boutique : ils sont
+    // restés à 0. On pose le tarif une seule fois, marqué par pricingSeededAt,
+    // et le seed n'y revient plus même s'il rejoue à chaque déploiement.
+    if (created.pricingSeededAt === null) {
+      await prisma.course.update({
+        where: { id: created.id },
+        data: {
+          accessType: pricing.accessType,
+          priceCents: pricing.priceCents,
+          currency: pricing.currency,
+          pricingSeededAt: new Date(),
+        },
+      });
+    }
 
     await prisma.coursePart.deleteMany({ where: { courseId: created.id } });
     // Freemium : les 2 premières leçons du cours (ordre global, parties

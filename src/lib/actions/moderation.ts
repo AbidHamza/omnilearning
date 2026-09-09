@@ -3,10 +3,31 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import {
+  DEFAULT_CURRENCY,
+  DEFAULT_REVENUE_SHARE_PCT,
+  MAX_PRICE_CENTS,
+  MIN_PRICE_CENTS,
+} from "@/lib/pricing";
 
 export type ModerationResult =
   | { ok: true }
   | { ok: false; error: string };
+
+/**
+ * Prix retenu à la publication : celui que l'admin saisit s'il en saisit un,
+ * sinon celui proposé par le formateur. Un prix hors bornes est ramené dans
+ * les bornes plutôt que refusé : la file de modération ne doit pas se bloquer
+ * sur une faute de frappe.
+ */
+function finalPrice(override: number | undefined, proposed: number): number {
+  const raw = override === undefined ? proposed : override;
+  if (!Number.isFinite(raw) || raw <= 0) return 0;
+  const cents = Math.round(raw);
+  if (cents < MIN_PRICE_CENTS) return MIN_PRICE_CENTS;
+  if (cents > MAX_PRICE_CENTS) return MAX_PRICE_CENTS;
+  return cents;
+}
 
 // Approuve ou refuse un brouillon de formation soumis (CourseDraft SUBMITTED).
 // Réservé aux admins. L'approbation publie un Course minimal lié à l'auteur ;
@@ -14,6 +35,7 @@ export type ModerationResult =
 export async function moderateDraftAction(
   draftId: string,
   approved: boolean,
+  priceCentsOverride?: number,
 ): Promise<ModerationResult> {
   const session = await auth();
   if (session?.user?.role !== "ADMIN") {
@@ -22,7 +44,15 @@ export async function moderateDraftAction(
 
   const draft = await prisma.courseDraft.findUnique({
     where: { id: draftId },
-    include: { author: { select: { id: true, name: true } } },
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          instructorProfile: { select: { revenueSharePct: true } },
+        },
+      },
+    },
   });
   if (!draft) return { ok: false, error: "Brouillon introuvable." };
   if (draft.status !== "SUBMITTED") {
@@ -55,6 +85,12 @@ export async function moderateDraftAction(
     slug = `${baseSlug}-${i}`;
   }
 
+  // Le prix décide de tout le reste : accessType, part formateur, devise.
+  // Un cours à 0 reste FREE, personne n'a de session Stripe à créer pour lui.
+  const priceCents = finalPrice(priceCentsOverride, draft.priceCents);
+  const sharePct =
+    draft.author.instructorProfile?.revenueSharePct ?? DEFAULT_REVENUE_SHARE_PCT;
+
   await prisma.$transaction([
     prisma.course.create({
       data: {
@@ -68,6 +104,13 @@ export async function moderateDraftAction(
         instructorId: draft.author.id,
         image: "/og.png",
         status: "PUBLISHED",
+        accessType: priceCents > 0 ? "PAID" : "FREE",
+        priceCents,
+        currency: draft.currency || DEFAULT_CURRENCY,
+        revenueSharePct: sharePct,
+        // Le prix vient d'être tranché à la main : le seed de prix n'a plus
+        // rien à faire sur cette ligne.
+        pricingSeededAt: new Date(),
         skills: draft.skills ? JSON.stringify(draft.skills.split(",").map((s) => s.trim())) : null,
         prerequisites: draft.prerequisites
           ? JSON.stringify(draft.prerequisites.split(",").map((s) => s.trim()))

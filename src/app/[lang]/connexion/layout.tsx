@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { alternatesFor, pageUrl, siteName } from "@/lib/site";
+import { alternatesFor, pageUrl, shareCard, siteName } from "@/lib/site";
 
 // La page elle-même est un composant client : elle ne peut pas exporter
 // generateMetadata. Ce layout ne fait que porter les métadonnées, sans quoi la
@@ -26,6 +26,7 @@ export async function generateMetadata(
       description,
       url: pageUrl(locale, "/connexion"),
       locale,
+      images: [shareCard(locale)],
     },
   };
 }

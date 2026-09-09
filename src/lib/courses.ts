@@ -106,6 +106,9 @@ type CourseRow = {
   objectives: string | null;
   skills: string | null;
   contentTypes: string | null;
+  accessType: string;
+  priceCents: number;
+  currency: string;
   parts: { id: string; title: string; lessons: LessonRow[] }[];
 };
 
@@ -178,6 +181,9 @@ function toUiCourse(c: CourseRow): Course {
     objectives: parseArr(c.objectives),
     skills: parseArr(c.skills),
     contentTypes: parseArr(c.contentTypes),
+    accessType: c.accessType === "PAID" ? "PAID" : "FREE",
+    priceCents: c.priceCents,
+    currency: c.currency,
     parts,
   };
 }

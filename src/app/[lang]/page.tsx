@@ -15,8 +15,8 @@ import {
   StarIcon,
 } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { defaultLocale, isLocale, localePath } from "@/i18n/config";
-import { alternatesFor, pageUrl } from "@/lib/site";
+import { defaultLocale, isLocale, localePath, type Locale } from "@/i18n/config";
+import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
 import { notFound } from "next/navigation";
 
 const featureIcons = [LayersIcon, ClockIcon, StarIcon, QuizIcon];
@@ -44,6 +44,63 @@ function chiffresCatalogue(cours: { hours: number; parts: { lessons: { isFree?: 
   };
 }
 
+const ORG_ID = `${siteUrl}/#organization`;
+
+/**
+ * Éditeur du site et moteur de recherche du catalogue. Rien ici n'est
+ * décoratif : chaque valeur se retrouve dans les mentions légales ou dans
+ * une route servie. Pas de `sameAs` : aucun profil social n'est vérifié.
+ */
+function donneesStructurees(locale: Locale) {
+  const rechercheUrl = `${pageUrl(locale, "/formations")}?q={search_term_string}`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": ["Organization", "EducationalOrganization"],
+        "@id": ORG_ID,
+        name: siteName,
+        legalName: "OmniLearnConsultingCommerce LLC",
+        url: siteUrl,
+        email: "info@omnilearn.org",
+        logo: {
+          "@type": "ImageObject",
+          url: `${siteUrl}/icon-512.png`,
+          width: 512,
+          height: 512,
+        },
+        address: {
+          "@type": "PostalAddress",
+          addressRegion: "WY",
+          addressCountry: "US",
+        },
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: "info@omnilearn.org",
+          availableLanguage: ["fr", "en", "ar"],
+        },
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        name: siteName,
+        url: pageUrl(locale),
+        inLanguage: locale,
+        publisher: { "@id": ORG_ID },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: rechercheUrl,
+          },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+}
+
 export async function generateMetadata(
   props: PageProps<"/[lang]">,
 ): Promise<Metadata> {
@@ -52,7 +109,7 @@ export async function generateMetadata(
   // Titre et description viennent du layout ; la page ne pose que son adresse.
   return {
     alternates: alternatesFor(locale),
-    openGraph: { url: pageUrl(locale) },
+    openGraph: { url: pageUrl(locale), images: [shareCard(locale)] },
   };
 }
 
@@ -77,8 +134,14 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
     { value: nf.format(n.libres), label: t.home.statFree },
   ];
 
+  const jsonLd = donneesStructurees(lang);
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ── Hero : mesh clair + mockup produit ─────────────────────── */}
       <section className="relative overflow-hidden hero-mesh">
         <div className="pointer-events-none absolute inset-0 hero-grid" />
@@ -277,6 +340,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 key={c.slug}
                 course={c}
                 labels={t.card}
+                locale={lang}
                 variant="compact"
                 className="w-[230px] shrink-0"
               />

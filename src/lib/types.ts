@@ -69,6 +69,11 @@ export interface Course {
   objectives?: string[];
   skills?: string[];
   contentTypes?: string[];
+  /** FREE : ouvert dès l'inscription. PAID : achat unique requis. */
+  accessType?: "FREE" | "PAID";
+  /** Prix TTC en centimes (0 si gratuit). */
+  priceCents?: number;
+  currency?: string;
   parts: CoursePart[];
 }
 

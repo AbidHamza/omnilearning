@@ -183,7 +183,12 @@ export const getInstructorDashboard = cache(
   },
 );
 
-export type PendingDraft = PendingCourse & { id: string };
+export type PendingDraft = PendingCourse & {
+  id: string;
+  /** Prix proposé par le formateur. L'admin le confirme ou le change. */
+  priceCents: number;
+  currency: string;
+};
 
 export interface AdminDashboard {
   pending: PendingDraft[];
@@ -238,6 +243,8 @@ export const getAdminDashboard = cache(
       instructor: d.author.name ?? d.author.email,
       category: d.category ?? "--",
       level: d.level ?? "--",
+      priceCents: d.priceCents,
+      currency: d.currency,
       submitted: fmtDate(d.updatedAt),
     }));
 
@@ -305,5 +312,195 @@ export const getBillingState = cache(
       select: { stripeCustomerId: true },
     });
     return { stripeEnabled, hasCustomer: Boolean(user?.stripeCustomerId) };
+  },
+);
+
+export type ConnectStage =
+  | "off" // Stripe non configuré côté serveur
+  | "none" // aucune fiche formateur
+  | "pending" // candidature déposée, pas encore tranchée
+  | "rejected"
+  | "todo" // approuvé, compte Stripe pas encore ouvert
+  | "incomplete" // compte ouvert, dossier Stripe inachevé
+  | "ready"; // encaissement et versements actifs
+
+export interface InstructorPayouts {
+  stage: ConnectStage;
+  revenueSharePct: number;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+  detailsSubmitted: boolean;
+  hasAccount: boolean;
+  currency: string;
+  salesCount: number;
+  grossCents: number;
+  earnedCents: number;
+  platformCents: number;
+  refundedCount: number;
+  recent: { title: string; date: string; amountCents: number; earnedCents: number }[];
+}
+
+/**
+ * Revenus réels du formateur connecté et état de son compte Stripe Connect.
+ *
+ * Les montants ne se recalculent pas depuis le barème courant : ils se lisent
+ * dans les lignes Purchase, où le découpage a été figé à la vente. Changer le
+ * pourcentage demain ne doit pas réécrire ce qui a déjà été encaissé.
+ */
+export const getInstructorPayouts = cache(
+  async (): Promise<InstructorPayouts | null> => {
+    const session = await auth();
+    const userId = session?.user?.id;
+    const role = session?.user?.role;
+    if (!userId) return null;
+    if (role !== "INSTRUCTOR" && role !== "ADMIN") return null;
+
+    const [profile, paid, refundedCount] = await Promise.all([
+      prisma.instructorProfile.findUnique({
+        where: { userId },
+        select: {
+          applicationStatus: true,
+          revenueSharePct: true,
+          stripeAccountId: true,
+          chargesEnabled: true,
+          payoutsEnabled: true,
+          detailsSubmitted: true,
+        },
+      }),
+      prisma.purchase.findMany({
+        where: { status: "paid", course: { instructorId: userId } },
+        select: {
+          amountCents: true,
+          currency: true,
+          instructorAmountCents: true,
+          platformFeeCents: true,
+          paidAt: true,
+          createdAt: true,
+          course: { select: { title: true } },
+        },
+        orderBy: { paidAt: "desc" },
+        take: 200,
+      }),
+      prisma.purchase.count({
+        where: { status: "refunded", course: { instructorId: userId } },
+      }),
+    ]);
+
+    const stripeOn = Boolean(process.env.STRIPE_SECRET_KEY);
+    const hasAccount = Boolean(profile?.stripeAccountId);
+    let stage: ConnectStage;
+    if (!stripeOn) stage = "off";
+    else if (!profile) stage = "none";
+    else if (profile.applicationStatus === "PENDING") stage = "pending";
+    else if (profile.applicationStatus === "REJECTED") stage = "rejected";
+    else if (!hasAccount) stage = "todo";
+    else if (profile.chargesEnabled && profile.payoutsEnabled) stage = "ready";
+    else stage = "incomplete";
+
+    const grossCents = paid.reduce((s, p) => s + p.amountCents, 0);
+    const earnedCents = paid.reduce((s, p) => s + p.instructorAmountCents, 0);
+    const platformCents = paid.reduce((s, p) => s + p.platformFeeCents, 0);
+
+    return {
+      stage,
+      revenueSharePct: profile?.revenueSharePct ?? 70,
+      chargesEnabled: profile?.chargesEnabled ?? false,
+      payoutsEnabled: profile?.payoutsEnabled ?? false,
+      detailsSubmitted: profile?.detailsSubmitted ?? false,
+      hasAccount,
+      currency: paid[0]?.currency ?? "eur",
+      salesCount: paid.length,
+      grossCents,
+      earnedCents,
+      platformCents,
+      refundedCount,
+      recent: paid.slice(0, 8).map((p) => ({
+        title: p.course.title,
+        date: fmtDate(p.paidAt ?? p.createdAt),
+        amountCents: p.amountCents,
+        earnedCents: p.instructorAmountCents,
+      })),
+    };
+  },
+);
+
+export interface PendingInstructor {
+  id: string;
+  name: string;
+  email: string;
+  headline: string;
+  bio: string;
+  expertise: string;
+  website: string;
+  country: string;
+  applied: string;
+}
+
+/** File des candidatures formateur en attente, pour l'espace admin. */
+export const getPendingInstructors = cache(
+  async (): Promise<PendingInstructor[]> => {
+    const session = await auth();
+    if (session?.user?.role !== "ADMIN") return [];
+
+    const rows = await prisma.instructorProfile.findMany({
+      where: { applicationStatus: "PENDING" },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        displayName: true,
+        headline: true,
+        bio: true,
+        expertise: true,
+        website: true,
+        country: true,
+        createdAt: true,
+        user: { select: { email: true } },
+      },
+    });
+
+    return rows.map((r) => ({
+      id: r.id,
+      name: r.displayName,
+      email: r.user.email,
+      headline: r.headline ?? "",
+      bio: r.bio ?? "",
+      expertise: r.expertise ?? "",
+      website: r.website ?? "",
+      country: r.country,
+      applied: fmtDate(r.createdAt),
+    }));
+  },
+);
+
+/**
+ * État de la candidature formateur du compte connecté, pour la page publique
+ * « devenir formateur ». Volontairement plus permissif que
+ * `getInstructorPayouts` : un candidat est encore un simple apprenant, il n'a
+ * aucun rôle à faire valoir ici.
+ *
+ * `null` = personne de connecté. `"none"` = connecté, aucune candidature.
+ */
+export type ApplicationState = "none" | "PENDING" | "APPROVED" | "REJECTED";
+
+export const getMyApplicationState = cache(
+  async (): Promise<{ state: ApplicationState; name: string } | null> => {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) return null;
+
+    const row = await prisma.instructorProfile.findUnique({
+      where: { userId },
+      select: { applicationStatus: true, displayName: true },
+    });
+
+    const fallbackName = session.user?.name ?? "";
+    if (!row) return { state: "none", name: fallbackName };
+
+    const raw = row.applicationStatus;
+    const state: ApplicationState =
+      raw === "PENDING" || raw === "APPROVED" || raw === "REJECTED"
+        ? raw
+        : "none";
+    return { state, name: row.displayName || fallbackName };
   },
 );

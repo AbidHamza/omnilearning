@@ -9,7 +9,10 @@ import {
   toPublicQuestions,
 } from "@/lib/courses";
 import { getCourseViewerState } from "@/lib/dal";
-import { alternatesFor, pageUrl, siteName } from "@/lib/site";
+import { getCourseAccess, isLessonLocked } from "@/lib/entitlements";
+import { formatPrice } from "@/lib/pricing";
+import BuyCourseButton from "@/components/buy-course-button";
+import { alternatesFor, pageUrl, shareCard, siteName } from "@/lib/site";
 import Quiz from "@/components/quiz";
 import Markdown from "@/components/markdown";
 import LessonTypeIcon from "@/components/lesson-type-icon";
@@ -54,6 +57,7 @@ export async function generateMetadata(
       description,
       url: pageUrl(locale, path),
       locale,
+      images: [shareCard(locale)],
     },
   };
 }
@@ -126,8 +130,13 @@ export default async function LessonPage(
 
   const viewer = await getCourseViewerState(course.slug);
   const completed = new Set(viewer.completedKeys);
-  // Garde serveur : leçon non gratuite + visiteur anonyme = vue verrouillée.
-  const locked = !lesson.isFree && !viewer.isAuthenticated;
+  // Garde serveur. Une leçon marquée gratuite reste ouverte à tous ; le reste
+  // dépend du droit réel sur le cours : gratuit et connecté, acheté, ou auteur.
+  // Un compte créé en trente secondes n'ouvre plus un cours payant.
+  const access = await getCourseAccess(course.slug);
+  const locked = isLessonLocked(lesson.isFree, access);
+  const needsPurchase = access.accessType === "PAID" && !access.hasPurchase && !access.isOwner;
+  const price = formatPrice(access.priceCents, access.currency, lang);
 
   // Chemin de retour NON préfixé par la locale : useLocaleRouter.push() du
   // formulaire de connexion re-préfixe lui-même.
@@ -187,25 +196,41 @@ export default async function LessonPage(
               <div className="border-t border-line px-5 py-5">
                 <p className="flex items-center gap-2 font-semibold">
                   <LockIcon width={16} height={16} className="text-primary" />
-                  {c.lockedTitle}
+                  {needsPurchase ? c.lockedPaidTitle : c.lockedTitle}
                 </p>
-                <p className="mt-2 text-sm text-muted">{c.lockedText}</p>
+                <p className="mt-2 text-sm text-muted">
+                  {needsPurchase ? c.lockedPaidText : c.lockedText}
+                </p>
                 <p className="mt-1 text-sm text-muted">{c.freeTeaser}</p>
-                <div className="mt-5 flex flex-wrap items-center gap-3">
-                  <Link
-                    href={lp(`/creer-compte?next=${nextParam}`)}
-                    className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep"
-                  >
-                    {c.lockedCreate}
-                    <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
-                  </Link>
-                  <Link
-                    href={lp(`/connexion?next=${nextParam}`)}
-                    className="inline-flex items-center gap-2 rounded-[3px] border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
-                  >
-                    {c.lockedSignIn}
-                  </Link>
-                </div>
+
+                {needsPurchase && access.isAuthenticated ? (
+                  <div className="mt-5">
+                    <p className="text-2xl font-bold tracking-tight">{price}</p>
+                    <p className="mt-1 text-sm text-muted">
+                      {c.lifetimeAccess} · {c.securePayment}
+                    </p>
+                    <div className="mt-4">
+                      <BuyCourseButton slug={course.slug} label={c.buyCta} />
+                    </div>
+                    <p className="mt-3 text-xs text-muted">{c.refundNote}</p>
+                  </div>
+                ) : (
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <Link
+                      href={lp(`/creer-compte?next=${nextParam}`)}
+                      className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep"
+                    >
+                      {c.lockedCreate}
+                      <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
+                    </Link>
+                    <Link
+                      href={lp(`/connexion?next=${nextParam}`)}
+                      className="inline-flex items-center gap-2 rounded-[3px] border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
+                    >
+                      {c.lockedSignIn}
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -307,9 +332,20 @@ export default async function LessonPage(
           <div className="border-b border-line bg-surface px-4 py-3 text-sm font-semibold">
             {c.programLabel} · {lessons.length} {c.lessonsCount}
           </div>
-          {!viewer.isAuthenticated && (
+          {!access.canAccessFullCourse && (
             <div className="border-b border-line bg-bg px-4 py-2.5 text-xs text-muted">
               {c.freeTeaser}
+              {needsPurchase && access.isAuthenticated && (
+                <>
+                  {" "}
+                  <Link
+                    href={lp(`/formations/${course.slug}`)}
+                    className="font-semibold text-primary hover:underline"
+                  >
+                    {c.buyCta} · {price}
+                  </Link>
+                </>
+              )}
             </div>
           )}
           <div className="max-h-[70vh] overflow-y-auto">
@@ -320,7 +356,7 @@ export default async function LessonPage(
                 </div>
                 {part.lessons.map((l) => {
                   const active = l.id === lessonId;
-                  const isLocked = !viewer.isAuthenticated && !l.isFree;
+                  const isLocked = isLessonLocked(l.isFree, access);
                   const isDone = completed.has(l.id);
                   return (
                     <Link
