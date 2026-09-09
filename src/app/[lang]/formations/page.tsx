@@ -3,7 +3,7 @@ import CatalogClient from "@/components/catalog-client";
 import { getCategories, getCourses } from "@/lib/courses";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { alternatesFor, pageUrl, siteName } from "@/lib/site";
+import { alternatesFor, pageUrl, shareCard, siteName } from "@/lib/site";
 
 export async function generateMetadata(
   props: PageProps<"/[lang]/formations">,
@@ -25,6 +25,7 @@ export async function generateMetadata(
       description,
       url: pageUrl(locale, "/formations"),
       locale,
+      images: [shareCard(locale)],
     },
   };
 }

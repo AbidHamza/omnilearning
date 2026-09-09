@@ -2,7 +2,7 @@ import { LocaleLink } from "@/i18n/navigation";
 import { isLocale, defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import type { Metadata } from "next";
-import { alternatesFor, pageUrl, siteName } from "@/lib/site";
+import { alternatesFor, pageUrl, shareCard, siteName } from "@/lib/site";
 import SupportButton from "@/components/support-button";
 import type { SupportTier } from "@/lib/stripe";
 
@@ -34,6 +34,7 @@ export async function generateMetadata(
       description,
       url: pageUrl(locale, "/soutenir"),
       locale,
+      images: [shareCard(locale)],
     },
   };
 }

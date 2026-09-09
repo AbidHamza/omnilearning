@@ -8,18 +8,18 @@ import LessonTypeIcon from "./lesson-type-icon";
 import { useT } from "@/i18n/provider";
 import { localePath, type Locale } from "@/i18n/config";
 
-// Programme détaillé d'un cours (accordéon par partie). Pour un visiteur
-// anonyme, les leçons hors accès libre portent un cadenas ; pour un membre,
-// les leçons terminées portent une coche (completedKeys vient du serveur).
+// Programme détaillé d'un cours (accordéon par partie). Sans droit complet
+// sur le cours, les leçons hors accès libre portent un cadenas ; sinon les
+// leçons terminées portent une coche (completedKeys vient du serveur).
 export default function Curriculum({
   course,
   locale,
-  isAuthenticated = false,
+  hasFullAccess = false,
   completedKeys = [],
 }: {
   course: Course;
   locale: Locale;
-  isAuthenticated?: boolean;
+  hasFullAccess?: boolean;
   completedKeys?: string[];
 }) {
   const t = useT();
@@ -30,7 +30,7 @@ export default function Curriculum({
 
   return (
     <div className="space-y-6">
-      {!isAuthenticated && (
+      {!hasFullAccess && (
         <p className="flex items-center gap-2 rounded-[var(--radius-card)] border border-line bg-surface px-4 py-3 text-sm text-muted">
           <LockIcon width={15} height={15} className="shrink-0 text-primary" />
           {t.course.freeTeaser}
@@ -59,7 +59,7 @@ export default function Curriculum({
             {isOpen && (
               <div className="mt-3 space-y-3">
                 {part.lessons.map((lesson) => {
-                  const isLocked = !isAuthenticated && !lesson.isFree;
+                  const isLocked = !hasFullAccess && !lesson.isFree;
                   const isDone = completed.has(lesson.id);
                   return (
                     <Link
@@ -81,7 +81,7 @@ export default function Curriculum({
                         </div>
                         <div className="text-sm text-muted">
                           {t.lessonType[lesson.type]}
-                          {!isAuthenticated && lesson.isFree && (
+                          {!hasFullAccess && lesson.isFree && (
                             <span className="text-primary">
                               {" "}
                               · {t.course.freeBadge}

@@ -195,6 +195,8 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
             <CourseCard
               key={c.slug}
               course={c}
+              labels={dict.card}
+              locale={locale}
               variant="compact"
               className="w-[230px] shrink-0 bg-bg"
             />

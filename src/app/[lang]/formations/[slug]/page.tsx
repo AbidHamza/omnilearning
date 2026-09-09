@@ -4,12 +4,15 @@ import { notFound } from "next/navigation";
 import { contentCourses as seedCourses } from "@/lib/content";
 import { allLessons, getCourseOutline, getReviews } from "@/lib/courses";
 import { getCourseViewerState } from "@/lib/dal";
+import { getCourseAccess } from "@/lib/entitlements";
+import { formatPrice } from "@/lib/pricing";
+import BuyCourseButton from "@/components/buy-course-button";
 import CourseReviews from "@/components/course-reviews";
 import Curriculum from "@/components/curriculum";
-import { PlayIcon, UserIcon } from "@/components/icons";
+import { CheckIcon, LockIcon, PlayIcon, UserIcon } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localePath } from "@/i18n/config";
-import { alternatesFor, pageUrl, siteName, siteUrl } from "@/lib/site";
+import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
 
 export function generateStaticParams() {
   // Slugs canoniques (seed) pour le pré-rendu ; le contenu est lu en DB au build.
@@ -36,6 +39,7 @@ export async function generateMetadata(
       description: course.tagline || course.description.slice(0, 160),
       url: pageUrl(locale, path),
       locale,
+      images: [shareCard(locale)],
     },
   };
 }
@@ -55,6 +59,10 @@ export default async function CoursePage(
   const firstLesson = lessons[0];
   const reviews = await getReviews(course.slug, lang);
   const viewer = await getCourseViewerState(course.slug);
+  const access = await getCourseAccess(course.slug);
+  const needsPurchase =
+    access.accessType === "PAID" && !access.hasPurchase && !access.isOwner;
+  const price = formatPrice(access.priceCents, access.currency, lang);
   const reviewsTitle = t.reviews.title;
 
   const c = t.course;
@@ -73,11 +81,16 @@ export default async function CoursePage(
         url: courseUrl,
         inLanguage: lang,
         provider: { "@type": "Organization", name: siteName, url: siteUrl },
+        // L'offre déclarée à Google doit être celle qui est réellement
+        // pratiquée : annoncer « 0 » sur un cours payant est un prix faux dans
+        // les résultats de recherche, et Merchant/Rich Results le sanctionne.
         offers: {
           "@type": "Offer",
-          price: "0",
-          priceCurrency: "EUR",
-          category: "Free",
+          price: (access.priceCents / 100).toFixed(2),
+          priceCurrency: access.currency.toUpperCase(),
+          category: access.accessType === "PAID" ? "Paid" : "Free",
+          availability: "https://schema.org/InStock",
+          url: courseUrl,
         },
         hasCourseInstance: {
           "@type": "CourseInstance",
@@ -177,6 +190,41 @@ export default async function CoursePage(
         </div>
       )}
 
+      {/* Prix et accès */}
+      <div className="mt-8 rounded-[var(--radius-card)] border border-line bg-surface px-5 py-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
+        <div>
+          <p className="text-3xl font-extrabold tracking-tight">
+            {access.accessType === "PAID" ? price : c.priceFree}
+          </p>
+          <p className="mt-1 text-sm text-muted">
+            {access.accessType === "PAID"
+              ? `${c.lifetimeAccess} · ${c.securePayment}`
+              : c.freeTeaser}
+          </p>
+        </div>
+        <div className="mt-4 sm:mt-0">
+          {access.hasPurchase || access.isOwner ? (
+            <p className="inline-flex items-center gap-2 rounded-[3px] border border-success/40 bg-success/10 px-4 py-2.5 text-sm font-semibold text-success">
+              <CheckIcon width={16} height={16} />
+              {c.owned}
+            </p>
+          ) : needsPurchase && access.isAuthenticated ? (
+            <BuyCourseButton slug={course.slug} label={`${c.buyCta} · ${price}`} />
+          ) : needsPurchase ? (
+            <Link
+              href={lp(`/creer-compte?next=${encodeURIComponent(`/formations/${course.slug}`)}`)}
+              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep"
+            >
+              <LockIcon width={16} height={16} />
+              {c.lockedCreate}
+            </Link>
+          ) : null}
+        </div>
+      </div>
+      {needsPurchase && (
+        <p className="mt-2 text-xs text-muted">{c.refundNote}</p>
+      )}
+
       {/* Description + vidéo */}
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div>
@@ -207,7 +255,7 @@ export default async function CoursePage(
             <Curriculum
               course={course}
               locale={lang}
-              isAuthenticated={viewer.isAuthenticated}
+              hasFullAccess={access.canAccessFullCourse}
               completedKeys={viewer.completedKeys}
             />
           </div>
@@ -287,15 +335,24 @@ export default async function CoursePage(
         countLabel={t.reviews.count}
       />
 
-      {/* CTA */}
+      {/* CTA de fin de page. Sur un cours payant non acheté, il n'y a rien à
+          « commencer » : le bouton mène au paiement, pas à un mur. */}
       {firstLesson && (
         <div className="mt-14 flex justify-center">
-          <Link
-            href={lp(`/formations/${course.slug}/${firstLesson.id}`)}
-            className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
-          >
-            {c.start}
-          </Link>
+          {needsPurchase && access.isAuthenticated ? (
+            <BuyCourseButton
+              slug={course.slug}
+              label={`${c.buyCta} · ${price}`}
+              className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:opacity-60"
+            />
+          ) : (
+            <Link
+              href={lp(`/formations/${course.slug}/${firstLesson.id}`)}
+              className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+            >
+              {c.start}
+            </Link>
+          )}
         </div>
       )}
     </div>

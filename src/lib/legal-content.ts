@@ -5,7 +5,7 @@
 // locale et le rendent via le composant LegalDocument.
 import type { Metadata } from "next";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
-import { alternatesFor, siteName, siteUrl } from "@/lib/site";
+import { alternatesFor, shareCard, siteName, siteUrl } from "@/lib/site";
 
 /** Adresse de contact unique de la LLC, réutilisée dans le texte et les liens mailto. */
 export const legalEmail = "info@omnilearn.org";
@@ -35,6 +35,8 @@ export interface LegalContent {
   mentionsLegales: LegalPage;
   confidentialite: LegalPage;
   cgu: LegalPage;
+  /** Contrat propre aux formateurs qui publient et vendent sur la place de marche. */
+  formateurs: LegalPage;
   contact: LegalPage;
   aPropos: LegalPage;
 }
@@ -47,7 +49,7 @@ const fr: LegalContent = {
     description:
       "Éditeur, hébergement et informations légales de la plateforme OmniLearn, éditée par OmniLearnConsultingCommerce LLC (Wyoming, États-Unis).",
     lead: "Les informations ci-dessous identifient l'éditeur du site omnilearn.org et précisent le cadre légal de son fonctionnement.",
-    updated: "Dernière mise à jour : 2 juillet 2026",
+    updated: "Dernière mise à jour : 9 septembre 2026",
     sections: [
       {
         heading: "Éditeur du site",
@@ -85,7 +87,7 @@ const fr: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "Les cours, textes, vidéos, quiz, illustrations, exemples de code et éléments graphiques publiés sur OmniLearn sont créés en interne ou utilisés avec autorisation. Ils sont protégés par le droit d'auteur. Vous pouvez les consulter et vous en servir dans le cadre de votre apprentissage personnel. Toute reproduction, diffusion ou revente sans accord écrit préalable est interdite.",
+            text: "Les cours, textes, vidéos, quiz, illustrations, exemples de code et éléments graphiques publiés sur OmniLearn sont créés en interne, publiés par des formateurs indépendants qui en restent propriétaires, ou utilisés avec autorisation. Ils sont protégés par le droit d'auteur. Vous pouvez les consulter et vous en servir dans le cadre de votre apprentissage personnel. Toute reproduction, diffusion ou revente sans accord écrit préalable est interdite.",
           },
           {
             type: "p",
@@ -119,7 +121,7 @@ const fr: LegalContent = {
     description:
       "Quelles données OmniLearn collecte, pourquoi, combien de temps, et comment exercer vos droits (RGPD, CCPA). Les paiements passent par Stripe : aucune donnée bancaire sur nos serveurs.",
     lead: "Cette page explique concrètement quelles données nous traitons quand vous utilisez OmniLearn, dans quel but, et les droits dont vous disposez.",
-    updated: "Dernière mise à jour : 2 juillet 2026",
+    updated: "Dernière mise à jour : 9 septembre 2026",
     sections: [
       {
         heading: "Responsable du traitement",
@@ -140,6 +142,8 @@ const fr: LegalContent = {
               "Connexion Google (facultative) : si vous choisissez de vous connecter avec Google, nous recevons votre adresse e-mail et votre nom tels que Google nous les transmet.",
               "Progression pédagogique : leçons terminées, points d'expérience (XP), badges et niveau. Ces données servent à afficher votre avancement et le classement.",
               "Dons : lorsque vous soutenez la plateforme, le paiement est traité par Stripe. Nous recevons le montant, la date et un identifiant de transaction, mais jamais votre numéro de carte.",
+              "Achat d'un cours : le cours acheté, le montant, la date et l'identifiant de la transaction Stripe. Le paiement se déroule sur les serveurs de Stripe, votre numéro de carte ne nous parvient pas.",
+              "Formateurs : si vous publiez un cours, nous conservons vos coordonnées de contact, vos cours et le détail des ventes qui vous reviennent. Les pièces d'identité et le compte bancaire nécessaires au versement sont collectés et détenus par Stripe, pas par nous.",
               "Données techniques : journaux de connexion et cookies nécessaires au fonctionnement du site.",
             ],
           },
@@ -167,6 +171,7 @@ const fr: LegalContent = {
               "Créer et sécuriser votre compte, vous authentifier : exécution du contrat.",
               "Suivre votre progression et animer la gamification : exécution du contrat et intérêt légitime.",
               "Traiter les dons via Stripe : exécution du contrat et obligations comptables.",
+              "Encaisser l'achat d'un cours, ouvrir l'accès correspondant et verser sa part au formateur : exécution du contrat et obligations comptables.",
               "Assurer la sécurité et prévenir les abus : intérêt légitime.",
             ],
           },
@@ -179,7 +184,8 @@ const fr: LegalContent = {
             type: "list",
             items: [
               "Données de compte et de progression : conservées tant que votre compte est actif ; supprimées lorsque vous le fermez.",
-              "Données de dons : conservées le temps requis par les obligations comptables et fiscales.",
+              "Données de dons et d'achat : conservées le temps requis par les obligations comptables et fiscales, dix ans pour les pièces comptables.",
+              "Accès acheté : conservé tant que votre compte existe, sans quoi le cours payé se refermerait.",
               "Journaux techniques : conservés quelques mois puis purgés.",
             ],
           },
@@ -195,7 +201,7 @@ const fr: LegalContent = {
           {
             type: "list",
             items: [
-              "Stripe (paiement des dons) : reçoit les informations de paiement directement, sur ses propres serveurs.",
+              "Stripe (dons, achat de cours, versements aux formateurs) : reçoit les informations de paiement directement, sur ses propres serveurs.",
               "Google (connexion OAuth, si vous l'utilisez).",
               "Notre hébergeur, pour le stockage sécurisé des données.",
             ],
@@ -244,9 +250,9 @@ const fr: LegalContent = {
   cgu: {
     title: "Conditions générales d'utilisation",
     description:
-      "Les règles d'utilisation d'OmniLearn : accès freemium aux cours, création de compte, dons facultatifs via Stripe, propriété du contenu et droit applicable (Wyoming).",
-    lead: "En utilisant OmniLearn, vous acceptez les règles ci-dessous. Elles encadrent l'accès aux cours, la création de compte et les dons.",
-    updated: "Dernière mise à jour : 2 juillet 2026",
+      "Les règles d'utilisation d'OmniLearn : accès freemium, cours payants, remboursement, cours des formateurs indépendants, dons via Stripe et droit applicable (Wyoming).",
+    lead: "En utilisant OmniLearn, vous acceptez les règles ci-dessous. Elles encadrent l'accès aux cours, l'achat d'une formation, la création de compte et les dons.",
+    updated: "Dernière mise à jour : 9 septembre 2026",
     sections: [
       {
         heading: "Objet",
@@ -262,7 +268,56 @@ const fr: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "Les deux premières leçons de chaque cours sont en accès libre, sans inscription. La suite des leçons, les quiz, le suivi de progression et les badges nécessitent la création d'un compte gratuit.",
+            text: "Les deux premières leçons de chaque cours sont en accès libre, sans inscription. Sur un cours gratuit, la suite des leçons, les quiz, le suivi de progression et les badges demandent seulement un compte gratuit. Sur un cours payant, la suite s'ouvre après l'achat, dans les conditions décrites juste en dessous.",
+          },
+        ],
+      },
+      {
+        heading: "Cours payants",
+        blocks: [
+          {
+            type: "p",
+            text: "Une partie du catalogue est payante. Le prix figure sur la carte du cours et sur sa fiche, en euros, taxes comprises. Rien n'est débité tant que vous n'avez pas validé le paiement sur la page sécurisée de Stripe.",
+          },
+          {
+            type: "list",
+            items: [
+              "Le paiement passe par Stripe. Votre numéro de carte ne transite pas par nos serveurs et nous ne le conservons pas.",
+              "Un achat ouvre l'accès complet au cours concerné, pour votre compte seul, sans limite de durée tant que le cours reste publié.",
+              "Si un cours que vous avez acheté quitte le catalogue, vous en gardez l'accès pendant au moins douze mois à compter du retrait.",
+              "Le reçu vous parvient par e-mail juste après le paiement.",
+              "L'accès est personnel : il ne se prête pas, ne se partage pas et ne se revend pas.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "Rétractation et remboursement",
+        blocks: [
+          {
+            type: "p",
+            text: "Un cours est un contenu numérique livré immédiatement. Le droit européen vous accorde quatorze jours pour vous rétracter, et prévoit que ce délai s'éteint dès que la livraison commence avec votre accord exprès. En validant le paiement, vous demandez l'accès immédiat au cours et vous acceptez de perdre ce droit une fois la première leçon payante ouverte.",
+          },
+          {
+            type: "p",
+            text: "Tant qu'aucune leçon payante n'a été ouverte, l'achat est remboursé sur simple demande dans les quatorze jours, à info@omnilearn.org, sans avoir à vous justifier. Au-delà, nous remboursons dès que la situation le mérite : un cours qui ne correspond pas à sa description, un défaut technique qui vous empêche de le suivre, une double facturation.",
+          },
+          {
+            type: "p",
+            text: "Le remboursement repart sur le moyen de paiement d'origine. Comptez cinq à dix jours ouvrés pour le voir arriver, ce délai dépend de votre banque et non de nous.",
+          },
+        ],
+      },
+      {
+        heading: "Cours publiés par des formateurs indépendants",
+        blocks: [
+          {
+            type: "p",
+            text: "Une partie des cours vient de formateurs indépendants. Ils écrivent leur contenu, en gardent la propriété et répondent de son exactitude. OmniLearn héberge le cours, encaisse le paiement et reverse au formateur la part convenue.",
+          },
+          {
+            type: "p",
+            text: "Chaque cours est relu avant sa mise en ligne. Nous pouvons retirer un cours qui enfreint la loi, ces conditions ou les règles applicables aux formateurs, et rembourser les acheteurs concernés.",
           },
         ],
       },
@@ -306,7 +361,7 @@ const fr: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "Le contenu pédagogique reste la propriété d'OmniLearnConsultingCommerce LLC ou de ses partenaires. Votre compte vous donne un droit d'accès personnel, non exclusif et non transférable.",
+            text: "Le contenu pédagogique reste la propriété d'OmniLearnConsultingCommerce LLC ou du formateur qui l'a publié. Votre compte, ou votre achat, vous donne un droit d'accès personnel, non exclusif et non transférable.",
           },
         ],
       },
@@ -343,6 +398,141 @@ const fr: LegalContent = {
           {
             type: "p",
             text: "Ces conditions relèvent du droit de l'État du Wyoming (États-Unis), sans préjudice des protections impératives dont bénéficient les consommateurs de l'Union européenne.",
+          },
+        ],
+      },
+    ],
+  },
+
+  formateurs: {
+    title: "Conditions applicables aux formateurs",
+    description:
+      "Publier et vendre un cours sur OmniLearn : validation éditoriale, prix, part reversée, versements Stripe, propriété du contenu et conditions de retrait.",
+    lead: "Ce document complète les conditions générales pour toute personne qui publie un cours sur OmniLearn. Il vaut contrat entre vous et OmniLearnConsultingCommerce LLC.",
+    updated: "Dernière mise à jour : 9 septembre 2026",
+    sections: [
+      {
+        heading: "Qui peut publier",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "Vous déposez une candidature depuis la page Devenir formateur. Elle est examinée à la main.",
+              "Vous devez avoir la capacité juridique de contracter et pouvoir justifier de votre identité auprès de Stripe avant tout versement.",
+              "Un compte formateur est nominatif. Il ne se prête pas et ne se cède pas.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "Votre contenu reste le vôtre",
+        blocks: [
+          {
+            type: "p",
+            text: "Vous gardez la propriété entière de ce que vous publiez. Vous nous accordez le droit non exclusif de l'héberger, de l'afficher, de le traduire et d'en faire la promotion tant que le cours est en ligne, sur le site et dans nos supports de communication.",
+          },
+          {
+            type: "p",
+            text: "Vous garantissez que le contenu est de vous, ou que vous détenez les droits nécessaires sur ce qu'il reprend : textes, images, extraits de code, marques citées.",
+          },
+        ],
+      },
+      {
+        heading: "Validation avant publication",
+        blocks: [
+          {
+            type: "p",
+            text: "Chaque cours passe en modération avant d'être visible. Nous vérifions la cohérence pédagogique, la langue, les droits sur les éléments repris et le prix proposé. Le prix peut être ajusté à ce moment-là, et il vous est indiqué avant la mise en ligne.",
+          },
+          {
+            type: "p",
+            text: "Un refus est motivé et vous pouvez soumettre à nouveau après correction.",
+          },
+        ],
+      },
+      {
+        heading: "Prix et part reversée",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "Le prix est fixé en euros, taxes comprises, et s'entend par acheteur pour un accès à vie au cours.",
+              "Vous percevez 70 % de chaque vente, la plateforme retient 30 %. Un taux différent peut être convenu par écrit et s'affiche alors dans votre espace formateur.",
+              "Les frais de traitement de Stripe sont supportés par la plateforme, pas par vous : votre part se calcule sur le prix payé par l'acheteur.",
+              "Le taux est figé au moment de la vente. Un changement de barème ne recalcule jamais une vente déjà encaissée.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "Versements",
+        blocks: [
+          {
+            type: "p",
+            text: "Les versements passent par un compte Stripe Express que vous créez depuis votre espace formateur. Stripe vérifie votre identité et vos coordonnées bancaires. Tant que cette vérification n'est pas terminée, les ventes sont encaissées mais rien ne part.",
+          },
+          {
+            type: "p",
+            text: "Une fois le compte actif, Stripe verse selon son calendrier habituel. Le détail des ventes, la part qui vous revient et le solde en attente sont lisibles dans votre espace formateur.",
+          },
+        ],
+      },
+      {
+        heading: "Impôts et cotisations",
+        blocks: [
+          {
+            type: "p",
+            text: "Vous êtes indépendant. OmniLearn n'est ni votre employeur ni votre mandataire fiscal. Vous déclarez vos revenus et réglez les taxes qui vous incombent dans votre pays. Un récapitulatif annuel de vos ventes vous est fourni sur demande à info@omnilearn.org.",
+          },
+        ],
+      },
+      {
+        heading: "Ce qui n'a pas sa place sur la plateforme",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "Du contenu copié, traduit sans droit ou généré sans relecture ni vérification des faits.",
+              "Des promesses de résultat : emploi garanti, réussite certaine à un examen, revenus chiffrés.",
+              "Des données personnelles d'un tiers, des identifiants ou des accès partagés.",
+              "Une invitation à payer en direct, hors de la plateforme, pour contourner le partage.",
+              "Tout ce qui est illégal, haineux ou trompeur.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "Remboursement d'un acheteur",
+        blocks: [
+          {
+            type: "p",
+            text: "Quand un acheteur est remboursé, la part qui vous avait été attribuée sur cette vente est annulée. Si elle vous a déjà été versée, elle est déduite de vos versements suivants.",
+          },
+          {
+            type: "p",
+            text: "Un taux de remboursement anormalement élevé sur vos cours nous conduit à revoir leur description avec vous, et le cas échéant à les dépublier.",
+          },
+        ],
+      },
+      {
+        heading: "Retrait d'un cours et fin de la collaboration",
+        blocks: [
+          {
+            type: "p",
+            text: "Vous pouvez retirer un cours à tout moment, avec un préavis de trente jours. Les personnes qui l'ont déjà acheté conservent leur accès pendant au moins douze mois : c'est ce qu'elles ont payé.",
+          },
+          {
+            type: "p",
+            text: "Nous pouvons suspendre un compte formateur immédiatement en cas de fraude, de contenu illégal ou de manquement grave à ces conditions. Les sommes régulièrement dues vous restent acquises.",
+          },
+        ],
+      },
+      {
+        heading: "Droit applicable",
+        blocks: [
+          {
+            type: "p",
+            text: "Ce document relève du droit de l'État du Wyoming (États-Unis), sans préjudice des protections impératives dont vous bénéficiez dans votre pays de résidence.",
           },
         ],
       },
@@ -392,7 +582,7 @@ const fr: LegalContent = {
   aPropos: {
     title: "À propos d'OmniLearn",
     description:
-      "OmniLearn, plateforme d'apprentissage tech éditée par OmniLearnConsultingCommerce LLC : cours créés en interne, modèle freemium financé par les dons, mission d'accès au savoir.",
+      "OmniLearn, plateforme d'apprentissage tech éditée par OmniLearnConsultingCommerce LLC : deux leçons libres par cours, catalogue gratuit et payant, formateurs indépendants, mission d'accès au savoir.",
     lead: "OmniLearn est une plateforme pour apprendre les métiers techniques sans payer pour commencer. Voici d'où ça vient et comment ça tourne.",
     sections: [
       {
@@ -409,7 +599,7 @@ const fr: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "Chaque cours s'ouvre sur deux leçons libres. Si le sujet vous parle, un compte gratuit débloque la suite : les quiz, le suivi de progression, les badges et le classement. La gamification n'est pas là pour faire joli, elle aide à tenir dans la durée, là où beaucoup abandonnent.",
+            text: "Chaque cours s'ouvre sur deux leçons libres. Si le sujet vous parle, un compte gratuit ouvre la suite des cours gratuits : les quiz, le suivi de progression, les badges et le classement. Les cours payants s'achètent à l'unité, une fois, et restent ouverts ensuite. La gamification n'est pas là pour faire joli, elle aide à tenir dans la durée, là où beaucoup abandonnent.",
           },
         ],
       },
@@ -418,7 +608,7 @@ const fr: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "OmniLearn est édité par OmniLearnConsultingCommerce LLC, une société immatriculée dans le Wyoming (États-Unis). Les cours sont écrits et produits en interne, pas agrégés au hasard depuis le web.",
+            text: "OmniLearn est édité par OmniLearnConsultingCommerce LLC, une société immatriculée dans le Wyoming (États-Unis). Une partie du catalogue est écrite en interne, l'autre vient de formateurs indépendants dont chaque cours est relu avant d'être publié. Rien n'est agrégé au hasard depuis le web.",
           },
         ],
       },
@@ -427,7 +617,7 @@ const fr: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "Pas de paywall caché, pas de revente de vos données. La plateforme est financée par les dons de celles et ceux qui en tirent de la valeur et veulent qu'elle reste ouverte. C'est un pari : tant que le contenu est utile, une partie des apprenants soutient le reste.",
+            text: "Deux leçons libres sur chaque cours, sans compte et sans carte. Ensuite, une partie du catalogue reste gratuite et l'autre s'achète à l'unité, sans abonnement, sans paywall caché et sans revente de vos données. Sur un cours vendu par un formateur indépendant, 70 % du prix lui reviennent et 30 % financent la plateforme : hébergement, relecture des cours, frais de paiement. Les dons restent possibles, ils servent à garder ouverte la partie gratuite.",
           },
         ],
       },
@@ -450,7 +640,7 @@ const en: LegalContent = {
     description:
       "Publisher, hosting and legal information for OmniLearn, operated by OmniLearnConsultingCommerce LLC (Wyoming, USA).",
     lead: "The information below identifies who runs omnilearn.org and sets out the legal framework behind it.",
-    updated: "Last updated: 2 July 2026",
+    updated: "Last updated: 9 September 2026",
     sections: [
       {
         heading: "Publisher",
@@ -488,7 +678,7 @@ const en: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "Courses, text, videos, quizzes, illustrations, sample code and graphics published on OmniLearn are produced in-house or used under licence, and are protected by copyright. You may view and use them for your own learning. Copying, redistributing or reselling them without prior written consent is not allowed.",
+            text: "Courses, text, videos, quizzes, illustrations, sample code and graphics published on OmniLearn are produced in-house, published by independent instructors who keep ownership of them, or used under licence. All of it is protected by copyright. You may view and use them for your own learning. Copying, redistributing or reselling them without prior written consent is not allowed.",
           },
           {
             type: "p",
@@ -522,7 +712,7 @@ const en: LegalContent = {
     description:
       "What OmniLearn collects, why, how long we keep it, and how to exercise your rights (GDPR, CCPA). Payments run through Stripe, so card details never touch our servers.",
     lead: "This page spells out, in plain terms, what we do with your data when you use OmniLearn, why, and the rights you have.",
-    updated: "Last updated: 2 July 2026",
+    updated: "Last updated: 9 September 2026",
     sections: [
       {
         heading: "Data controller",
@@ -543,6 +733,8 @@ const en: LegalContent = {
               "Google sign-in (optional): if you sign in with Google, we receive your email and name as Google passes them to us.",
               "Learning progress: completed lessons, experience points (XP), badges and level. We use these to show your progress and the leaderboard.",
               "Donations: when you support the platform, payment is handled by Stripe. We receive the amount, the date and a transaction ID, but never your card number.",
+              "Course purchases: the course bought, the amount, the date and the Stripe transaction ID. Payment happens on Stripe servers, so your card number never reaches us.",
+              "Instructors: if you publish a course, we keep your contact details, your courses and the sales figures behind your share. The identity documents and bank account needed to pay you out are collected and held by Stripe, not by us.",
               "Technical data: connection logs and the cookies the site needs to run.",
             ],
           },
@@ -570,6 +762,7 @@ const en: LegalContent = {
               "Creating and securing your account, and signing you in: performance of the contract.",
               "Tracking progress and running the gamification: contract and legitimate interest.",
               "Processing donations through Stripe: contract and accounting obligations.",
+              "Taking payment for a course, opening the matching access and paying the instructor their share: contract and accounting obligations.",
               "Keeping the service secure and preventing abuse: legitimate interest.",
             ],
           },
@@ -582,7 +775,8 @@ const en: LegalContent = {
             type: "list",
             items: [
               "Account and progress data: kept while your account is active; deleted when you close it.",
-              "Donation records: kept for as long as accounting and tax rules require.",
+              "Donation and purchase records: kept for as long as accounting and tax rules require, ten years for accounting documents.",
+              "Purchased access: kept for the life of your account, otherwise the course you paid for would close again.",
               "Technical logs: kept for a few months, then purged.",
             ],
           },
@@ -598,7 +792,7 @@ const en: LegalContent = {
           {
             type: "list",
             items: [
-              "Stripe (donation payments): receives payment details directly, on its own servers.",
+              "Stripe (donations, course payments, instructor payouts): receives payment details directly, on its own servers.",
               "Google (OAuth sign-in, if you use it).",
               "Our host, for secure data storage.",
             ],
@@ -647,9 +841,9 @@ const en: LegalContent = {
   cgu: {
     title: "Terms of use",
     description:
-      "How OmniLearn works: freemium access to courses, account creation, optional donations via Stripe, content ownership and governing law (Wyoming).",
-    lead: "By using OmniLearn you agree to the rules below. They cover access to courses, creating an account, and donations.",
-    updated: "Last updated: 2 July 2026",
+      "How OmniLearn works: freemium access, paid courses, refunds, courses from independent instructors, donations via Stripe and governing law (Wyoming).",
+    lead: "By using OmniLearn you agree to the rules below. They cover access to courses, buying a course, creating an account, and donations.",
+    updated: "Last updated: 9 September 2026",
     sections: [
       {
         heading: "Purpose",
@@ -665,7 +859,56 @@ const en: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "The first two lessons of every course are free, with no sign-up. The rest of the lessons, the quizzes, progress tracking and badges require a free account.",
+            text: "The first two lessons of every course are free, with no sign-up. On a free course, the remaining lessons, the quizzes, progress tracking and badges only ask for a free account. On a paid course, the rest opens once you buy it, under the terms set out just below.",
+          },
+        ],
+      },
+      {
+        heading: "Paid courses",
+        blocks: [
+          {
+            type: "p",
+            text: "Part of the catalogue is paid. The price appears on the course card and on the course page, in euros, taxes included. Nothing is charged until you confirm the payment on Stripe's secure page.",
+          },
+          {
+            type: "list",
+            items: [
+              "Payment goes through Stripe. Your card number never reaches our servers and we do not store it.",
+              "A purchase opens full access to that course, for your account only, with no time limit for as long as the course stays published.",
+              "If a course you bought leaves the catalogue, you keep access to it for at least twelve months from the day it is removed.",
+              "Your receipt arrives by email right after the payment.",
+              "Access is personal: it cannot be lent, shared or resold.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "Withdrawal and refunds",
+        blocks: [
+          {
+            type: "p",
+            text: "A course is digital content delivered immediately. European law gives you fourteen days to withdraw, and provides that this right ends once delivery begins with your express consent. By confirming the payment you ask for immediate access to the course and accept losing that right once the first paid lesson is opened.",
+          },
+          {
+            type: "p",
+            text: "As long as no paid lesson has been opened, we refund the purchase on request within fourteen days, at info@omnilearn.org, with no reason needed. After that we still refund whenever the situation calls for it: a course that does not match its description, a technical fault that stops you from following it, a double charge.",
+          },
+          {
+            type: "p",
+            text: "Refunds go back to the original payment method. Allow five to ten working days for it to show up, a delay that depends on your bank rather than on us.",
+          },
+        ],
+      },
+      {
+        heading: "Courses published by independent instructors",
+        blocks: [
+          {
+            type: "p",
+            text: "Some courses come from independent instructors. They write the content, keep ownership of it and answer for its accuracy. OmniLearn hosts the course, collects the payment and pays the instructor their agreed share.",
+          },
+          {
+            type: "p",
+            text: "Every course is reviewed before it goes live. We can take down a course that breaks the law, these terms or the instructor terms, and refund the buyers concerned.",
           },
         ],
       },
@@ -709,7 +952,7 @@ const en: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "Course content remains the property of OmniLearnConsultingCommerce LLC or its partners. Your account gives you a personal, non-exclusive, non-transferable right to access it.",
+            text: "Course content remains the property of OmniLearnConsultingCommerce LLC or of the instructor who published it. Your account, or your purchase, gives you a personal, non-exclusive, non-transferable right to access it.",
           },
         ],
       },
@@ -746,6 +989,141 @@ const en: LegalContent = {
           {
             type: "p",
             text: "These terms are governed by the law of the State of Wyoming (United States), without prejudice to the mandatory protections EU consumers enjoy.",
+          },
+        ],
+      },
+    ],
+  },
+
+  formateurs: {
+    title: "Instructor terms",
+    description:
+      "Publishing and selling a course on OmniLearn: editorial review, pricing, revenue share, Stripe payouts, content ownership and how to withdraw a course.",
+    lead: "This document completes the terms of use for anyone who publishes a course on OmniLearn. It stands as the agreement between you and OmniLearnConsultingCommerce LLC.",
+    updated: "Last updated: 9 September 2026",
+    sections: [
+      {
+        heading: "Who can publish",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "You apply from the Become an instructor page. Every application is read by hand.",
+              "You must be legally able to enter into a contract, and able to prove your identity to Stripe before any payout.",
+              "An instructor account is personal. It cannot be lent or transferred.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "Your content stays yours",
+        blocks: [
+          {
+            type: "p",
+            text: "You keep full ownership of what you publish. You grant us the non-exclusive right to host, display, translate and promote it for as long as the course is online, on the site and in our communication material.",
+          },
+          {
+            type: "p",
+            text: "You warrant that the content is yours, or that you hold the rights to whatever it reuses: text, images, code excerpts, trademarks mentioned.",
+          },
+        ],
+      },
+      {
+        heading: "Review before publication",
+        blocks: [
+          {
+            type: "p",
+            text: "Every course goes through moderation before it becomes visible. We check the teaching structure, the language, the rights on reused material and the price you proposed. The price can be adjusted at that point, and you are told before the course goes live.",
+          },
+          {
+            type: "p",
+            text: "A rejection comes with a reason, and you can submit again once it is fixed.",
+          },
+        ],
+      },
+      {
+        heading: "Price and revenue share",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "The price is set in euros, taxes included, per buyer, for lifetime access to the course.",
+              "You receive 70% of every sale and the platform keeps 30%. A different rate can be agreed in writing, and then shows in your instructor area.",
+              "Stripe's processing fees are borne by the platform, not by you: your share is computed on the price the buyer paid.",
+              "The rate is locked at the moment of the sale. Changing the scheme later never recomputes a sale already collected.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "Payouts",
+        blocks: [
+          {
+            type: "p",
+            text: "Payouts run through a Stripe Express account you create from your instructor area. Stripe verifies your identity and your bank details. Until that check is done, sales are collected but nothing is paid out.",
+          },
+          {
+            type: "p",
+            text: "Once the account is active, Stripe pays out on its usual schedule. Sales, your share and the pending balance are all readable in your instructor area.",
+          },
+        ],
+      },
+      {
+        heading: "Tax and social contributions",
+        blocks: [
+          {
+            type: "p",
+            text: "You are independent. OmniLearn is neither your employer nor your tax agent. You declare your income and settle whatever taxes apply where you live. A yearly summary of your sales is available on request at info@omnilearn.org.",
+          },
+        ],
+      },
+      {
+        heading: "What does not belong on the platform",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "Content copied, translated without rights, or generated without review and factchecking.",
+              "Promises of a result: guaranteed job, certain exam pass, a figure of income.",
+              "Someone else's personal data, credentials or shared accounts.",
+              "Any invitation to pay directly, off the platform, to get around the revenue share.",
+              "Anything illegal, hateful or misleading.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "When a buyer is refunded",
+        blocks: [
+          {
+            type: "p",
+            text: "When a buyer is refunded, the share credited to you on that sale is cancelled. If it has already been paid out, it is deducted from your next payouts.",
+          },
+          {
+            type: "p",
+            text: "An unusually high refund rate on your courses leads us to review their description with you, and to unpublish them if needed.",
+          },
+        ],
+      },
+      {
+        heading: "Withdrawing a course and ending the agreement",
+        blocks: [
+          {
+            type: "p",
+            text: "You can withdraw a course at any time with thirty days' notice. People who already bought it keep their access for at least twelve months, because that is what they paid for.",
+          },
+          {
+            type: "p",
+            text: "We can suspend an instructor account immediately in case of fraud, illegal content or serious breach of these terms. Amounts properly due to you remain yours.",
+          },
+        ],
+      },
+      {
+        heading: "Governing law",
+        blocks: [
+          {
+            type: "p",
+            text: "This document is governed by the law of the State of Wyoming (United States), without prejudice to the mandatory protections you enjoy in your country of residence.",
           },
         ],
       },
@@ -795,7 +1173,7 @@ const en: LegalContent = {
   aPropos: {
     title: "About OmniLearn",
     description:
-      "OmniLearn is a tech learning platform run by OmniLearnConsultingCommerce LLC: courses built in-house, a freemium model funded by donations, and a mission of open access to knowledge.",
+      "OmniLearn is a tech learning platform run by OmniLearnConsultingCommerce LLC: two free lessons on every course, a catalogue that mixes free and paid, independent instructors, and a mission of open access to knowledge.",
     lead: "OmniLearn is a place to learn technical skills without paying to get started. Here's where it comes from and how it runs.",
     sections: [
       {
@@ -812,7 +1190,7 @@ const en: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "Every course opens with two free lessons. If it clicks, a free account unlocks the rest: the quizzes, progress tracking, badges and the leaderboard. The gamification isn't decoration, it helps you keep going where a lot of people give up.",
+            text: "Every course opens with two free lessons. If it clicks, a free account opens the rest of the free courses: the quizzes, progress tracking, badges and the leaderboard. Paid courses are bought one at a time, once, and stay open afterwards. The gamification isn't decoration, it helps you keep going where a lot of people give up.",
           },
         ],
       },
@@ -821,7 +1199,7 @@ const en: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "OmniLearn is operated by OmniLearnConsultingCommerce LLC, a company registered in Wyoming (United States). Courses are written and produced in-house, not scraped together from around the web.",
+            text: "OmniLearn is operated by OmniLearnConsultingCommerce LLC, a company registered in Wyoming (United States). Part of the catalogue is written in-house, the rest comes from independent instructors whose courses are read through before they go live. Nothing is scraped together from around the web.",
           },
         ],
       },
@@ -830,7 +1208,7 @@ const en: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "No hidden paywall, no reselling your data. The platform is funded by donations from the people who get something out of it and want it to stay open. It's a bet: as long as the content is useful, some learners will support the rest.",
+            text: "Two free lessons on every course, no account and no card. After that, part of the catalogue stays free and part is bought one course at a time, with no subscription, no hidden paywall and no reselling of your data. On a course sold by an independent instructor, 70 % of the price goes to them and 30 % funds the platform: hosting, reading courses before they go live, payment fees. Donations are still open, and they are what keeps the free half free.",
           },
         ],
       },
@@ -853,7 +1231,7 @@ const ar: LegalContent = {
     description:
       "الناشر والاستضافة والمعلومات القانونية لمنصّة OmniLearn التي تديرها شركة OmniLearnConsultingCommerce LLC (وايومنغ، الولايات المتحدة).",
     lead: "تحدّد المعلومات التالية الجهة الناشرة لموقع omnilearn.org وتوضّح الإطار القانوني لعمله.",
-    updated: "آخر تحديث: 2 يوليو 2026",
+    updated: "آخر تحديث: 9 سبتمبر 2026",
     sections: [
       {
         heading: "الجهة الناشرة",
@@ -891,7 +1269,7 @@ const ar: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "الدورات والنصوص ومقاطع الفيديو والاختبارات والرسوم وأمثلة الشيفرة والعناصر المرئية المنشورة على OmniLearn منتَجة داخليًا أو مستخدَمة بترخيص، وهي محمية بموجب حقوق المؤلّف. يمكنكم الاطّلاع عليها واستخدامها في إطار تعلّمكم الشخصي، ويُمنع نسخها أو نشرها أو إعادة بيعها دون إذن كتابي مسبق.",
+            text: "الدورات والنصوص ومقاطع الفيديو والاختبارات والرسوم وأمثلة الشيفرة والعناصر المرئية المنشورة على OmniLearn منتَجة داخليًا، أو ينشرها مدرّبون مستقلّون تبقى ملكيتها لهم، أو مستخدَمة بترخيص، وهي محمية بموجب حقوق المؤلّف. يمكنكم الاطّلاع عليها واستخدامها في إطار تعلّمكم الشخصي، ويُمنع نسخها أو نشرها أو إعادة بيعها دون إذن كتابي مسبق.",
           },
           {
             type: "p",
@@ -925,7 +1303,7 @@ const ar: LegalContent = {
     description:
       "ما البيانات التي تجمعها OmniLearn ولماذا ومدّة الاحتفاظ بها وكيفية ممارسة حقوقك (GDPR وCCPA). المدفوعات تمرّ عبر Stripe، فلا تمرّ بيانات البطاقة على خوادمنا.",
     lead: "توضّح هذه الصفحة بشكل ملموس البيانات التي نعالجها عند استخدامك OmniLearn، والغرض منها، والحقوق المتاحة لك.",
-    updated: "آخر تحديث: 2 يوليو 2026",
+    updated: "آخر تحديث: 9 سبتمبر 2026",
     sections: [
       {
         heading: "المسؤول عن المعالجة",
@@ -946,6 +1324,8 @@ const ar: LegalContent = {
               "تسجيل الدخول عبر Google (اختياري): إذا اخترت الدخول عبر Google، نتلقّى عنوان بريدك واسمك كما يرسلهما Google إلينا.",
               "التقدّم التعليمي: الدروس المكتملة ونقاط الخبرة (XP) والأوسمة والمستوى. تُستخدم هذه البيانات لعرض تقدّمك ولوحة الترتيب.",
               "التبرّعات: عند دعمك للمنصّة تُعالَج عملية الدفع بواسطة Stripe. نتلقّى المبلغ والتاريخ ومعرّف العملية، لكننا لا نتلقّى رقم بطاقتك.",
+              "شراء دورة: الدورة المشتراة والمبلغ والتاريخ ومعرّف العملية لدى Stripe. تتمّ عملية الدفع على خوادم Stripe، فلا يصلنا رقم بطاقتك.",
+              "المدرّبون: إذا نشرت دورة، نحتفظ ببيانات التواصل معك ودوراتك وتفاصيل المبيعات التي تعود إليك. أمّا وثائق الهوية والحساب البنكي اللازمان للتحويل فتجمعها Stripe وتحتفظ بها، لا نحن.",
               "بيانات تقنية: سجلّات الدخول وملفّات تعريف الارتباط اللازمة لتشغيل الموقع.",
             ],
           },
@@ -973,6 +1353,7 @@ const ar: LegalContent = {
               "إنشاء حسابك وتأمينه والتحقّق من هويتك: تنفيذ العقد.",
               "متابعة تقدّمك وتشغيل عناصر التحفيز: تنفيذ العقد والمصلحة المشروعة.",
               "معالجة التبرّعات عبر Stripe: تنفيذ العقد والالتزامات المحاسبية.",
+              "تحصيل ثمن الدورة وفتح الوصول إليها وتحويل حصّة المدرّب: تنفيذ العقد والالتزامات المحاسبية.",
               "ضمان الأمن ومنع إساءة الاستخدام: المصلحة المشروعة.",
             ],
           },
@@ -985,7 +1366,8 @@ const ar: LegalContent = {
             type: "list",
             items: [
               "بيانات الحساب والتقدّم: تُحفظ ما دام حسابك نشطًا، وتُحذف عند إغلاقه.",
-              "بيانات التبرّعات: تُحفظ للمدّة التي تفرضها الالتزامات المحاسبية والضريبية.",
+              "بيانات التبرّعات والمشتريات: تُحفظ للمدّة التي تفرضها الالتزامات المحاسبية والضريبية، وعشر سنوات للمستندات المحاسبية.",
+              "الوصول المشترى: يُحفظ ما دام حسابك قائمًا، وإلّا أُغلقت الدورة التي دفعت ثمنها.",
               "السجلّات التقنية: تُحفظ بضعة أشهر ثم تُمحى.",
             ],
           },
@@ -1001,7 +1383,7 @@ const ar: LegalContent = {
           {
             type: "list",
             items: [
-              "Stripe (معالجة مدفوعات التبرّعات): تتلقّى بيانات الدفع مباشرةً على خوادمها الخاصة.",
+              "Stripe (التبرّعات وشراء الدورات وتحويلات المدرّبين): تتلقّى بيانات الدفع مباشرةً على خوادمها الخاصة.",
               "Google (تسجيل الدخول عبر OAuth إذا استخدمته).",
               "مستضيفنا، لتخزين البيانات بشكل آمن.",
             ],
@@ -1050,9 +1432,9 @@ const ar: LegalContent = {
   cgu: {
     title: "شروط الاستخدام",
     description:
-      "قواعد استخدام OmniLearn: الوصول المجاني الجزئي إلى الدورات، وإنشاء الحساب، والتبرّعات الاختيارية عبر Stripe، وملكية المحتوى، والقانون الواجب التطبيق (وايومنغ).",
-    lead: "باستخدامك OmniLearn فإنك توافق على القواعد التالية التي تنظّم الوصول إلى الدورات وإنشاء الحساب والتبرّعات.",
-    updated: "آخر تحديث: 2 يوليو 2026",
+      "قواعد استخدام OmniLearn: الوصول المجاني الجزئي، والدورات المدفوعة، والاسترداد، ودورات المدرّبين المستقلّين، والتبرّعات عبر Stripe، والقانون الواجب التطبيق (وايومنغ).",
+    lead: "باستخدامك OmniLearn فإنك توافق على القواعد التالية التي تنظّم الوصول إلى الدورات وشراءها وإنشاء الحساب والتبرّعات.",
+    updated: "آخر تحديث: 9 سبتمبر 2026",
     sections: [
       {
         heading: "الغرض",
@@ -1068,7 +1450,56 @@ const ar: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "أوّل درسين من كل دورة متاحان مجانًا دون تسجيل، أمّا بقية الدروس والاختبارات ومتابعة التقدّم والأوسمة فتتطلّب إنشاء حساب مجاني.",
+            text: "أوّل درسين من كل دورة متاحان مجانًا دون تسجيل. في الدورات المجانية تتطلّب بقية الدروس والاختبارات ومتابعة التقدّم والأوسمة حسابًا مجانيًا فقط، أمّا في الدورات المدفوعة فتُفتح البقية بعد الشراء وفق الشروط الواردة أدناه.",
+          },
+        ],
+      },
+      {
+        heading: "الدورات المدفوعة",
+        blocks: [
+          {
+            type: "p",
+            text: "جزء من الكتالوج مدفوع. يظهر السعر على بطاقة الدورة وفي صفحتها، باليورو وشاملًا الضرائب. ولا يُخصم أي مبلغ قبل أن تؤكّد الدفع على صفحة Stripe الآمنة.",
+          },
+          {
+            type: "list",
+            items: [
+              "يمرّ الدفع عبر Stripe. ولا يمرّ رقم بطاقتك عبر خوادمنا ولا نحتفظ به.",
+              "يفتح الشراء وصولًا كاملًا إلى الدورة المعنيّة، لحسابك وحده، بلا حدّ زمني ما دامت الدورة منشورة.",
+              "إذا خرجت دورة اشتريتها من الكتالوج، يبقى وصولك إليها اثني عشر شهرًا على الأقل من تاريخ سحبها.",
+              "يصلك الإيصال بالبريد الإلكتروني بعد الدفع مباشرة.",
+              "الوصول شخصي: لا يُعار ولا يُشارك ولا يُعاد بيعه.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "حقّ الانسحاب والاسترداد",
+        blocks: [
+          {
+            type: "p",
+            text: "الدورة محتوى رقمي يُسلَّم فورًا. يمنحك القانون الأوروبي أربعة عشر يومًا للانسحاب، وينصّ على سقوط هذا الحقّ متى بدأ التسليم بموافقتك الصريحة. وبتأكيدك الدفع تطلب الوصول الفوري إلى الدورة وتقبل فقدان هذا الحقّ بمجرّد فتح أوّل درس مدفوع.",
+          },
+          {
+            type: "p",
+            text: "ما دام لم يُفتح أي درس مدفوع، نردّ لك المبلغ عند الطلب خلال أربعة عشر يومًا على info@omnilearn.org دون أن تبرّر طلبك. وبعد ذلك نردّ المبلغ كلّما استحقّت الحالة: دورة لا تطابق وصفها، أو عطل تقني يمنعك من متابعتها، أو خصم مزدوج.",
+          },
+          {
+            type: "p",
+            text: "يعود المبلغ إلى وسيلة الدفع الأصلية. واحتسب من خمسة إلى عشرة أيام عمل لظهوره، وهي مهلة تعود إلى مصرفك لا إلينا.",
+          },
+        ],
+      },
+      {
+        heading: "دورات ينشرها مدرّبون مستقلّون",
+        blocks: [
+          {
+            type: "p",
+            text: "يأتي جزء من الدورات من مدرّبين مستقلّين. هم من يكتب المحتوى ويحتفظ بملكيّته ويتحمّل مسؤوليّة دقّته. وتتولّى OmniLearn استضافة الدورة وتحصيل المبلغ وتحويل حصّة المدرّب المتّفق عليها.",
+          },
+          {
+            type: "p",
+            text: "تُراجَع كلّ دورة قبل نشرها. ويمكننا سحب أي دورة تخالف القانون أو هذه الشروط أو الشروط الخاصّة بالمدرّبين، مع ردّ المبالغ إلى المشترين المعنيّين.",
           },
         ],
       },
@@ -1112,7 +1543,7 @@ const ar: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "يبقى المحتوى التعليمي ملكًا لشركة OmniLearnConsultingCommerce LLC أو لشركائها. ويمنحك حسابك حقّ وصول شخصيًّا غير حصري وغير قابل للتحويل.",
+            text: "يبقى المحتوى التعليمي ملكًا لشركة OmniLearnConsultingCommerce LLC أو للمدرّب الذي نشره. ويمنحك حسابك أو شراؤك حقّ وصول شخصيًّا غير حصري وغير قابل للتحويل.",
           },
         ],
       },
@@ -1149,6 +1580,141 @@ const ar: LegalContent = {
           {
             type: "p",
             text: "تخضع هذه الشروط لقانون ولاية وايومنغ (الولايات المتحدة)، دون المساس بالحماية الإلزامية التي يتمتّع بها مستهلكو الاتحاد الأوروبي.",
+          },
+        ],
+      },
+    ],
+  },
+
+  formateurs: {
+    title: "شروط المدرّبين",
+    description:
+      "نشر دورة وبيعها على OmniLearn: المراجعة التحريرية، والسعر، والحصّة المحوَّلة، ودفعات Stripe، وملكية المحتوى، وشروط السحب.",
+    lead: "يكمّل هذا المستند شروط الاستخدام لكلّ من ينشر دورة على OmniLearn، ويقوم مقام العقد بينك وبين شركة OmniLearnConsultingCommerce LLC.",
+    updated: "آخر تحديث: 9 سبتمبر 2026",
+    sections: [
+      {
+        heading: "من يمكنه النشر",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "تقدّم طلبك من صفحة كن مدرّبًا، ويُدرَس كلّ طلب يدويًّا.",
+              "يجب أن تكون أهلًا للتعاقد وقادرًا على إثبات هويّتك لدى Stripe قبل أي تحويل.",
+              "حساب المدرّب اسمي، لا يُعار ولا يُنقل إلى غيرك.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "محتواك يبقى لك",
+        blocks: [
+          {
+            type: "p",
+            text: "تحتفظ بالملكية الكاملة لما تنشره، وتمنحنا حقًّا غير حصري في استضافته وعرضه وترجمته والترويج له ما دامت الدورة متاحة، على الموقع وفي موادّنا التواصلية.",
+          },
+          {
+            type: "p",
+            text: "وتضمن أنّ المحتوى من إنشائك، أو أنّك تملك الحقوق اللازمة على ما يقتبسه من نصوص وصور ومقاطع برمجية وعلامات تجارية مذكورة.",
+          },
+        ],
+      },
+      {
+        heading: "المراجعة قبل النشر",
+        blocks: [
+          {
+            type: "p",
+            text: "تمرّ كلّ دورة بالمراجعة قبل أن تصبح ظاهرة. نتحقّق من البناء التعليمي واللغة والحقوق على العناصر المقتبسة والسعر المقترح. وقد يُعدَّل السعر عندئذ، ويُبلَّغ إليك قبل النشر.",
+          },
+          {
+            type: "p",
+            text: "ويأتي الرفض مسبَّبًا، ويمكنك إعادة التقديم بعد التصحيح.",
+          },
+        ],
+      },
+      {
+        heading: "السعر والحصّة",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "يُحدَّد السعر باليورو شاملًا الضرائب، لكلّ مشترٍ، مقابل وصول دائم إلى الدورة.",
+              "تحصل على 70 % من كلّ عملية بيع وتحتفظ المنصّة بـ 30 %. ويمكن الاتفاق كتابةً على نسبة أخرى تظهر عندئذ في مساحتك.",
+              "تتحمّل المنصّة رسوم Stripe، لا أنت: تُحتسب حصّتك على السعر الذي دفعه المشتري.",
+              "تُثبَّت النسبة لحظة البيع، ولا يعيد أيّ تغيير لاحق احتساب بيع تمّ تحصيله.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "التحويلات",
+        blocks: [
+          {
+            type: "p",
+            text: "تمرّ التحويلات عبر حساب Stripe Express تنشئه من مساحة المدرّب. ويتحقّق Stripe من هويّتك وبياناتك المصرفية. وإلى أن يكتمل هذا التحقّق تُحصَّل المبيعات ولا يخرج شيء.",
+          },
+          {
+            type: "p",
+            text: "وبعد تفعيل الحساب يحوّل Stripe وفق جدوله المعتاد. وتقرأ تفاصيل المبيعات وحصّتك والرصيد المعلّق في مساحة المدرّب.",
+          },
+        ],
+      },
+      {
+        heading: "الضرائب والاشتراكات",
+        blocks: [
+          {
+            type: "p",
+            text: "أنت مستقلّ. OmniLearn ليست ربّ عملك ولا وكيلك الضريبي. أنت من يصرّح بدخله ويسدّد ما يترتّب عليه من ضرائب في بلده. ويتوفّر ملخّص سنوي لمبيعاتك عند الطلب على info@omnilearn.org.",
+          },
+        ],
+      },
+      {
+        heading: "ما لا مكان له على المنصّة",
+        blocks: [
+          {
+            type: "list",
+            items: [
+              "محتوى منسوخ أو مترجم دون حقّ أو مولَّد دون مراجعة ولا تحقّق من الوقائع.",
+              "وعود بنتيجة: وظيفة مضمونة أو نجاح مؤكّد في امتحان أو دخل بالأرقام.",
+              "بيانات شخصية تخصّ غيرك أو بيانات دخول أو حسابات مشتركة.",
+              "أيّ دعوة إلى الدفع مباشرةً خارج المنصّة للالتفاف على تقاسم العائد.",
+              "كلّ ما هو مخالف للقانون أو محرّض على الكراهية أو مضلّل.",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "عند ردّ مبلغ إلى مشترٍ",
+        blocks: [
+          {
+            type: "p",
+            text: "عند ردّ المبلغ إلى مشترٍ تُلغى الحصّة التي قُيّدت لك على تلك العملية. وإن كانت قد حُوّلت إليك، تُخصم من تحويلاتك التالية.",
+          },
+          {
+            type: "p",
+            text: "وارتفاع نسبة الاسترداد على دوراتك بصورة غير معتادة يدفعنا إلى مراجعة وصفها معك، وإلى إلغاء نشرها عند الاقتضاء.",
+          },
+        ],
+      },
+      {
+        heading: "سحب دورة وإنهاء التعاون",
+        blocks: [
+          {
+            type: "p",
+            text: "يمكنك سحب دورة متى شئت بإشعار مدّته ثلاثون يومًا. ويحتفظ من اشتراها قبل ذلك بوصوله اثني عشر شهرًا على الأقلّ، لأنّ هذا ما دفع مقابله.",
+          },
+          {
+            type: "p",
+            text: "ويمكننا تعليق حساب مدرّب فورًا في حالات الاحتيال أو المحتوى المخالف للقانون أو الإخلال الجسيم بهذه الشروط. وتبقى لك المبالغ المستحقّة لك بوجه نظامي.",
+          },
+        ],
+      },
+      {
+        heading: "القانون الواجب التطبيق",
+        blocks: [
+          {
+            type: "p",
+            text: "يخضع هذا المستند لقانون ولاية وايومنغ (الولايات المتّحدة)، دون المساس بالحمايات الإلزامية التي تتمتّع بها في بلد إقامتك.",
           },
         ],
       },
@@ -1198,7 +1764,7 @@ const ar: LegalContent = {
   aPropos: {
     title: "عن OmniLearn",
     description:
-      "OmniLearn منصّة لتعلّم المجالات التقنية تديرها شركة OmniLearnConsultingCommerce LLC: دورات تُصنع داخليًا، ونموذج مجاني جزئيًا يموّله الدعم، ورسالة إتاحة المعرفة للجميع.",
+      "OmniLearn منصّة لتعلّم المجالات التقنية تديرها شركة OmniLearnConsultingCommerce LLC: درسان مجانيان في كل دورة، وكتالوج يجمع بين المجاني والمدفوع، ومدرّبون مستقلّون، ورسالة إتاحة المعرفة للجميع.",
     lead: "OmniLearn منصّة لتعلّم المهن التقنية دون أن تدفع لتبدأ. إليك من أين جاءت وكيف تعمل.",
     sections: [
       {
@@ -1215,7 +1781,7 @@ const ar: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "تبدأ كل دورة بدرسين مجانيين. وإن نال الموضوع اهتمامك، يفتح حساب مجاني بقيّة الدروس والاختبارات ومتابعة التقدّم والأوسمة ولوحة الترتيب. وعناصر التحفيز ليست للزينة، بل تساعد على الاستمرار حيث يتوقّف كثيرون.",
+            text: "تبدأ كل دورة بدرسين مجانيين. وإن نال الموضوع اهتمامك، يفتح حساب مجاني بقيّة الدورات المجانية والاختبارات ومتابعة التقدّم والأوسمة ولوحة الترتيب. أمّا الدورات المدفوعة فتُشترى واحدةً واحدة، مرّة واحدة، وتبقى مفتوحة بعدها. وعناصر التحفيز ليست للزينة، بل تساعد على الاستمرار حيث يتوقّف كثيرون.",
           },
         ],
       },
@@ -1224,7 +1790,7 @@ const ar: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "تدير OmniLearn شركة OmniLearnConsultingCommerce LLC المسجّلة في وايومنغ (الولايات المتحدة). تُكتب الدورات وتُنتَج داخليًا، لا تُجمَع اعتباطًا من الإنترنت.",
+            text: "تدير OmniLearn شركة OmniLearnConsultingCommerce LLC المسجّلة في وايومنغ (الولايات المتحدة). جزء من الكتالوج يُكتب داخليًا، والباقي يأتي من مدرّبين مستقلّين تُراجَع كل دورة لهم قبل نشرها. ولا شيء يُجمَع اعتباطًا من الإنترنت.",
           },
         ],
       },
@@ -1233,7 +1799,7 @@ const ar: LegalContent = {
         blocks: [
           {
             type: "p",
-            text: "لا جدار دفع خفيّ، ولا بيع لبياناتك. تُموَّل المنصّة من تبرّعات من يجدون فيها قيمة ويريدون بقاءها مفتوحة. إنه رهان: ما دام المحتوى مفيدًا، يدعم جزء من المتعلّمين البقيّة.",
+            text: "درسان مجانيان في كل دورة، دون حساب ودون بطاقة. وبعد ذلك يبقى جزء من الكتالوج مجانيًا ويُشترى الجزء الآخر دورةً دورة، دون اشتراك ودون جدار دفع خفيّ ودون بيع لبياناتك. وفي الدورة التي يبيعها مدرّب مستقلّ تعود إليه 70 % من الثمن وتموّل 30 % المنصّة: الاستضافة ومراجعة الدورات ورسوم الدفع. ويبقى باب التبرّع مفتوحًا، وهو ما يُبقي الجزء المجاني مجانيًا.",
           },
         ],
       },
@@ -1286,6 +1852,7 @@ export function buildLegalMetadata(
       description: page.description,
       url,
       locale,
+      images: [shareCard(locale)],
     },
   };
 }

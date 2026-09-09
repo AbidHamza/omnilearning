@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { Category, Course } from "@/lib/types";
 import CourseCard from "./course-card";
 import { ChevronUp, SearchIcon } from "./icons";
-import { useT } from "@/i18n/provider";
+import { useI18n } from "@/i18n/provider";
 
 // Les valeurs des niveaux correspondent aux données (fr) ; seul l'affichage est traduit.
 const levelValues = ["Débutant", "Intermédiaire", "Avancé"] as const;
@@ -26,13 +26,19 @@ export default function CatalogClient({
   initialQ: string;
   initialCat: string;
 }) {
-  const t = useT();
+  const { locale, dict: t } = useI18n();
   const tc = t.catalog;
 
   const levelLabels: Record<string, string> = {
     Débutant: tc.levelBeginner,
     Intermédiaire: tc.levelIntermediate,
     Avancé: tc.levelAdvanced,
+  };
+  // Gratuit / payant : le filtre le plus demandé d'un catalogue mixte, et le
+  // seul qui se lise directement sur la fiche cours (accessType).
+  const priceLabels: Record<string, string> = {
+    free: tc.priceFree,
+    paid: tc.pricePaid,
   };
   const durationLabels: Record<string, string> = {
     lt1: tc.durLt1,
@@ -44,6 +50,7 @@ export default function CatalogClient({
   const [q, setQ] = useState(initialQ);
   const [selLevels, setSelLevels] = useState<string[]>([]);
   const [selDur, setSelDur] = useState<string[]>([]);
+  const [selPrice, setSelPrice] = useState<string[]>([]);
   const [selCats, setSelCats] = useState<string[]>(
     initialCat ? [initialCat] : []
   );
@@ -63,6 +70,9 @@ export default function CatalogClient({
         c.tagline.toLowerCase().includes(needle) ||
         c.category.toLowerCase().includes(needle);
       const matchLevel = !selLevels.length || selLevels.includes(c.level);
+      const isPaid = c.accessType === "PAID" && (c.priceCents ?? 0) > 0;
+      const matchPrice =
+        !selPrice.length || selPrice.includes(isPaid ? "paid" : "free");
       const matchCat = !selCats.length || selCats.includes(c.category);
       const matchDur =
         !selDur.length ||
@@ -75,9 +85,9 @@ export default function CatalogClient({
             (max === undefined || c.hours < max)
           );
         });
-      return matchQ && matchLevel && matchCat && matchDur;
+      return matchQ && matchLevel && matchCat && matchDur && matchPrice;
     });
-  }, [courses, q, selLevels, selDur, selCats]);
+  }, [courses, q, selLevels, selDur, selCats, selPrice]);
 
   const label = q || initialCat || tc.defaultLabel;
 
@@ -107,6 +117,17 @@ export default function CatalogClient({
               label={levelLabels[l]}
               checked={selLevels.includes(l)}
               onChange={() => toggle(selLevels, setSelLevels, l)}
+            />
+          ))}
+        </FilterGroup>
+
+        <FilterGroup title={tc.filterPrice}>
+          {["free", "paid"].map((p) => (
+            <Check
+              key={p}
+              label={priceLabels[p]}
+              checked={selPrice.includes(p)}
+              onChange={() => toggle(selPrice, setSelPrice, p)}
             />
           ))}
         </FilterGroup>
@@ -151,7 +172,7 @@ export default function CatalogClient({
         ) : (
           <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {filtered.map((c) => (
-              <CourseCard key={c.slug} course={c} labels={t.card} />
+              <CourseCard key={c.slug} course={c} labels={t.card} locale={locale} />
             ))}
           </div>
         )}

@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/dal";
 import { I18nProvider } from "@/i18n/provider";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localeDir, locales, type Locale } from "@/i18n/config";
-import { siteName, siteUrl } from "@/lib/site";
+import { shareCard, siteName, siteUrl } from "@/lib/site";
 import MetaPixel from "@/components/meta-pixel";
 import { GoogleTagManager, GoogleTagManagerNoscript } from "@/components/gtm";
 import ConsentBanner from "@/components/consent-banner";
@@ -80,11 +80,13 @@ export async function generateMetadata({
       title: seo.title,
       description: seo.description,
       locale,
+      images: [shareCard(locale)],
     },
     twitter: {
       card: "summary_large_image",
       title: seo.title,
       description: seo.description,
+      images: [`${siteUrl}/og-${locale}.png`],
     },
   };
 }

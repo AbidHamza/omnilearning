@@ -6,6 +6,8 @@ import type { CreatedCourse, CourseStatus, InstructorStats } from "@/lib/types";
 import { ClockIcon, LayersIcon, StarIcon } from "@/components/icons";
 import ProgressChart from "@/components/progress-chart";
 import { useT } from "@/i18n/provider";
+import type { InstructorPayouts } from "@/lib/dal";
+import PayoutsPanel from "./payouts-panel";
 
 const statusCls: Record<CourseStatus, string> = {
   online: "bg-success-soft text-success",
@@ -17,10 +19,14 @@ export default function FormateurClient({
   name,
   created,
   stats,
+  payouts,
+  justBack,
 }: {
   name: string;
   created: CreatedCourse[];
   stats: InstructorStats;
+  payouts: InstructorPayouts | null;
+  justBack: boolean;
 }) {
   const t = useT();
   const i = t.instructor;
@@ -73,6 +79,8 @@ export default function FormateurClient({
           </ul>
         )}
       </section>
+
+      {payouts && <PayoutsPanel data={payouts} justBack={justBack} />}
 
       {/* Tableau des formations */}
       <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">

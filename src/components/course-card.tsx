@@ -1,29 +1,46 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Course } from "@/lib/types";
+import { type Locale, defaultLocale } from "@/i18n/config";
+import { formatPrice } from "@/lib/pricing";
 
 type CardLabels = {
   levelPrefix: string;
   hoursUnit: string;
   access: string;
+  free: string;
 };
+
+/**
+ * Étiquette de prix d'une carte. Une place de marché qui garde son prix pour
+ * la fiche fait revenir le visiteur en arrière une fois sur deux : il se lit
+ * ici, au moment du choix.
+ */
+function priceLabel(course: Course, locale: Locale, freeLabel: string): string {
+  if (course.accessType !== "PAID" || !course.priceCents) return freeLabel;
+  return formatPrice(course.priceCents, course.currency ?? "eur", locale);
+}
 
 export default function CourseCard({
   course,
   labels,
+  locale = defaultLocale,
   variant = "catalog",
   className = "",
 }: {
   course: Course;
   // Requis pour la variante "catalog" (libellés niveau/heures/CTA).
-  // Inutile pour la variante "compact" qui n'affiche que titre + accroche.
+  // Pour la variante "compact", seul `free` sert : sans labels, pas de prix.
   labels?: CardLabels;
+  locale?: Locale;
   variant?: "catalog" | "compact";
   className?: string;
 }) {
   const href = `/formations/${course.slug}`;
+  const isFree = course.accessType !== "PAID" || !course.priceCents;
 
   if (variant === "compact") {
+    const price = labels ? priceLabel(course, locale, labels.free) : null;
     return (
       <Link
         href={href}
@@ -45,6 +62,11 @@ export default function CourseCard({
           <p className="mt-1 line-clamp-2 font-sans text-xs leading-relaxed text-muted">
             {course.tagline}
           </p>
+          {price && (
+            <span className="mt-2 font-mono text-[11px] font-bold text-primary">
+              {price}
+            </span>
+          )}
         </div>
       </Link>
     );
@@ -54,7 +76,9 @@ export default function CourseCard({
     levelPrefix: "",
     hoursUnit: "",
     access: "",
+    free: "",
   };
+  const price = priceLabel(course, locale, cardLabels.free);
 
   return (
     <Link
@@ -74,6 +98,15 @@ export default function CourseCard({
         <span className="absolute start-3 top-3 rounded-[3px] border border-line bg-bg/90 px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wide text-primary backdrop-blur">
           {course.category}
         </span>
+        {price && (
+          <span
+            className={`absolute end-3 top-3 rounded-[3px] border bg-bg/90 px-2.5 py-1 font-mono text-[11px] font-bold backdrop-blur ${
+              isFree ? "border-line text-muted" : "border-primary/50 text-ink"
+            }`}
+          >
+            {price}
+          </span>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-5">
         <h3 className="font-display text-lg font-bold leading-tight tracking-tight transition-colors group-hover:text-primary">

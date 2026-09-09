@@ -39,6 +39,8 @@ model User {
   stats         UserStats?
   userBadges    UserBadge[]
   reviews       Review[]
+  purchases     Purchase[]
+  instructorProfile InstructorProfile?
 
   // ID client Stripe (pour le portail + abonnements)
   stripeCustomerId String? @unique
@@ -124,6 +126,22 @@ model Course {
   // Traductions (en, ar) sérialisées en JSON-string : { en: {title,tagline,...}, ar: {...} }
   i18n             String?
   status           String  @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED
+  // ----- Monétisation -----
+  // FREE : accès dès l'inscription. PAID : achat unique requis (priceCents > 0).
+  accessType       String  @default("FREE")
+  // Prix TTC en centimes, dans la devise ci-dessous. 0 tant que FREE.
+  priceCents       Int     @default(0)
+  currency         String  @default("eur")
+  // Part reversée au formateur, en % du montant encaissé (le reste = commission
+  // plateforme). Figée à la publication : changer le barème ne réécrit pas les
+  // ventes déjà faites, chaque Purchase garde son propre découpage.
+  revenueSharePct  Int     @default(70)
+  // Horodatage du prix d'amorçage. Non nul = le tarif a déjà été posé une fois,
+  // le seed n'y retouche plus jamais : un prix changé en back-office survit aux
+  // déploiements suivants.
+  pricingSeededAt  DateTime?
+  stripeProductId  String?
+  stripePriceId    String?
   // Liens optionnels vers les entités relationnelles
   instructorId     String?
   categoryId       String?
@@ -135,9 +153,11 @@ model Course {
   parts        CoursePart[]
   enrollments  Enrollment[]
   reviews      Review[]
+  purchases    Purchase[]
 
   @@index([slug])
   @@index([status])
+  @@index([accessType])
 }
 
 model CoursePart {
@@ -264,12 +284,83 @@ model CourseDraft {
   // URLs des fichiers uploadés (image, vidéo, ressources) en JSON-string
   uploads      String?
   status       String   @default("DRAFT") // DRAFT | SUBMITTED
+  // Prix proposé par le formateur (centimes). L'admin tranche à la validation.
+  priceCents   Int      @default(0)
+  currency     String   @default("eur")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
+}
+
+// ----- Achat de formation (paiement unique) -----
+
+// Une ligne = un droit d'accès payé. C'est ce modèle, et lui seul, qui ouvre
+// une formation PAID : un compte gratuit ne déverrouille plus rien.
+// Le découpage (part formateur / commission) est figé au moment de l'encaissement.
+model Purchase {
+  id                      String  @id @default(cuid())
+  userId                  String
+  courseId                String
+  // pending : session ouverte, argent pas encore confirmé.
+  // paid    : webhook Stripe reçu, accès ouvert.
+  // refunded: remboursé, accès révoqué.
+  status                  String  @default("pending")
+  amountCents             Int     @default(0)
+  currency                String  @default("eur")
+  // Découpage figé (centimes) : ce que garde la plateforme / ce qui part au formateur.
+  platformFeeCents        Int     @default(0)
+  instructorAmountCents   Int     @default(0)
+  // Compte Connect destinataire au moment de la vente (null = vente maison).
+  instructorAccountId     String?
+  stripeCheckoutSessionId String? @unique
+  stripePaymentIntentId   String? @unique
+  paidAt                  DateTime?
+  refundedAt              DateTime?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // Un seul droit d'accès par couple (achat re-tenté = même ligne réutilisée).
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([status])
+}
+
+// ----- Formateurs tiers (candidature + compte de versement Stripe Connect) -----
+
+model InstructorProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  // PENDING | APPROVED | REJECTED — APPROVED bascule aussi User.role à INSTRUCTOR.
+  applicationStatus String @default("PENDING")
+  displayName String
+  headline    String?
+  bio         String?
+  expertise   String?
+  website     String?
+  country     String  @default("FR")
+  // Barème appliqué aux formations de ce formateur (% qui lui revient).
+  revenueSharePct Int  @default(70)
+  // ----- Stripe Connect (compte Express du formateur) -----
+  stripeAccountId String? @unique
+  // Recopiés depuis l'événement account.updated : tant que chargesEnabled est
+  // faux, aucune vente ne peut être routée vers ce compte.
+  chargesEnabled   Boolean @default(false)
+  payoutsEnabled   Boolean @default(false)
+  detailsSubmitted Boolean @default(false)
+  reviewedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([applicationStatus])
 }
 
 // ----- Abonnements Stripe (page "soutenir") -----

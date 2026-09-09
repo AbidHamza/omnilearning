@@ -27,10 +27,20 @@ export default function Footer() {
       ],
     },
     {
+      title: t.footer.colLegal,
+      items: [
+        { label: t.footer.legalNotice, href: "/mentions-legales" },
+        { label: t.footer.terms, href: "/cgu" },
+        { label: t.footer.privacy, href: "/confidentialite" },
+        { label: t.footer.instructorTerms, href: "/conditions-formateurs" },
+      ],
+    },
+    {
       title: t.footer.colAccount,
       items: [
         { label: t.common.signIn, href: "/connexion" },
         { label: t.common.createAccount, href: "/creer-compte" },
+        { label: t.teach.metaTitle, href: "/devenir-formateur" },
         { label: t.nav.settings, href: "/parametres" },
       ],
     },
@@ -38,7 +48,7 @@ export default function Footer() {
 
   return (
     <footer className="section-dark mt-24 border-t border-line text-ink">
-      <div className="container-page grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="container-page grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-bg text-primary">

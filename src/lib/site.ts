@@ -46,6 +46,31 @@ export function alternatesFor(locale: Locale, path = "") {
   return { canonical: `${siteUrl}/${locale}${clean}`, languages };
 }
 
+/**
+ * Carte de partage, une par langue, rendue depuis la charte de l'interface
+ * (fond charbon, vert phosphore, JetBrains Mono). Les chiffres qu'elle affiche
+ * sont ceux du catalogue publié.
+ *
+ * À reposer dans CHAQUE `openGraph` de page : Next remplace l'objet du layout
+ * au lieu de le compléter, donc une page qui déclare son og:url sans image
+ * perd la carte et ressort en bloc gris sur LinkedIn ou WhatsApp.
+ */
+const shareAlt: Record<Locale, string> = {
+  fr: "OmniLearn · 12 formations, 295 leçons, 73 heures",
+  en: "OmniLearn · 12 courses, 295 lessons, 73 hours",
+  ar: "OmniLearn · 12 دورة و295 درسًا و73 ساعة",
+};
+
+export function shareCard(locale: Locale) {
+  return {
+    url: `${siteUrl}/og-${locale}.png`,
+    width: 1200,
+    height: 630,
+    alt: shareAlt[locale],
+    type: "image/png",
+  };
+}
+
 /** URL absolue d'une page dans une langue donnée (og:url, JSON-LD, sitemap). */
 export function pageUrl(locale: Locale, path = ""): string {
   const clean = path && !path.startsWith("/") ? `/${path}` : path;
