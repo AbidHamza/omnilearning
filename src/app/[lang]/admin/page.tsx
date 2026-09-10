@@ -18,8 +18,8 @@ export default async function AdminDashboard({ params }: PageProps<"/[lang]">) {
   await requireRole(locale, ["admin"]);
 
   const [data, applicants] = await Promise.all([
-    getAdminDashboard(),
-    getPendingInstructors(),
+    getAdminDashboard(locale),
+    getPendingInstructors(locale),
   ]);
   if (!data) {
     // requireRole a déjà filtré, donc on n'arrive ici qu'en cas d'incohérence DB.

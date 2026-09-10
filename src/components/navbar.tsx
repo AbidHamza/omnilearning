@@ -3,7 +3,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
-  BellIcon,
   ChevronDown,
   GraduationIcon,
   GlobeIcon,
@@ -149,19 +148,12 @@ export default function Navbar() {
 
               {user ? (
                 <>
-                  <button
-                    aria-label={t.nav.notifications}
-                    className="relative hidden h-9 w-9 place-items-center rounded-full text-muted transition hover:bg-surface md:grid"
-                  >
-                    <BellIcon width={19} height={19} />
-                    <span className="absolute inset-inline-end-2 top-2 h-2 w-2 rounded-full bg-danger ring-2 ring-bg" />
-                  </button>
                   <AccountMenu
                     user={user}
                     roleLabel={roleLabels[role]}
                     open={acctMenu}
                     setOpen={setAcctMenu}
-                    settingsHref={role === "admin" ? "/admin" : "/parametres"}
+                    settingsHref={"/parametres"}
                     settingsLabel={t.nav.settings}
                     logoutLabel={t.auth.logout}
                     onLogout={logout}
@@ -238,7 +230,7 @@ export default function Navbar() {
             {user ? (
               <>
                 <LocaleLink
-                  href={role === "admin" ? "/admin" : "/parametres"}
+                  href={"/parametres"}
                   onClick={() => setOpen(false)}
                   className="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-surface"
                 >

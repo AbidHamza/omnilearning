@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { isLocale, defaultLocale } from "@/i18n/config";
+import { isLocale, defaultLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getCourses } from "@/lib/courses";
 import { requireRole } from "@/lib/dal";
@@ -91,7 +91,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
         <section className="rounded-[var(--radius-card)] bg-surface p-6">
           <h2 className="text-sm text-muted">{d.enrolledTitle}</h2>
           <div className="mt-4 space-y-6">
-            {enrolled.slice(0, 2).map((e) => {
+            {enrolled.map((e) => {
               const resume = resumeLesson(e.course, e.lastLesson);
               const totalLessons = e.course.parts.reduce(
                 (n, p) => n + p.lessons.length,
@@ -110,7 +110,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
                   <div className="mt-2 flex items-center gap-3">
                     <div className="h-2 flex-1 overflow-hidden rounded-full bg-bg">
                       <div
-                        className="h-full rounded-[3px] bg-primary"
+                        className="h-full bg-primary"
                         style={{ width: `${e.progress}%` }}
                       />
                     </div>
@@ -123,15 +123,24 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
                       {resume ? resume.title : ""}
                     </span>
                     <Link
-                      href={
+                      href={localePath(
+                        locale,
                         resume
                           ? `/formations/${e.slug}/${resume.id}`
-                          : `/formations/${e.slug}`
-                      }
+                          : `/formations/${e.slug}`,
+                      )}
                       className="shrink-0 rounded-full border border-line bg-bg px-5 py-1.5 text-sm font-semibold transition hover:border-primary hover:text-primary-dark"
                     >
                       {d.resume}
                     </Link>
+                    {e.progress >= 100 && (
+                      <Link
+                        href={localePath(locale, `/formations/${e.slug}/certificat`)}
+                        className="shrink-0 text-sm font-semibold text-primary-dark hover:underline"
+                      >
+                        {dict.certificate.linkLabel}
+                      </Link>
+                    )}
                   </div>
                 </div>
               );
@@ -158,14 +167,14 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold">{d.progressionHeading}</h2>
           <Link
-            href="/formations"
+            href={localePath(locale, "/formations")}
             className="rounded-full border border-line bg-bg px-4 py-1.5 text-sm font-semibold transition hover:border-primary"
           >
             {d.seeMore}
           </Link>
         </div>
         <div className="mt-5 grid gap-5 md:grid-cols-[200px_1fr]">
-          <div className="rounded-xl bg-bg p-5">
+          <div className="bg-bg p-5">
             <p className="text-sm text-muted">{d.total}</p>
             <ul className="mt-4 space-y-4">
               {totals.map((t) => (

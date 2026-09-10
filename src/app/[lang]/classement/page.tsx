@@ -4,6 +4,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { requireRole } from "@/lib/dal";
 import { auth } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/gamification";
+import { formatNumber } from "@/lib/intl";
 import type { Metadata } from "next";
 
 // Écran privé : derrière une session, sans contenu public. Il n'a rien à faire
@@ -75,7 +76,7 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
                   </p>
                 </div>
                 <span className="shrink-0 font-display text-lg font-bold text-primary">
-                  {r.xp.toLocaleString("fr-FR")}
+                  {formatNumber(r.xp, locale)}
                   <span className="ms-1 text-xs font-normal text-muted">XP</span>
                 </span>
               </li>

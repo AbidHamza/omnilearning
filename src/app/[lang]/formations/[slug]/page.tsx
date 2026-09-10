@@ -8,8 +8,9 @@ import { getCourseAccess } from "@/lib/entitlements";
 import { formatPrice } from "@/lib/pricing";
 import BuyCourseButton from "@/components/buy-course-button";
 import CourseReviews from "@/components/course-reviews";
+import ReviewForm from "@/components/review-form";
 import Curriculum from "@/components/curriculum";
-import { CheckIcon, LockIcon, PlayIcon, UserIcon } from "@/components/icons";
+import { CheckIcon, LockIcon, UserIcon } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
@@ -48,6 +49,8 @@ export default async function CoursePage(
   props: PageProps<"/[lang]/formations/[slug]">,
 ) {
   const { lang, slug } = await props.params;
+  const sp = await props.searchParams;
+  const achat = typeof sp.achat === "string" ? sp.achat : undefined;
   if (!isLocale(lang)) notFound();
   const t = await getDictionary(lang);
   const lp = (path: string) => localePath(lang, path);
@@ -60,6 +63,11 @@ export default async function CoursePage(
   const reviews = await getReviews(course.slug, lang);
   const viewer = await getCourseViewerState(course.slug);
   const access = await getCourseAccess(course.slug);
+  const canReview =
+    access.isAuthenticated &&
+    !access.isOwner &&
+    (access.hasPurchase || viewer.isEnrolled) &&
+    !viewer.hasReviewed;
   const needsPurchase =
     access.accessType === "PAID" && !access.hasPurchase && !access.isOwner;
   const price = formatPrice(access.priceCents, access.currency, lang);
@@ -224,26 +232,18 @@ export default async function CoursePage(
       {needsPurchase && (
         <p className="mt-2 text-xs text-muted">{c.refundNote}</p>
       )}
-
-      {/* Description + vidéo */}
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div>
-          <h2 className="text-xl font-bold">{c.description}</h2>
-          <p className="mt-3 max-w-xl leading-relaxed text-muted">
-            {course.description}
+        {(achat === "ok" || achat === "annule") && (
+          <p
+            role="status"
+            className={`mt-4 rounded-[3px] px-4 py-3 text-sm font-semibold ${achat === "ok" ? "bg-success-soft text-success" : "bg-warning/15 text-warning"}`}
+          >
+            {achat === "ok" ? c.purchaseSuccess : c.purchaseCancelled}
           </p>
-        </div>
-        <button
-          className="group relative grid aspect-video place-items-center overflow-hidden rounded-[var(--radius-card)] text-white"
-          style={{ background: course.accent }}
-        >
-          <span className="grid h-16 w-16 place-items-center rounded-full bg-white/90 text-ink transition-transform group-hover:scale-105">
-            <PlayIcon width={26} height={26} />
-          </span>
-          <span className="absolute bottom-3 inset-inline-start-4 text-xs text-white/80">
-            {c.trailer}
-          </span>
-        </button>
+        )}
+
+      <div className="mt-10 max-w-2xl">
+        <h2 className="text-xl font-bold">{c.description}</h2>
+        <p className="mt-3 leading-relaxed text-muted">{course.description}</p>
       </div>
 
       {/* Programme détaillé (accordéon, cadenas pour les visiteurs, coches
@@ -333,7 +333,12 @@ export default async function CoursePage(
         summary={reviews}
         title={reviewsTitle}
         countLabel={t.reviews.count}
+        locale={lang}
       />
+      {canReview && <ReviewForm slug={course.slug} />}
+      {!canReview && access.isAuthenticated && viewer.hasReviewed && (
+        <p className="mt-8 text-sm font-semibold text-success">{t.reviews.errors.alreadyReviewed}</p>
+      )}
 
       {/* CTA de fin de page. Sur un cours payant non acheté, il n'y a rien à
           « commencer » : le bouton mène au paiement, pas à un mur. */}

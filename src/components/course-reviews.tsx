@@ -1,4 +1,5 @@
 import type { ReviewSummary } from "@/lib/courses";
+import { formatNumber } from "@/lib/intl";
 
 function Stars({ rating, className = "" }: { rating: number; className?: string }) {
   // Étoiles pleines/vides, arrondi au demi près pour l'affichage agrégé.
@@ -18,10 +19,12 @@ export default function CourseReviews({
   summary,
   title,
   countLabel,
+  locale,
 }: {
   summary: ReviewSummary;
   title: string;
   countLabel: string;
+  locale: string;
 }) {
   if (summary.count === 0) return null;
 
@@ -34,13 +37,13 @@ export default function CourseReviews({
         <div className="rounded-[var(--radius-card)] bg-surface p-5">
           <div className="flex items-baseline gap-2">
             <span className="font-display text-4xl font-extrabold">
-              {summary.average.toLocaleString("fr-FR")}
+              {formatNumber(summary.average, locale)}
             </span>
             <span className="text-sm text-muted">/ 5</span>
           </div>
           <Stars rating={summary.average} className="mt-1 text-lg" />
           <p className="mt-1 text-xs text-muted">
-            {summary.count.toLocaleString("fr-FR")} {countLabel}
+            {formatNumber(summary.count, locale)} {countLabel}
           </p>
 
           <div className="mt-4 space-y-1.5">

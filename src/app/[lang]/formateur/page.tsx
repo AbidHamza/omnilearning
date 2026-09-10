@@ -1,5 +1,10 @@
 import { isLocale, defaultLocale } from "@/i18n/config";
-import { getInstructorDashboard, getInstructorPayouts, requireRole } from "@/lib/dal";
+import {
+  getInstructorDashboard,
+  getInstructorEnrollmentsByDay,
+  getInstructorPayouts,
+  requireRole,
+} from "@/lib/dal";
 import FormateurClient from "./formateur-client";
 import type { Metadata } from "next";
 
@@ -20,9 +25,10 @@ export default async function FormateurDashboard({
   // Garde serveur : formateur ou admin réel uniquement.
   const { user } = await requireRole(locale, ["formateur", "admin"]);
 
-  const [data, payouts] = await Promise.all([
+  const [data, payouts, enrollmentsByDay] = await Promise.all([
     getInstructorDashboard(),
-    getInstructorPayouts(),
+    getInstructorPayouts(locale),
+    getInstructorEnrollmentsByDay(14),
   ]);
   const name = data?.name ?? user.name;
   const created = data?.created ?? [];
@@ -39,6 +45,7 @@ export default async function FormateurDashboard({
       created={created}
       stats={stats}
       payouts={payouts}
+      enrollmentsByDay={enrollmentsByDay}
       justBack={justBack}
     />
   );

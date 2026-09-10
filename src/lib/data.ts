@@ -559,9 +559,9 @@ export const instructorUser: User = {
   enrolled: [],
   certificates: [],
   created: [
-    { title: "Cybersécurité niveau 1", status: "online", started: 15, finished: 6 },
-    { title: "Cybersécurité niveau 2", status: "pending", started: 0, finished: 0 },
-    { title: "Sécuriser ses bases de données", status: "draft", started: 0, finished: 0 },
+    { id: "mock-1", title: "Cybersécurité niveau 1", status: "online", started: 15, finished: 6 },
+    { id: "mock-2", title: "Cybersécurité niveau 2", status: "pending", started: 0, finished: 0 },
+    { id: "mock-3", title: "Sécuriser ses bases de données", status: "draft", started: 0, finished: 0 },
   ],
   stats: { started: 15, finished: 6, rating: 4.0 },
 };

@@ -97,6 +97,12 @@ export type Role = "visiteur" | "etudiant" | "formateur" | "admin";
 export type CourseStatus = "online" | "pending" | "draft";
 
 export interface CreatedCourse {
+  /** Id du Course publié, ou du CourseDraft pour un brouillon. */
+  id: string;
+  /** Présent pour un cours publié : mène à sa fiche. */
+  slug?: string;
+  /** Présent pour un brouillon : mène à l'assistant de reprise. */
+  draftId?: string;
   title: string;
   status: CourseStatus;
   started: number;
