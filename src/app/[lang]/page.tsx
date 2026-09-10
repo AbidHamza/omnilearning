@@ -16,6 +16,7 @@ import {
 } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localePath, type Locale } from "@/i18n/config";
+import { intlTag } from "@/lib/intl";
 import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
 import { notFound } from "next/navigation";
 
@@ -126,7 +127,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
 
   const n = chiffresCatalogue(allCourses);
-  const nf = new Intl.NumberFormat(lang === "ar" ? "ar" : lang === "en" ? "en-US" : "fr-FR");
+  const nf = new Intl.NumberFormat(intlTag(lang));
   const stats = [
     { value: nf.format(n.formations), label: t.home.statCourses },
     { value: nf.format(n.lecons), label: t.home.statLessons },

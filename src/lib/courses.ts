@@ -205,8 +205,8 @@ export const getCourses = cache(async (): Promise<Course[]> => {
 /** Fiche cours : métadonnées + sommaire, sans le contenu des leçons. */
 export const getCourseOutline = cache(
   async (slug: string): Promise<Course | undefined> => {
-    const c = await prisma.course.findUnique({
-      where: { slug },
+    const c = await prisma.course.findFirst({
+      where: { slug, status: "PUBLISHED" },
       include: outlineInclude,
     });
     return c ? toUiCourse(c) : undefined;
@@ -219,8 +219,8 @@ export const getCourseOutline = cache(
  * portent leur `correctIndex`. Pour l'affichage, voir `toPublicQuestions`.
  */
 export const getCourse = cache(async (slug: string): Promise<Course | undefined> => {
-  const c = await prisma.course.findUnique({
-    where: { slug },
+  const c = await prisma.course.findFirst({
+    where: { slug, status: "PUBLISHED" },
     include: fullInclude,
   });
   return c ? toUiCourse(c) : undefined;

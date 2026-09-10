@@ -49,3 +49,4 @@ prisma/*.db
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+replay-result.json

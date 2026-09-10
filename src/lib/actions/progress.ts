@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { awardXp } from "@/lib/gamification";
+import { QUIZ_PASS_RATIO } from "@/lib/curriculum";
 
 // Persiste la progression (inscriptions, leçons terminées, tentatives de quiz)
 // liée à l'utilisateur connecté. No-op silencieux si non connecté (mode démo).
@@ -141,7 +142,8 @@ export async function recordQuizAttemptAction(input: {
   });
   if (!lesson) return { ok: false as const };
 
-  const isPassed = input.maxScore > 0 && input.score / input.maxScore >= 0.7;
+  const isPassed =
+    input.maxScore > 0 && input.score / input.maxScore >= QUIZ_PASS_RATIO;
 
   await prisma.quizAttempt.create({
     data: {

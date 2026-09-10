@@ -9,6 +9,8 @@ import {
   MAX_PRICE_CENTS,
   MIN_PRICE_CENTS,
 } from "@/lib/pricing";
+import { countLessons, parseCurriculum, totalMinutes } from "@/lib/curriculum";
+import { locales } from "@/i18n/config";
 
 export type ModerationResult =
   | { ok: true }
@@ -29,9 +31,45 @@ function finalPrice(override: number | undefined, proposed: number): number {
   return cents;
 }
 
-// Approuve ou refuse un brouillon de formation soumis (CourseDraft SUBMITTED).
-// Réservé aux admins. L'approbation publie un Course minimal lié à l'auteur ;
-// le refus repasse le brouillon en DRAFT (renvoyé au formateur).
+function splitList(raw: string | null): string | null {
+  if (!raw) return null;
+  const items = raw
+    .split(/[,\n;]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return items.length ? JSON.stringify(items) : null;
+}
+
+function refreshAll() {
+  for (const l of locales) {
+    revalidatePath(`/${l}/admin`);
+    revalidatePath(`/${l}/formateur`);
+    revalidatePath(`/${l}/formations`);
+    revalidatePath(`/${l}`);
+  }
+}
+
+type UploadRef = { field: string; url: string; name: string };
+
+function parseUploads(raw: string | null): UploadRef[] {
+  if (!raw) return [];
+  try {
+    const v = JSON.parse(raw);
+    return Array.isArray(v)
+      ? v.filter(
+          (u): u is UploadRef =>
+            !!u && typeof u.url === "string" && typeof u.field === "string",
+        )
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+// Approuve ou refuse un brouillon soumis (CourseDraft SUBMITTED). Réservé aux
+// admins. L'approbation publie un Course complet : parties, leçons, vidéos et
+// quiz saisis par le formateur, couverture envoyée. Le refus repasse le
+// brouillon en DRAFT, le formateur le retrouve dans son espace.
 export async function moderateDraftAction(
   draftId: string,
   approved: boolean,
@@ -49,7 +87,7 @@ export async function moderateDraftAction(
         select: {
           id: true,
           name: true,
-          instructorProfile: { select: { revenueSharePct: true } },
+          instructorProfile: { select: { revenueSharePct: true, bio: true } },
         },
       },
     },
@@ -60,16 +98,22 @@ export async function moderateDraftAction(
   }
 
   if (!approved) {
-    // Refus : renvoyé au formateur en l'état de brouillon.
     await prisma.courseDraft.update({
       where: { id: draftId },
       data: { status: "DRAFT" },
     });
-    revalidatePath("/fr/admin");
+    refreshAll();
     return { ok: true };
   }
 
-  // Approbation : publie un Course à partir des champs du brouillon.
+  const modules = parseCurriculum(draft.curriculum);
+  if (countLessons(modules) === 0) {
+    return {
+      ok: false,
+      error: "Ce brouillon n'a aucune leçon : il ne peut pas être publié.",
+    };
+  }
+
   const title = draft.name?.trim() || "Formation sans titre";
   const baseSlug =
     title
@@ -79,17 +123,57 @@ export async function moderateDraftAction(
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "") || `formation-${draftId.slice(0, 6)}`;
 
-  // Garantit l'unicité du slug.
   let slug = baseSlug;
   for (let i = 2; await prisma.course.findUnique({ where: { slug } }); i++) {
     slug = `${baseSlug}-${i}`;
   }
 
-  // Le prix décide de tout le reste : accessType, part formateur, devise.
-  // Un cours à 0 reste FREE, personne n'a de session Stripe à créer pour lui.
   const priceCents = finalPrice(priceCentsOverride, draft.priceCents);
   const sharePct =
     draft.author.instructorProfile?.revenueSharePct ?? DEFAULT_REVENUE_SHARE_PCT;
+
+  const uploads = parseUploads(draft.uploads);
+  const cover = uploads.find((u) => u.field === "cover")?.url;
+  const trailer = uploads.find((u) => u.field === "video")?.url;
+
+  // Les deux premières leçons restent ouvertes sans compte, comme pour les
+  // formations maison : c'est ce que le catalogue annonce.
+  let lessonIndex = 0;
+  const contentTypes = new Set<string>();
+  const parts = modules.map((m, order) => ({
+    title: m.title,
+    order,
+    lessons: {
+      create: m.lessons.map((l, lo) => {
+        lessonIndex += 1;
+        contentTypes.add(l.type);
+        const questions = l.questions?.map((q, qi) => ({
+          id: `q${qi + 1}`,
+          prompt: q.prompt,
+          options: q.options,
+          correctIndex: q.correctIndex,
+          ...(q.explanation ? { explanation: q.explanation } : null),
+        }));
+        // Une vidéo sans fichier : la première leçon reprend la bande-annonce
+        // envoyée avec le brouillon, les autres affichent leur texte.
+        const videoUrl = l.videoUrl ?? (lessonIndex === 1 ? trailer : undefined);
+        return {
+          key: `l${lessonIndex}`,
+          title: l.title,
+          type: l.type,
+          duration: l.durationMin > 0 ? `${l.durationMin} min` : "",
+          body: l.body ?? null,
+          videoUrl: l.type === "video" ? (videoUrl ?? null) : null,
+          videoDurationSec: l.type === "video" && l.durationMin ? l.durationMin * 60 : null,
+          questions: questions?.length ? JSON.stringify(questions) : null,
+          isFree: lessonIndex <= 2,
+          order: lo,
+        };
+      }),
+    },
+  }));
+
+  const objectives = splitList(draft.skills);
 
   await prisma.$transaction([
     prisma.course.create({
@@ -101,25 +185,26 @@ export async function moderateDraftAction(
         category: draft.category ?? "Général",
         level: draft.level ?? "Débutant",
         instructorName: draft.author.name ?? "Formateur",
+        instructorBio: draft.author.instructorProfile?.bio ?? null,
         instructorId: draft.author.id,
-        image: "/og.png",
+        image: cover ?? "/og.png",
+        hours: Math.max(1, Math.ceil(totalMinutes(modules) / 60)),
         status: "PUBLISHED",
         accessType: priceCents > 0 ? "PAID" : "FREE",
         priceCents,
         currency: draft.currency || DEFAULT_CURRENCY,
         revenueSharePct: sharePct,
-        // Le prix vient d'être tranché à la main : le seed de prix n'a plus
-        // rien à faire sur cette ligne.
         pricingSeededAt: new Date(),
-        skills: draft.skills ? JSON.stringify(draft.skills.split(",").map((s) => s.trim())) : null,
-        prerequisites: draft.prerequisites
-          ? JSON.stringify(draft.prerequisites.split(",").map((s) => s.trim()))
-          : null,
+        skills: splitList(draft.skills),
+        objectives,
+        prerequisites: splitList(draft.prerequisites),
+        contentTypes: JSON.stringify([...contentTypes]),
+        parts: { create: parts },
       },
     }),
     prisma.courseDraft.delete({ where: { id: draftId } }),
   ]);
 
-  revalidatePath("/fr/admin");
+  refreshAll();
   return { ok: true };
 }

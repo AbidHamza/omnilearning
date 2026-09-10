@@ -1,5 +1,10 @@
 import { isLocale, defaultLocale } from "@/i18n/config";
-import { getInstructorDashboard, getBillingState, requireRole } from "@/lib/dal";
+import {
+  getInstructorDashboard,
+  getBillingState,
+  getPurchasesForUser,
+  requireRole,
+} from "@/lib/dal";
 import { getCourses } from "@/lib/courses";
 import type { User } from "@/lib/types";
 import ParametresClient from "./parametres-client";
@@ -17,7 +22,10 @@ export default async function ParametresPage({ params }: PageProps<"/[lang]">) {
 
   // Garde serveur : tout utilisateur authentifié (étudiant, formateur, admin).
   const { role, user } = await requireRole(locale, ["etudiant", "formateur", "admin"]);
-  const billing = await getBillingState();
+  const [billing, purchases] = await Promise.all([
+    getBillingState(),
+    getPurchasesForUser(locale),
+  ]);
 
   // Formateur/admin : enrichir avec les vraies formations créées + stats.
   let enriched: User = user;
@@ -36,6 +44,7 @@ export default async function ParametresPage({ params }: PageProps<"/[lang]">) {
       user={enriched}
       courseTitles={courseTitles}
       billing={billing}
+      purchases={purchases}
     />
   );
 }

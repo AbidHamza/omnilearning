@@ -283,6 +283,9 @@ model CourseDraft {
   activities   String?
   // URLs des fichiers uploadés (image, vidéo, ressources) en JSON-string
   uploads      String?
+  // Modules et leçons saisis par le formateur, en JSON-string :
+  // [{ title, lessons:[{ title, type, duration, body?, videoUrl?, questions? }] }]
+  curriculum   String?
   status       String   @default("DRAFT") // DRAFT | SUBMITTED
   // Prix proposé par le formateur (centimes). L'admin tranche à la validation.
   priceCents   Int      @default(0)

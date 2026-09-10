@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { CreatedCourse, CourseStatus, InstructorStats } from "@/lib/types";
 import { ClockIcon, LayersIcon, StarIcon } from "@/components/icons";
-import ProgressChart from "@/components/progress-chart";
+import ProgressChart, { type ChartPoint } from "@/components/progress-chart";
 import { useT } from "@/i18n/provider";
+import { LocaleLink } from "@/i18n/navigation";
 import type { InstructorPayouts } from "@/lib/dal";
 import PayoutsPanel from "./payouts-panel";
 
@@ -20,12 +19,14 @@ export default function FormateurClient({
   created,
   stats,
   payouts,
+  enrollmentsByDay,
   justBack,
 }: {
   name: string;
   created: CreatedCourse[];
   stats: InstructorStats;
   payouts: InstructorPayouts | null;
+  enrollmentsByDay: ChartPoint[];
   justBack: boolean;
 }) {
   const t = useT();
@@ -35,7 +36,6 @@ export default function FormateurClient({
     pending: t.status.pending,
     draft: t.status.draft,
   };
-  const router = useRouter();
 
   const firstName = name.split(" ")[0];
   const actions = created.filter((c) => c.status !== "online");
@@ -49,28 +49,27 @@ export default function FormateurClient({
         {i.titleLead} <span className="text-primary">{i.titleAccent}</span>
       </h1>
 
-      {/* Vos actions en cours */}
       <section className="mt-8 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">
         <h2 className="text-sm font-semibold text-muted">{i.actionsTitle}</h2>
         {actions.length === 0 ? (
-          <p className="mt-4 rounded-xl bg-bg px-4 py-3.5 text-sm text-muted">
+          <p className="mt-4 rounded-[3px] bg-bg px-4 py-3.5 text-sm text-muted">
             {i.noActions}
           </p>
         ) : (
           <ul className="mt-4 space-y-3">
             {actions.map((c) => (
               <li
-                key={c.title}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-bg px-4 py-3.5"
+                key={c.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[3px] bg-bg px-4 py-3.5"
               >
                 <span className="font-display font-bold">{c.title}</span>
-                {c.status === "draft" ? (
-                  <Link
-                    href="/creer"
+                {c.status === "draft" && c.draftId ? (
+                  <LocaleLink
+                    href={`/creer?draft=${c.draftId}`}
                     className="rounded-[3px] bg-primary px-4 py-2 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
                   >
                     {i.continueCreating}
-                  </Link>
+                  </LocaleLink>
                 ) : (
                   <span className="text-sm text-muted">{i.pendingAdmin}</span>
                 )}
@@ -82,18 +81,17 @@ export default function FormateurClient({
 
       {payouts && <PayoutsPanel data={payouts} justBack={justBack} />}
 
-      {/* Tableau des formations */}
       <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">
         <h2 className="text-sm font-semibold text-muted">{i.tableTitle}</h2>
 
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[680px] border-collapse text-sm">
             <thead>
-              <tr className="text-left align-top text-xs font-semibold text-muted">
-                <th className="pb-3 pr-4 font-semibold">{i.colName}</th>
-                <th className="pb-3 pr-4 font-semibold">{i.colStatus}</th>
-                <th className="pb-3 pr-4 font-semibold">{i.colStarted}</th>
-                <th className="pb-3 pr-4 font-semibold">{i.colFinished}</th>
+              <tr className="text-start align-top text-xs font-semibold text-muted">
+                <th className="pb-3 pe-4 font-semibold">{i.colName}</th>
+                <th className="pb-3 pe-4 font-semibold">{i.colStatus}</th>
+                <th className="pb-3 pe-4 font-semibold">{i.colStarted}</th>
+                <th className="pb-3 pe-4 font-semibold">{i.colFinished}</th>
                 <th className="pb-3 font-semibold">{i.colActions}</th>
               </tr>
             </thead>
@@ -106,30 +104,29 @@ export default function FormateurClient({
                 </tr>
               ) : (
                 created.map((c) => (
-                  <tr key={c.title} className="border-t border-line align-middle">
-                    <td className="py-4 pr-4 font-semibold">{c.title}</td>
-                    <td className="py-4 pr-4">
+                  <tr key={c.id} className="border-t border-line align-middle">
+                    <td className="py-4 pe-4 font-semibold">{c.title}</td>
+                    <td className="py-4 pe-4">
                       <span
                         className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${statusCls[c.status]}`}
                       >
                         {statusLabel[c.status]}
                       </span>
                     </td>
-                    <td className="py-4 pr-4 font-semibold">{c.started}</td>
-                    <td className="py-4 pr-4">
+                    <td className="py-4 pe-4 font-semibold">{c.started}</td>
+                    <td className="py-4 pe-4">
                       {c.status === "online" ? c.finished : "--"}
                     </td>
                     <td className="py-4">
-                      <div className="flex gap-2">
-                        {c.status === "draft" ? (
-                          <RowBtn href="/creer">{t.actions.continue}</RowBtn>
-                        ) : (
-                          <RowBtn href="/creer">{t.actions.edit}</RowBtn>
-                        )}
-                        {c.status === "online" && (
-                          <RowBtn href="/formations/cybersecurite">{t.actions.viewPlus}</RowBtn>
-                        )}
-                      </div>
+                      {c.status === "draft" && c.draftId && (
+                        <RowBtn href={`/creer?draft=${c.draftId}`}>{t.actions.continue}</RowBtn>
+                      )}
+                      {c.status === "online" && c.slug && (
+                        <RowBtn href={`/formations/${c.slug}`}>{t.actions.view}</RowBtn>
+                      )}
+                      {c.status === "pending" && (
+                        <span className="text-xs text-muted">{i.pendingAdmin}</span>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -139,26 +136,20 @@ export default function FormateurClient({
         </div>
 
         <div className="mt-6 flex justify-center">
-          <button
-            onClick={() => router.push("/creer")}
+          <LocaleLink
+            href="/creer"
             className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
           >
             {i.createNew}
-          </button>
+          </LocaleLink>
         </div>
       </section>
 
-      {/* Statistiques */}
       <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">{i.statsTitle}</h2>
-          <button className="rounded-full border border-line bg-bg px-4 py-1.5 text-sm font-semibold transition hover:border-primary">
-            {i.viewDetail}
-          </button>
-        </div>
+        <h2 className="font-display text-xl font-bold">{i.statsTitle}</h2>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[300px_1fr]">
-          <div className="rounded-xl bg-bg p-5">
+          <div className="rounded-[3px] bg-bg p-5">
             <p className="text-sm font-semibold text-muted">{i.total}</p>
             <ul className="mt-4 space-y-4">
               <StatRow icon={<LayersIcon width={18} height={18} />} value={stats.started}>
@@ -176,7 +167,11 @@ export default function FormateurClient({
             </ul>
           </div>
 
-          <ProgressChart title={i.viewsTitle} />
+          <ProgressChart
+            title={i.enrollmentsTitle}
+            data={enrollmentsByDay}
+            emptyText={i.enrollmentsEmpty}
+          />
         </div>
       </section>
     </div>
@@ -185,12 +180,12 @@ export default function FormateurClient({
 
 function RowBtn({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link
+    <LocaleLink
       href={href}
       className="rounded-full border border-line bg-bg px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark"
     >
       {children}
-    </Link>
+    </LocaleLink>
   );
 }
 

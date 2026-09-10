@@ -1,22 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useTransition } from "react";
 import type { CourseStatus, Role, User } from "@/lib/types";
+import type { PurchaseRow } from "@/lib/dal";
 import BillingPortalButton from "@/components/billing-portal-button";
-import { useT } from "@/i18n/provider";
+import { useI18n } from "@/i18n/provider";
+import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
+import { formatPrice } from "@/lib/pricing";
+import {
+  changePasswordAction,
+  updateProfileAction,
+  type ProfileError,
+} from "@/lib/actions/profile";
+import { deleteDraftAction } from "@/lib/actions/draft";
 import {
   ClockIcon,
-  EyeIcon,
   LayersIcon,
-  PencilIcon,
   ShieldIcon,
   StarIcon,
+  TrashIcon,
   UserIcon,
 } from "@/components/icons";
 
 const inputCls =
-  "mt-2 w-full rounded-lg border border-line bg-bg px-3.5 py-2.5 text-sm outline-none transition focus:border-primary";
+  "mt-2 w-full rounded-[3px] border border-line bg-bg px-3.5 py-2.5 text-sm outline-none transition focus:border-primary";
+const panelCls = "border-t border-line py-4 text-sm";
+const primaryBtn =
+  "rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:opacity-50";
+const ghostBtn =
+  "rounded-[3px] border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary disabled:opacity-50";
+const rowLink =
+  "rounded-[3px] border border-line px-3 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark";
+const thCls = "pb-3 pe-4 text-start text-xs font-semibold text-muted";
+const tdCls = "py-3 pe-4";
 
 const statusCls: Record<CourseStatus, string> = {
   online: "bg-success-soft text-success",
@@ -24,12 +40,11 @@ const statusCls: Record<CourseStatus, string> = {
   draft: "bg-surface-2 text-muted",
 };
 
-// Un onglet « Certifications » figurait ici. La plateforme ne délivre aucun
-// certificat : dal.ts renvoie une liste vide en dur, la base n'a pas de modèle,
-// et le bouton de téléchargement n'était relié à rien. L'onglet ne pouvait donc
-// qu'afficher son état vide, définitivement. Retiré en attendant que la
-// fonctionnalité existe.
-type TabId = "profile" | "reminders" | "tracking" | "created" | "stats";
+// Deux onglets ont existé ici sans rien derrière : « Certifications » (aucun
+// modèle en base) et « Rappels » (aucun champ de notification, aucun envoi).
+// Un formulaire qui n'enregistre rien trompe l'utilisateur : ils reviendront
+// avec leur backend.
+type TabId = "profile" | "tracking" | "purchases" | "created" | "stats";
 
 export interface BillingState {
   stripeEnabled: boolean;
@@ -41,20 +56,22 @@ export default function ParametresClient({
   user,
   courseTitles,
   billing,
+  purchases,
 }: {
   role: Role;
   user: User;
   // slug -> titre, pour résoudre les cours suivis sans dépendre des données démo.
   courseTitles: Record<string, string>;
   billing: BillingState;
+  purchases: PurchaseRow[];
 }) {
-  const t = useT();
+  const { dict: t } = useI18n();
   const s = t.settings;
 
   const labels: Record<TabId, string> = {
     profile: s.tabProfile,
-    reminders: s.tabReminders,
     tracking: s.tabTracking,
+    purchases: s.tabPurchases,
     created: s.tabCreated,
     stats: s.tabStats,
   };
@@ -64,7 +81,7 @@ export default function ParametresClient({
       ? ["profile", "created", "stats"]
       : role === "admin"
         ? ["profile"]
-        : ["profile", "reminders", "tracking"];
+        : ["profile", "tracking", "purchases"];
 
   const [tab, setTab] = useState<TabId>(tabIds[0]);
 
@@ -76,15 +93,13 @@ export default function ParametresClient({
       <h1 className="text-4xl font-semibold">{t.nav.settings}</h1>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[240px_1fr]">
-        <nav className="flex gap-2 overflow-x-auto border-line lg:flex-col lg:overflow-visible lg:border-r lg:pr-6">
+        <nav className="flex gap-2 overflow-x-auto border-line lg:flex-col lg:overflow-visible lg:border-e lg:pe-6">
           {tabIds.map((id) => (
             <button
               key={id}
               onClick={() => setTab(id)}
-              className={`shrink-0 rounded-lg px-4 py-2.5 text-left text-sm transition ${
-                tab === id
-                  ? "bg-primary-soft font-bold text-primary-dark"
-                  : "text-muted hover:bg-surface"
+              className={`shrink-0 rounded-[3px] px-4 py-2.5 text-start text-sm ${
+                tab === id ? "bg-primary-soft font-bold text-primary-dark" : "text-muted hover:bg-surface"
               }`}
             >
               {labels[id]}
@@ -94,10 +109,8 @@ export default function ParametresClient({
 
         <div className="max-w-xl">
           {tab === "profile" && <ProfileTab user={user} billing={billing} />}
-          {tab === "reminders" && <RappelsTab />}
-          {tab === "tracking" && (
-            <SuiviTab user={user} courseTitles={courseTitles} />
-          )}
+          {tab === "tracking" && <SuiviTab user={user} courseTitles={courseTitles} />}
+          {tab === "purchases" && <PurchasesTab purchases={purchases} />}
           {tab === "created" && <FormationsCreesTab user={user} />}
           {tab === "stats" && <StatsTab user={user} />}
         </div>
@@ -107,312 +120,122 @@ export default function ParametresClient({
 }
 
 function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
-  const s = useT().settings;
-  const [saved, setSaved] = useState(false);
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
-      }}
-    >
-      <h2 className="flex items-center gap-2 font-display text-lg font-bold">
-        <UserIcon width={20} height={20} /> {s.profileHeading}
-      </h2>
+  const s = useI18n().dict.settings;
+  const router = useLocaleRouter();
+  const [name, setName] = useState(user.name);
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [profileMsg, setProfileMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [pwMsg, setPwMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [savingProfile, startProfile] = useTransition();
+  const [savingPw, startPw] = useTransition();
 
-      <p className="mt-6 text-sm font-semibold">{s.photoLabel}</p>
-      <div className="mt-2 flex items-center gap-4">
-        <span className="grid h-16 w-16 place-items-center rounded-full bg-brand-soft text-lg font-bold text-primary-dark">
-          {user.initials}
-        </span>
-        <button
-          type="button"
-          className="inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary"
-        >
-          <PencilIcon width={14} height={14} />
-          {s.changePhoto}
-        </button>
-      </div>
+  const errorText = (code: ProfileError) => s.profileErrors[code];
 
-      <label className="mt-6 block text-sm font-semibold">{s.nameLabel}</label>
-      <input defaultValue={user.name} className={inputCls} />
-
-      <label className="mt-5 block text-sm font-semibold">{s.emailLabel}</label>
-      <input type="email" defaultValue={user.email} className={inputCls} />
-
-      <h2 className="mt-10 flex items-center gap-2 font-display text-lg font-bold">
-        <ShieldIcon width={19} height={19} /> {s.changePwHeading}
-      </h2>
-      <label className="mt-5 block text-sm font-semibold">{s.currentPw}</label>
-      <input type="password" placeholder="••••••••" className={inputCls} />
-      <label className="mt-5 block text-sm font-semibold">{s.newPw}</label>
-      <input type="password" placeholder="••••••••" className={inputCls} />
-
-      <div className="mt-7 flex items-center gap-3">
-        <button
-          type="submit"
-          className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
-        >
-          {s.changePwBtn}
-        </button>
-        {saved && <span className="text-sm text-success">{s.saved} ✓</span>}
-      </div>
-
-      {billing.stripeEnabled && <BillingPortalButton hasCustomer={billing.hasCustomer} />}
-    </form>
-  );
-}
-
-function FormationsCreesTab({ user }: { user: User }) {
-  const t = useT();
-  const s = t.settings;
-  const statusLabel: Record<CourseStatus, string> = {
-    online: t.status.online,
-    pending: t.status.pending,
-    draft: t.status.draft,
-  };
-  const created = user.created ?? [];
-  return (
-    <div>
-      <h2 className="font-display text-lg font-bold">{s.createdHeading}</h2>
-      <p className="mt-1 text-sm text-muted">{s.createdSubtitle}</p>
-
-      <div className="mt-5 space-y-3">
-        {created.length === 0 ? (
-          <p className="rounded-xl bg-surface px-4 py-3.5 text-sm text-muted">
-            {s.noCreated}
-          </p>
-        ) : (
-          created.map((c) => (
-            <div
-              key={c.title}
-              className="flex flex-wrap items-center gap-3 rounded-xl bg-surface px-4 py-3.5"
-            >
-              <span className="font-semibold">{c.title}</span>
-              <span
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusCls[c.status]}`}
-              >
-                {statusLabel[c.status]}
-              </span>
-              <div className="ml-auto flex gap-2">
-                {c.status === "online" && <Pill href="/creer">{t.actions.edit}</Pill>}
-                {c.status === "draft" && <Pill href="/creer">{t.actions.resume}</Pill>}
-                <Pill href="/formations/cybersecurite" icon>
-                  {t.actions.view}
-                </Pill>
-                {c.status !== "pending" && (
-                  <button className="rounded-full border border-line bg-bg px-3.5 py-1.5 text-xs font-semibold text-muted transition hover:border-danger hover:text-danger">
-                    {t.actions.delete}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
-function StatsTab({ user }: { user: User }) {
-  const s = useT().settings;
-  const stats = user.stats;
-  const created = user.created ?? [];
-  if (!stats) return null;
-  const tiles = [
-    { icon: LayersIcon, value: stats.started, label: s.statStarted },
-    { icon: ClockIcon, value: stats.finished, label: s.statFinished },
-    {
-      icon: StarIcon,
-      value: stats.rating.toFixed(1).replace(".0", ""),
-      label: s.statRating,
-    },
-  ];
-  return (
-    <div>
-      <h2 className="font-display text-lg font-bold">{s.statsHeading}</h2>
-
-      <div className="mt-5 grid grid-cols-3 gap-3">
-        {tiles.map((t) => (
-          <div key={t.label} className="rounded-xl bg-surface p-4 text-center">
-            <span className="mx-auto grid h-9 w-9 place-items-center rounded-full bg-brand-soft text-primary-dark">
-              <t.icon width={18} height={18} />
-            </span>
-            <div className="mt-2 font-display text-2xl font-bold">{t.value}</div>
-            <div className="text-xs text-muted">{t.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-6 overflow-x-auto">
-        <table className="w-full min-w-[420px] border-collapse text-sm">
-          <thead>
-            <tr className="text-left text-xs font-semibold text-muted">
-              <th className="pb-3 pr-4 font-semibold">{s.tableFormation}</th>
-              <th className="pb-3 pr-4 font-semibold">{s.tableStarted}</th>
-              <th className="pb-3 font-semibold">{s.tableFinished}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {created.map((c) => (
-              <tr key={c.title} className="border-t border-line">
-                <td className="py-3 pr-4 font-medium">{c.title}</td>
-                <td className="py-3 pr-4">{c.started}</td>
-                <td className="py-3">{c.status === "online" ? c.finished : "--"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-function Pill({
-  href,
-  children,
-  icon,
-}: {
-  href: string;
-  children: React.ReactNode;
-  icon?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-bg px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark"
-    >
-      {icon && <EyeIcon width={13} height={13} />}
-      {children}
-    </Link>
-  );
-}
-
-function RappelsTab() {
-  const t = useT();
-  const s = t.settings;
-  const days = s.days;
-  const [all, setAll] = useState(false);
-  const [picked, setPicked] = useState<string[]>([]);
-
-  function toggleAll() {
-    const v = !all;
-    setAll(v);
-    setPicked(v ? [...days] : []);
+  function saveProfile(e: React.FormEvent) {
+    e.preventDefault();
+    setProfileMsg(null);
+    startProfile(async () => {
+      const res = await updateProfileAction(name);
+      if (res.ok) {
+        setProfileMsg({ ok: true, text: s.profileSaved });
+        router.refresh();
+      } else {
+        setProfileMsg({ ok: false, text: errorText(res.error) });
+      }
+    });
   }
-  function toggleDay(d: string) {
-    setPicked((p) => {
-      const nx = p.includes(d) ? p.filter((x) => x !== d) : [...p, d];
-      setAll(nx.length === days.length);
-      return nx;
+
+  function savePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwMsg(null);
+    startPw(async () => {
+      const res = await changePasswordAction(current, next);
+      if (res.ok) {
+        setPwMsg({ ok: true, text: s.passwordSaved });
+        setCurrent("");
+        setNext("");
+      } else {
+        setPwMsg({ ok: false, text: errorText(res.error) });
+      }
     });
   }
 
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <h2 className="font-display text-lg font-bold">{s.tabReminders}</h2>
-
-      <div className="mt-5 space-y-5">
-        <NotifRow
-          title={s.reminderLearnTitle}
-          desc={s.reminderLearnDesc}
-          email
-          sms
-        />
-        <NotifRow
-          title={s.reminderContentTitle}
-          desc={s.reminderContentDesc}
-          sms
-        />
-      </div>
-
-      <h2 className="mt-10 font-display text-lg font-bold">
-        {s.reminderGoalTitle}
-      </h2>
-      <p className="mt-1 text-sm text-muted">{s.reminderGoalDesc}</p>
-
-      <label className="mt-5 flex items-center gap-3 text-sm font-semibold">
-        <CheckBox checked={all} onChange={toggleAll} />
-        {s.selectAll}
-      </label>
-      <div className="mt-3 space-y-3 pl-6">
-        {days.map((d) => (
-          <label key={d} className="flex items-center gap-3 text-sm text-muted">
-            <CheckBox checked={picked.includes(d)} onChange={() => toggleDay(d)} />
-            {d}
-          </label>
-        ))}
-      </div>
-
-      <button
-        type="submit"
-        className="mt-7 rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
-      >
-        {t.common.save}
-      </button>
-    </form>
-  );
-}
-
-function NotifRow({
-  title,
-  desc,
-  email,
-  sms,
-}: {
-  title: string;
-  desc: string;
-  email?: boolean;
-  sms?: boolean;
-}) {
-  const s = useT().settings;
-  const [e, setE] = useState(!!email);
-  const [sm, setSm] = useState(!!sms);
-  return (
-    <div className="flex items-start justify-between gap-6 border-b border-line pb-5">
-      <div>
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <p className="mt-1 max-w-sm text-sm text-muted">{desc}</p>
-      </div>
-      <div className="flex shrink-0 gap-6 pt-1">
-        <label className="flex flex-col items-center gap-1.5 text-xs text-muted">
-          {s.email}
-          <CheckBox checked={e} onChange={() => setE((v) => !v)} round />
+    <div className="space-y-10">
+      <form onSubmit={saveProfile}>
+        <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+          <UserIcon width={18} height={18} />
+          {s.profileHeading}
+        </h2>
+        <label className="mt-5 block text-sm font-semibold">
+          {s.nameLabel}
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={80}
+            required
+            className={inputCls}
+          />
         </label>
-        <label className="flex flex-col items-center gap-1.5 text-xs text-muted">
-          {s.sms}
-          <CheckBox checked={sm} onChange={() => setSm((v) => !v)} round />
+        <label className="mt-4 block text-sm font-semibold">
+          {s.emailLabel}
+          <input value={user.email} readOnly className={`${inputCls} bg-surface text-muted`} />
         </label>
-      </div>
+        <div className="mt-5 flex items-center gap-4">
+          <button type="submit" disabled={savingProfile} className={primaryBtn}>
+            {s.saveProfile}
+          </button>
+          {profileMsg && <Feedback ok={profileMsg.ok}>{profileMsg.text}</Feedback>}
+        </div>
+      </form>
+
+      <form onSubmit={savePassword}>
+        <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+          <ShieldIcon width={18} height={18} />
+          {s.changePwHeading}
+        </h2>
+        <label className="mt-5 block text-sm font-semibold">
+          {s.currentPw}
+          <input
+            type="password"
+            value={current}
+            onChange={(e) => setCurrent(e.target.value)}
+            autoComplete="current-password"
+            required
+            className={inputCls}
+          />
+        </label>
+        <label className="mt-4 block text-sm font-semibold">
+          {s.newPw}
+          <input
+            type="password"
+            value={next}
+            onChange={(e) => setNext(e.target.value)}
+            autoComplete="new-password"
+            minLength={8}
+            required
+            className={inputCls}
+          />
+        </label>
+        <div className="mt-5 flex items-center gap-4">
+          <button type="submit" disabled={savingPw} className={ghostBtn}>
+            {s.changePwBtn}
+          </button>
+          {pwMsg && <Feedback ok={pwMsg.ok}>{pwMsg.text}</Feedback>}
+        </div>
+      </form>
+
+      {billing.stripeEnabled && <BillingPortalButton hasCustomer={billing.hasCustomer} />}
     </div>
   );
 }
 
-function CheckBox({
-  checked,
-  onChange,
-  round,
-}: {
-  checked: boolean;
-  onChange: () => void;
-  round?: boolean;
-}) {
+function Feedback({ ok, children }: { ok: boolean; children: React.ReactNode }) {
   return (
-    <button
-      type="button"
-      onClick={onChange}
-      className={`grid h-5 w-5 place-items-center border transition ${
-        round ? "rounded-full" : "rounded-md"
-      } ${checked ? "border-primary bg-primary" : "border-line bg-bg"}`}
-      aria-pressed={checked}
-    >
-      {checked && (
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-          <path d="M20 6 9 17l-5-5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
-    </button>
+    <span role="status" className={`text-sm ${ok ? "text-success" : "text-danger"}`}>
+      {children}
+    </span>
   );
 }
 
@@ -423,7 +246,8 @@ function SuiviTab({
   user: User;
   courseTitles: Record<string, string>;
 }) {
-  const s = useT().settings;
+  const { dict } = useI18n();
+  const s = dict.settings;
   const enrolled = user.enrolled.map((e) => ({
     ...e,
     title: courseTitles[e.slug] ?? e.slug,
@@ -431,27 +255,234 @@ function SuiviTab({
   return (
     <div>
       <h2 className="font-display text-lg font-bold">{s.trackingHeading}</h2>
-      <div className="mt-5 space-y-4">
+      <ul className="mt-5 border-b border-line">
         {enrolled.length === 0 ? (
-          <p className="rounded-xl border border-line p-4 text-sm text-muted">
-            {s.noTracking}
-          </p>
+          <li className={`${panelCls} text-muted`}>{s.noTracking}</li>
         ) : (
           enrolled.map((e) => (
-            <div key={e.slug} className="rounded-xl border border-line p-4">
-              <div className="flex items-center justify-between">
+            <li key={e.slug} className={panelCls}>
+              <div className="flex items-center justify-between gap-3">
                 <span className="font-semibold">{e.title}</span>
-                <span className="text-sm text-muted">{e.progress}%</span>
+                <span className="shrink-0 text-muted">{e.progress}%</span>
               </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface">
-                <div className="h-full rounded-[3px] bg-primary" style={{ width: `${e.progress}%` }} />
+              <div className="mt-2 h-1.5 overflow-hidden bg-surface">
+                <div className="h-full bg-primary" style={{ width: `${e.progress}%` }} />
               </div>
-              <p className="mt-2 text-sm text-muted">{s.lastLesson} {e.lastLesson}</p>
-            </div>
+              <div className="mt-3 flex justify-end">
+                <LocaleLink
+                  href={
+                    e.lastLesson
+                      ? `/formations/${e.slug}/${e.lastLesson}`
+                      : `/formations/${e.slug}`
+                  }
+                  className={rowLink}
+                >
+                  {dict.actions.resume}
+                </LocaleLink>
+              </div>
+            </li>
           ))
         )}
+      </ul>
+    </div>
+  );
+}
+
+function PurchasesTab({ purchases }: { purchases: PurchaseRow[] }) {
+  const { dict, locale } = useI18n();
+  const s = dict.settings;
+  const statusLabel: Record<string, string> = s.purchaseStatus;
+  return (
+    <div>
+      <h2 className="font-display text-lg font-bold">{s.tabPurchases}</h2>
+      {purchases.length === 0 ? (
+        <p className={`mt-5 ${panelCls} border-b text-muted`}>{s.noPurchases}</p>
+      ) : (
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[520px] border-collapse text-sm">
+            <thead>
+              <tr>
+                <th className={thCls}>{s.purchaseDate}</th>
+                <th className={thCls}>{s.purchaseCourse}</th>
+                <th className={thCls}>{s.purchaseAmount}</th>
+                <th className={thCls}>{s.purchaseStatusLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {purchases.map((p) => (
+                <tr key={p.id} className="border-t border-line align-middle">
+                  <td className={`${tdCls} text-muted`}>{p.date}</td>
+                  <td className={`${tdCls} font-semibold`}>
+                    <LocaleLink href={`/formations/${p.courseSlug}`} className="hover:underline">
+                      {p.courseTitle}
+                    </LocaleLink>
+                  </td>
+                  <td className={tdCls}>{formatPrice(p.amountCents, p.currency, locale)}</td>
+                  <td className={tdCls}>
+                    <span className="bg-surface px-2 py-0.5 text-xs font-semibold text-muted">
+                      {statusLabel[p.status] ?? p.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FormationsCreesTab({ user }: { user: User }) {
+  const { dict } = useI18n();
+  const s = dict.settings;
+  const router = useLocaleRouter();
+  const [deleting, startDelete] = useTransition();
+  const [removed, setRemoved] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
+  const created = (user.created ?? []).filter((c) => !removed.has(c.id));
+  const statusLabel: Record<CourseStatus, string> = {
+    online: dict.status.online,
+    pending: dict.status.pending,
+    draft: dict.status.draft,
+  };
+
+  function remove(id: string, draftId: string) {
+    setError(null);
+    startDelete(async () => {
+      const res = await deleteDraftAction(draftId);
+      if (res.ok) {
+        setRemoved((prev) => new Set(prev).add(id));
+        router.refresh();
+      } else {
+        setError(dict.create.errors[res.error]);
+      }
+    });
+  }
+
+  return (
+    <div>
+      <h2 className="font-display text-lg font-bold">{s.createdHeading}</h2>
+      <p className="mt-1 text-sm text-muted">{s.createdSubtitle}</p>
+      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
+      <ul className="mt-5 border-b border-line">
+        {created.length === 0 ? (
+          <li className={`${panelCls} text-muted`}>{s.noCreated}</li>
+        ) : (
+          created.map((c) => (
+            <li key={c.id} className={`${panelCls} flex flex-wrap items-center justify-between gap-3`}>
+              <div className="min-w-0">
+                <div className="font-semibold">{c.title}</div>
+                <span className={`mt-1 inline-block px-2 py-0.5 text-xs font-semibold ${statusCls[c.status]}`}>
+                  {statusLabel[c.status]}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {c.status === "draft" && c.draftId && (
+                  <>
+                    <LocaleLink href={`/creer?draft=${c.draftId}`} className={rowLink}>
+                      {dict.actions.resume}
+                    </LocaleLink>
+                    <button
+                      type="button"
+                      onClick={() => remove(c.id, c.draftId!)}
+                      disabled={deleting}
+                      aria-label={dict.actions.delete}
+                      className="grid h-8 w-8 place-items-center border border-line text-muted hover:border-danger hover:text-danger disabled:opacity-50"
+                    >
+                      <TrashIcon width={14} height={14} />
+                    </button>
+                  </>
+                )}
+                {c.status === "online" && c.slug && (
+                  <LocaleLink href={`/formations/${c.slug}`} className={rowLink}>
+                    {dict.actions.view}
+                  </LocaleLink>
+                )}
+                {c.status === "pending" && (
+                  <span className="text-xs text-muted">{dict.instructor.pendingAdmin}</span>
+                )}
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
+  );
+}
+
+function StatsTab({ user }: { user: User }) {
+  const { dict } = useI18n();
+  const s = dict.settings;
+  const stats = user.stats ?? { started: 0, finished: 0, rating: 0 };
+  const created = user.created ?? [];
+  return (
+    <div>
+      <h2 className="font-display text-lg font-bold">{s.statsHeading}</h2>
+      <ul className="mt-5 space-y-3">
+        <StatRow icon={<LayersIcon width={18} height={18} />} value={stats.started}>
+          {s.statStarted}
+        </StatRow>
+        <StatRow icon={<ClockIcon width={18} height={18} />} value={stats.finished}>
+          {s.statFinished}
+        </StatRow>
+        <StatRow
+          icon={<StarIcon width={18} height={18} />}
+          value={stats.rating ? stats.rating.toFixed(1).replace(".0", "") : "--"}
+        >
+          {s.statRating}
+        </StatRow>
+      </ul>
+      <div className="mt-6 overflow-x-auto">
+        <table className="w-full min-w-[420px] border-collapse text-sm">
+          <thead>
+            <tr>
+              <th className={thCls}>{s.tableFormation}</th>
+              <th className={thCls}>{s.tableStarted}</th>
+              <th className={thCls}>{s.tableFinished}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {created.length === 0 ? (
+              <tr className="border-t border-line">
+                <td colSpan={3} className="py-4 text-center text-muted">
+                  {s.noCreated}
+                </td>
+              </tr>
+            ) : (
+              created.map((c) => (
+                <tr key={c.id} className="border-t border-line">
+                  <td className={`${tdCls} font-semibold`}>{c.title}</td>
+                  <td className={tdCls}>{c.started}</td>
+                  <td className={tdCls}>{c.status === "online" ? c.finished : "--"}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
 
+function StatRow({
+  icon,
+  value,
+  children,
+}: {
+  icon: React.ReactNode;
+  value: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="flex items-center gap-3">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-soft text-primary-dark">
+        {icon}
+      </span>
+      <span>
+        <span className="font-display text-lg font-bold">{value}</span>{" "}
+        <span className="text-sm text-muted">{children}</span>
+      </span>
+    </li>
+  );
+}

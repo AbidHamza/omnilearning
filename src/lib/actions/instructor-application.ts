@@ -4,6 +4,15 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { DEFAULT_REVENUE_SHARE_PCT } from "@/lib/pricing";
+import { locales } from "@/i18n/config";
+
+function refreshAdminViews(withInstructor = false) {
+  for (const l of locales) {
+    revalidatePath(`/${l}/admin`);
+    revalidatePath(`/${l}/devenir-formateur`);
+    if (withInstructor) revalidatePath(`/${l}/formateur`);
+  }
+}
 
 export interface ApplyPayload {
   displayName?: string;
@@ -86,7 +95,7 @@ export async function applyAsInstructorAction(
     return { ok: false, error: "saveFailed" };
   }
 
-  revalidatePath("/fr/admin");
+  refreshAdminViews();
   return { ok: true };
 }
 
@@ -129,7 +138,7 @@ export async function reviewInstructorApplicationAction(
       where: { id: profile.id },
       data: { applicationStatus: "REJECTED", reviewedAt: new Date() },
     });
-    revalidatePath("/fr/admin");
+    refreshAdminViews();
     return { ok: true };
   }
 
@@ -148,7 +157,6 @@ export async function reviewInstructorApplicationAction(
     }),
   ]);
 
-  revalidatePath("/fr/admin");
-  revalidatePath("/fr/formateur");
+  refreshAdminViews(true);
   return { ok: true };
 }

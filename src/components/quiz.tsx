@@ -6,6 +6,7 @@ import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, XIcon } from "./icons";
 import { useT } from "@/i18n/provider";
 import { recordQuizAttemptAction } from "@/lib/actions/progress";
 import { checkQuizAnswerAction } from "@/lib/actions/quiz";
+import { QUIZ_PASS_RATIO } from "@/lib/curriculum";
 
 /**
  * Quiz d'une leçon.
@@ -102,7 +103,7 @@ export default function Quiz({
 
   if (done) {
     const ratio = Math.round((score / questions.length) * 100);
-    const pass = ratio >= 60;
+    const pass = score / questions.length >= QUIZ_PASS_RATIO;
     return (
       <div className="rounded-[var(--radius-card)] border border-line bg-bg p-8 text-center">
         <div
@@ -173,7 +174,7 @@ export default function Quiz({
               key={i}
               disabled={checked || pending}
               onClick={() => setSelected(i)}
-              className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-start text-sm transition ${ring} ${
+              className={`flex w-full items-center gap-3 rounded-[3px] border p-3.5 text-start text-sm transition ${ring} ${
                 !checked ? "hover:border-primary" : ""
               }`}
             >
@@ -206,7 +207,7 @@ export default function Quiz({
       </div>
 
       {verdict?.explanation && (
-        <p className="mt-4 rounded-xl bg-surface p-4 text-sm text-muted">
+        <p className="mt-4 rounded-[3px] bg-surface p-4 text-sm text-muted">
           {verdict.explanation}
         </p>
       )}
