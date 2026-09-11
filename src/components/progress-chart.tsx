@@ -62,7 +62,7 @@ export default function ProgressChart({
 
   if (!hasData) {
     return (
-      <div className="rounded-xl bg-bg p-5">
+      <div className="rounded-[3px] bg-bg p-5">
         {title && <p className="mb-3 text-sm font-semibold">{title}</p>}
         <div className="grid min-h-[180px] place-items-center rounded-[var(--radius-card)] border border-dashed border-line px-6 text-center">
           <div>
@@ -86,7 +86,7 @@ export default function ProgressChart({
   const labelEvery = points.length > 8 ? 2 : 1;
 
   return (
-    <div className="rounded-xl bg-bg p-5">
+    <div className="rounded-[3px] bg-bg p-5">
       {title && <p className="mb-3 text-sm font-semibold">{title}</p>}
       <p className="font-mono text-xs text-muted-soft">
         <span className="text-primary">$</span> xp --last-14-days

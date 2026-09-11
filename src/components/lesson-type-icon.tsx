@@ -18,7 +18,7 @@ export default function LessonTypeIcon({
   const Icon = iconByType[type];
   return (
     <span
-      className={`grid place-items-center rounded-lg bg-surface text-muted ${className}`}
+      className={`grid place-items-center rounded-[3px] bg-surface text-muted ${className}`}
       aria-hidden="true"
     >
       <Icon width={18} height={18} />

@@ -20,8 +20,7 @@ import { intlTag } from "@/lib/intl";
 import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
 import { notFound } from "next/navigation";
 
-const featureIcons = [LayersIcon, ClockIcon, StarIcon, QuizIcon];
-const statIcons = [LayersIcon, DocIcon, ClockIcon, CheckIcon];
+const featureIcons = [LayersIcon, ClockIcon, StarIcon, QuizIcon, DocIcon];
 
 /**
  * Les quatre chiffres de la bande sont comptés sur le catalogue publié au
@@ -146,7 +145,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ── Hero : mesh clair + mockup produit ─────────────────────── */}
       <section className="relative overflow-hidden hero-mesh">
         <div className="pointer-events-none absolute inset-0 hero-grid" />
-        <div className="container-page relative grid items-center gap-12 py-16 lg:grid-cols-[1.05fr_1fr] lg:py-24">
+        <div className="container-page relative grid items-center gap-12 py-16 [&>div]:min-w-0 lg:grid-cols-[1.05fr_1fr] lg:py-24">
           {/* Colonne texte */}
           <div className="rise">
             <span className="inline-flex items-center gap-2 rounded-[3px] border border-primary/30 bg-brand-soft px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-primary">
@@ -201,8 +200,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
 
           {/* Colonne mockup produit : fenêtre terminal */}
           <div className="rise relative mx-auto w-full max-w-md lg:mx-0">
-            {/* Bloom accent en arrière-plan, donne de la profondeur */}
-            <div className="absolute -inset-x-3 -top-5 bottom-8 rounded-[10px] bg-gradient-to-br from-brand-soft to-transparent blur-2xl" />
             <div className="glass-card relative overflow-hidden rounded-[10px] border border-line-soft">
               {/* Barre de fenêtre terminal */}
               <div className="flex items-center gap-3 border-b border-line bg-bg/60 px-4 py-2.5">
@@ -292,25 +289,18 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
 
       {/* ── Bande de stats ─────────────────────────────────────────── */}
       <section className="section-dark border-y border-line">
-        <div className="container-page py-10">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
-            {stats.map((s, i) => {
-              const Icon = statIcons[i];
-              return (
-                <div key={s.label} className="flex flex-col gap-2 text-center">
-                  <span className="mx-auto grid h-10 w-10 place-items-center rounded-[3px] border border-line bg-bg text-primary">
-                    <Icon width={18} height={18} />
-                  </span>
-                  <span className="font-display text-3xl font-extrabold tracking-tight text-primary">
-                    {s.value}
-                  </span>
-                  <span className="font-mono text-xs font-medium text-muted">
-                    {s.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+        <div className="container-page flex flex-col gap-6 py-9 lg:flex-row lg:items-baseline lg:justify-between">
+          <p className="max-w-[15rem] text-sm leading-relaxed text-muted">
+            {t.home.statsTitle}
+          </p>
+          <dl className="flex flex-wrap items-baseline gap-x-10 gap-y-4">
+            {stats.map((s) => (
+              <div key={s.label} className="flex items-baseline gap-2">
+                <dd className="font-display text-2xl font-bold text-primary">{s.value}</dd>
+                <dt className="font-mono text-xs text-muted">{s.label}</dt>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
@@ -366,9 +356,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             <Link
               key={cat.id}
               href={lp(`/formations?cat=${encodeURIComponent(cat.label)}`)}
-              className="group flex flex-col items-center gap-3 rounded-2xl border border-line bg-bg px-4 py-7 text-center transition hover:-translate-y-0.5 hover:border-brand hover:shadow-[0_16px_36px_-20px_rgba(10,21,29,0.4)]"
+              className="group flex flex-col items-center gap-3 rounded-[3px] border border-line bg-bg px-4 py-7 text-center transition hover:-translate-y-0.5 hover:border-brand hover:shadow-[0_16px_36px_-20px_rgba(10,21,29,0.4)]"
             >
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-primary-dark transition group-hover:bg-brand group-hover:text-ink">
+              <span className="grid h-12 w-12 place-items-center rounded-[3px] bg-brand-soft text-primary-dark transition group-hover:bg-brand group-hover:text-ink">
                 <CategoryIcon name={cat.icon} width={22} height={22} />
               </span>
               <span className="text-sm font-semibold leading-tight">
@@ -391,15 +381,15 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               {t.home.whySubtitle}
             </p>
           </div>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {t.home.features.map((text, i) => {
               const Icon = featureIcons[i];
               return (
                 <div
                   key={i}
-                  className="flex flex-col gap-4 rounded-2xl border border-line bg-bg p-6 transition hover:border-brand/60 hover:shadow-[0_16px_36px_-22px_rgba(10,21,29,0.4)]"
+                  className="flex flex-col gap-4 rounded-[3px] border border-line bg-bg p-6 transition hover:border-brand/60 hover:shadow-[0_16px_36px_-22px_rgba(10,21,29,0.4)]"
                 >
-                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-primary-dark">
+                  <span className="grid h-12 w-12 place-items-center rounded-[3px] bg-brand-soft text-primary-dark">
                     <Icon width={22} height={22} />
                   </span>
                   <div>
@@ -491,7 +481,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             {t.home.faq.map((item, i) => (
               <details
                 key={i}
-                className="group rounded-2xl border border-line bg-bg px-5 open:border-brand/50 open:shadow-[0_14px_34px_-24px_rgba(10,21,29,0.4)]"
+                className="group rounded-[3px] border border-line bg-bg px-5 open:border-brand/50 open:shadow-[0_14px_34px_-24px_rgba(10,21,29,0.4)]"
               >
                 <summary className="flex cursor-pointer items-center justify-between gap-4 py-4 text-start font-display text-[15px] font-bold text-ink">
                   {item.q}
@@ -513,10 +503,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ── CTA final : invocation terminal ────────────────────────── */}
       <section className="container-page pb-20">
         <div className="section-dark relative overflow-hidden rounded-[10px] border border-line px-8 py-14 text-center sm:px-12">
-          <div className="pointer-events-none absolute inset-0 opacity-80">
-            <div className="absolute -top-16 start-1/4 h-56 w-56 rounded-full bg-brand-soft blur-3xl" />
-            <div className="absolute -bottom-20 end-1/4 h-56 w-56 rounded-full bg-brand-soft blur-3xl" />
-          </div>
+          <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
           <div className="relative mx-auto max-w-xl">
             <p className="mb-3 term-comment font-mono text-xs text-muted-soft">
               omnilearn --start

@@ -50,3 +50,6 @@ prisma/*.db
 *.tsbuildinfo
 next-env.d.ts
 replay-result.json
+replay-prod-result.json
+replay-shots/
+lang-check-result.json

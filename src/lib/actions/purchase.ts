@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { siteUrl } from "@/lib/site";
 import { splitAmount, MIN_PRICE_CENTS } from "@/lib/pricing";
@@ -104,11 +105,20 @@ export async function createCoursePurchaseAction(
 
   let customerId = user.stripeCustomerId;
   if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: user.email,
-      name: user.name ?? undefined,
-      metadata: { userId },
-    });
+    // Clé révoquée, compte suspendu, Stripe indisponible : l'appel jette. Sans
+    // ce filet l'action serveur remonte une erreur brute et le bouton paraît
+    // mort, l'acheteur ne sait pas quoi faire.
+    let customer;
+    try {
+      customer = await stripe.customers.create({
+        email: user.email,
+        name: user.name ?? undefined,
+        metadata: { userId },
+      });
+    } catch (e) {
+      console.error("[achat] creation client Stripe refusee", e);
+      return { ok: false, error: "checkoutFailed" };
+    }
     customerId = customer.id;
     await prisma.user.update({
       where: { id: userId },
@@ -136,55 +146,61 @@ export async function createCoursePurchaseAction(
   // redéployer, et l'adresse n'est demandée que si la taxe est calculée.
   const taxOn = process.env.STRIPE_AUTOMATIC_TAX === "1";
 
-  const checkout = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer: customerId,
-    ...(taxOn
-      ? {
-          automatic_tax: { enabled: true },
-          billing_address_collection: "required" as const,
-        }
-      : {}),
-    // Livraison immédiate : la renonciation au délai de rétractation doit être
-    // lue avant de payer, pas après.
-    custom_text: { submit: { message: submitNotice(locale) } },
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: course.currency,
-          unit_amount: course.priceCents,
-          product_data: {
-            name: productName,
-            ...(productDesc ? { description: productDesc.slice(0, 300) } : {}),
+  let checkout: Stripe.Checkout.Session;
+  try {
+    checkout = await stripe.checkout.sessions.create({
+      mode: "payment",
+      customer: customerId,
+      ...(taxOn
+        ? {
+            automatic_tax: { enabled: true },
+            billing_address_collection: "required" as const,
+          }
+        : {}),
+      // Livraison immédiate : la renonciation au délai de rétractation doit être
+      // lue avant de payer, pas après.
+      custom_text: { submit: { message: submitNotice(locale) } },
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: course.currency,
+            unit_amount: course.priceCents,
+            product_data: {
+              name: productName,
+              ...(productDesc ? { description: productDesc.slice(0, 300) } : {}),
+            },
           },
         },
-      },
-    ],
-    success_url: courseUrl(locale, slug, "?achat=ok"),
-    cancel_url: courseUrl(locale, slug, "?achat=annule"),
-    metadata: {
-      kind: "course_purchase",
-      userId,
-      courseId: course.id,
-      courseSlug: slug,
-      sharePct: String(sharePct),
-    },
-    payment_intent_data: {
+      ],
+      success_url: courseUrl(locale, slug, "?achat=ok"),
+      cancel_url: courseUrl(locale, slug, "?achat=annule"),
       metadata: {
         kind: "course_purchase",
         userId,
         courseId: course.id,
         courseSlug: slug,
+        sharePct: String(sharePct),
       },
-      ...(connected
-        ? {
-            transfer_data: { destination: connected },
-            application_fee_amount: platformFeeCents,
-          }
-        : {}),
-    },
-  });
+      payment_intent_data: {
+        metadata: {
+          kind: "course_purchase",
+          userId,
+          courseId: course.id,
+          courseSlug: slug,
+        },
+        ...(connected
+          ? {
+              transfer_data: { destination: connected },
+              application_fee_amount: platformFeeCents,
+            }
+          : {}),
+      },
+    });
+  } catch (e) {
+    console.error("[achat] session de paiement refusee par Stripe", e);
+    return { ok: false, error: "checkoutFailed" };
+  }
 
   if (!checkout.url) return { ok: false, error: "checkoutFailed" };
 

@@ -120,7 +120,7 @@ export default function AdminClient({
           <h2 className="font-display text-xl font-bold">
             {m.queueTitle}
           </h2>
-          <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
+          <span className="rounded-[3px] bg-surface px-3 py-1 text-xs font-semibold text-muted">
             {m.queueCount.replace("{n}", String(queue.length))}
           </span>
         </div>
@@ -183,7 +183,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decide(c, false)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[3px] border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
                         >
                           <XIcon width={14} height={14} />
                           {m.refuse}
@@ -227,11 +227,11 @@ export default function AdminClient({
                 max={95}
                 value={share}
                 onChange={(e) => setShare(Number(e.target.value))}
-                className="w-20 rounded-full border border-line bg-surface px-3 py-1 text-center text-xs font-semibold outline-none focus:border-primary"
+                className="w-20 rounded-[3px] border border-line bg-surface px-3 py-1 text-center text-xs font-semibold outline-none focus:border-primary"
               />
               %
             </label>
-            <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
+            <span className="rounded-[3px] bg-surface px-3 py-1 text-xs font-semibold text-muted">
               {m.applyCount.replace("{n}", String(applyQueue.length))}
             </span>
           </div>
@@ -294,7 +294,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decideApplication(a, false)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[3px] border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
                         >
                           <XIcon width={14} height={14} />
                           {m.refuse}
@@ -320,7 +320,7 @@ export default function AdminClient({
               </span>
               <span className="flex-1 font-semibold">{u.name}</span>
               <span
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                className={`rounded-[3px] px-2.5 py-1 text-xs font-semibold ${
                   u.role === "Formateur"
                     ? "bg-primary-soft text-primary-dark"
                     : "bg-surface text-muted"

@@ -104,7 +104,7 @@ export default async function BecomeInstructorPage({
               </LocaleLink>
               <LocaleLink
                 href="/connexion"
-                className="rounded-full border border-line px-8 py-3 text-sm font-semibold transition hover:border-primary"
+                className="rounded-[3px] border border-line px-8 py-3 text-sm font-semibold transition hover:border-primary"
               >
                 {dict.auth.loginTitle}
               </LocaleLink>

@@ -92,12 +92,14 @@ const fr = {
       "Apprenez à votre rythme, où que vous soyez et quand vous le souhaitez.",
       "Bénéficiez de l'expertise de formateurs passionnés et reconnus dans leur domaine.",
       "Vérifiez vos acquis à chaque chapitre : quiz notés, points d'expérience et badges.",
+      "Repartez avec un certificat à votre nom dès la dernière leçon validée.",
     ],
     featureTitles: [
       "Essai libre",
       "À votre rythme",
       "Formateurs experts",
       "Quiz et progression",
+      "Certificat de fin",
     ],
 
     // Accès (section pricing)

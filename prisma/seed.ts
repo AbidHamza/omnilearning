@@ -1,10 +1,11 @@
 /**
  * Seed : reconstruit une base réaliste et cohérente pour la démo.
  *  - Catégories (data.ts) + 8 formations réelles (src/lib/content/*)
- *  - 3 comptes de démo (étudiant / formateur / admin), mots de passe bcrypt
+ *  - 3 comptes de démo (étudiant / formateur / admin), uniquement avec SEED_DEMO=1 ;
+ *    sans le drapeau ils sont retirés de la base s'ils existent encore
  *  - Badges déclaratifs (condition en JSON)
  *  - Purge des avis d'amorçage (aucun avis n'est plus fabriqué ici)
- *  - Apprenants « fantômes » pour peupler le classement
+ *  - Apprenants « fantômes » pour peupler le classement (SEED_DEMO=1 seulement)
  *  - État de gamification riche pour l'étudiant de démo (XP, série, badges),
  *    adossé à de vraies inscriptions + leçons terminées + tentatives de quiz.
  *
@@ -25,7 +26,11 @@ const adapter = new PrismaBetterSqlite3({
 const prisma = new PrismaClient({ adapter });
 
 // Barème XP : doit rester aligné sur src/lib/gamification.ts
-const XP = { lesson_complete: 20, quiz_passed: 30, course_completed: 120 } as const;
+const XP = {
+  lesson_complete: 20,
+  quiz_passed: 30,
+  course_completed: 120,
+} as const;
 function xpToReachLevel(level: number) {
   return 50 * (level - 1) * level;
 }
@@ -55,27 +60,60 @@ async function main() {
   console.log(`  ${categories.length} catégories`);
 
   // --- Comptes de démo ---
-  const demoPassword = await bcrypt.hash("omni1234", 10);
-  const demoAccounts = [
-    { email: "etudiant@omnilearn.tech", name: "Laura Durand", role: "USER" },
-    { email: "formateur@omnilearn.tech", name: "Pierre Martin", role: "INSTRUCTOR" },
-    { email: "admin@omnilearn.tech", name: "Admin OmniLearn", role: "ADMIN" },
-  ];
-  for (const a of demoAccounts) {
-    await prisma.user.upsert({
-      where: { email: a.email },
-      update: { name: a.name, role: a.role, password: demoPassword },
-      create: { email: a.email, name: a.name, role: a.role, password: demoPassword },
-    });
-  }
-  console.log(`  ${demoAccounts.length} comptes de démo`);
+  const SEED_DEMO = process.env.SEED_DEMO === "1";
+  let instructor: { id: string } | null = null;
+  let student: { id: string } | null = null;
+  if (SEED_DEMO) {
+    const demoPassword = await bcrypt.hash("omni1234", 10);
+    const demoAccounts = [
+      { email: "etudiant@omnilearn.tech", name: "Laura Durand", role: "USER" },
+      {
+        email: "formateur@omnilearn.tech",
+        name: "Pierre Martin",
+        role: "INSTRUCTOR",
+      },
+      { email: "admin@omnilearn.tech", name: "Admin OmniLearn", role: "ADMIN" },
+    ];
+    for (const a of demoAccounts) {
+      await prisma.user.upsert({
+        where: { email: a.email },
+        update: { name: a.name, role: a.role, password: demoPassword },
+        create: {
+          email: a.email,
+          name: a.name,
+          role: a.role,
+          password: demoPassword,
+        },
+      });
+    }
+    console.log(`  ${demoAccounts.length} comptes de démo`);
 
-  const instructor = await prisma.user.findUnique({
-    where: { email: "formateur@omnilearn.tech" },
-  });
-  const student = await prisma.user.findUnique({
-    where: { email: "etudiant@omnilearn.tech" },
-  });
+    instructor = await prisma.user.findUnique({
+      where: { email: "formateur@omnilearn.tech" },
+    });
+    student = await prisma.user.findUnique({
+      where: { email: "etudiant@omnilearn.tech" },
+    });
+  } else {
+    const demo = await prisma.user.findMany({
+      where: {
+        OR: [
+          { email: { endsWith: "@omnilearn.tech" } },
+          { email: { endsWith: "@learners.omnilearn.tech" } },
+        ],
+      },
+      select: { id: true },
+    });
+    if (demo.length > 0) {
+      const ids = demo.map((u) => u.id);
+      await prisma.course.updateMany({
+        where: { instructorId: { in: ids } },
+        data: { instructorId: null },
+      });
+      await prisma.user.deleteMany({ where: { id: { in: ids } } });
+    }
+    console.log(`  ${demo.length} comptes de démo retirés`);
+  }
 
   // --- Formations + parties + leçons ---
   for (const course of contentCourses) {
@@ -188,7 +226,8 @@ async function main() {
   const removed = await prisma.course.deleteMany({
     where: { slug: { notIn: keepSlugs } },
   });
-  if (removed.count > 0) console.log(`  ${removed.count} cours obsolètes retirés`);
+  if (removed.count > 0)
+    console.log(`  ${removed.count} cours obsolètes retirés`);
   console.log(`  ${contentCourses.length} formations`);
 
   // --- Badges ---
@@ -221,31 +260,34 @@ async function main() {
   // getReviews() ne retient désormais que les avis signés par un compte ; la
   // purge ci-dessous efface ce qu'un ancien seed a laissé derrière lui.
   const nowMs = Date.now();
-  const purgedReviews = await prisma.review.deleteMany({ where: { userId: null } });
+  const purgedReviews = await prisma.review.deleteMany({
+    where: { userId: null },
+  });
   console.log(`  ${purgedReviews.count} avis d'amorçage purgés`);
 
   // --- Apprenants fantômes (classement) ---
-  for (const [i, g] of ghostLearners.entries()) {
-    const email = `apprenant-${i + 1}@learners.omnilearn.tech`;
-    const u = await prisma.user.upsert({
-      where: { email },
-      update: { name: g.name, role: "USER" },
-      create: { email, name: g.name, role: "USER" },
-    });
-    await prisma.userStats.upsert({
-      where: { userId: u.id },
-      update: { xp: g.xp, level: levelForXp(g.xp) },
-      create: {
-        userId: u.id,
-        xp: g.xp,
-        level: levelForXp(g.xp),
-        currentStreak: 1 + (g.xp % 9),
-        longestStreak: 3 + (g.xp % 21),
-        lastActiveDate: new Date(nowMs - (g.xp % 5) * DAY),
-      },
-    });
-  }
-  console.log(`  ${ghostLearners.length} apprenants fantômes`);
+  if (SEED_DEMO)
+    for (const [i, g] of ghostLearners.entries()) {
+      const email = `apprenant-${i + 1}@learners.omnilearn.tech`;
+      const u = await prisma.user.upsert({
+        where: { email },
+        update: { name: g.name, role: "USER" },
+        create: { email, name: g.name, role: "USER" },
+      });
+      await prisma.userStats.upsert({
+        where: { userId: u.id },
+        update: { xp: g.xp, level: levelForXp(g.xp) },
+        create: {
+          userId: u.id,
+          xp: g.xp,
+          level: levelForXp(g.xp),
+          currentStreak: 1 + (g.xp % 9),
+          longestStreak: 3 + (g.xp % 21),
+          lastActiveDate: new Date(nowMs - (g.xp % 5) * DAY),
+        },
+      });
+    }
+  if (SEED_DEMO) console.log(`  ${ghostLearners.length} apprenants fantômes`);
 
   // --- État riche de l'étudiant de démo ---
   if (student) {
@@ -406,7 +448,10 @@ async function main() {
     const allBadges = await prisma.badge.findMany();
     let earned = 0;
     for (const b of allBadges) {
-      const cond = JSON.parse(b.condition) as { type: string; threshold: number };
+      const cond = JSON.parse(b.condition) as {
+        type: string;
+        threshold: number;
+      };
       if ((counters[cond.type] ?? 0) >= cond.threshold) {
         await prisma.userBadge.create({
           data: { userId: student.id, badgeId: b.id },
