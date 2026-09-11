@@ -1,54 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { Locale } from "@/i18n/config";
+import {
+  applyConsent,
+  parseConsent,
+  subscribeConsent,
+  readRawConsent,
+  saveConsent,
+  serverConsent,
+  type Choice,
+} from "@/lib/consent";
 
-// Stocke un simple oui/non pendant 6 mois. Pas de wall de préférences par
-// catégorie ici : le site ne pose que de la mesure d'audience + le pixel Meta,
-// donc un choix binaire couvre le besoin sans sur-ingénierie.
-const STORAGE_KEY = "olm_consent";
-const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 30 * 6;
-
-type Choice = "granted" | "denied";
-
-function readChoice(): Choice | null {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { choice: Choice; ts: number };
-    if (Date.now() - parsed.ts > SIX_MONTHS_MS) return null;
-    return parsed.choice === "granted" ? "granted" : "denied";
-  } catch {
-    return null;
-  }
-}
-
-function writeChoice(choice: Choice) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ choice, ts: Date.now() }));
-  } catch {
-    // localStorage indisponible (navigation privée stricte) : le bandeau
-    // se réaffichera au prochain chargement, ce n'est pas grave.
-  }
-}
-
-function pushConsentUpdate(choice: Choice) {
-  const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
-  if (choice === "granted") {
-    gtag?.("consent", "update", {
-      ad_storage: "granted",
-      analytics_storage: "granted",
-      ad_user_data: "granted",
-      ad_personalization: "granted",
-    });
-  }
-  window.dispatchEvent(new CustomEvent("olm-consent", { detail: choice }));
-}
+// Un simple oui/non gardé 6 mois. Pas de mur de préférences par catégorie :
+// le site ne pose que de la mesure d'audience et le pixel Meta, un choix
+// binaire couvre le besoin sans sur-ingénierie.
 
 const copy: Record<string, { text: string; accept: string; decline: string; manage: string; reopen: string }> = {
   fr: {
     text:
-      "On mesure l'audience du site (GA4) et, si vous dites oui, on affine aussi la pub Meta. Rien ne se déclenche avant votre réponse, et votre choix tient 6 mois.",
+      "On mesure l'audience du site (GA4) et, si vous dites oui, on affine aussi la pub Meta. Rien n'est déposé sur votre appareil avant votre réponse, et votre choix tient 6 mois.",
     accept: "J'accepte",
     decline: "Je refuse",
     manage: "Gérer",
@@ -56,7 +27,7 @@ const copy: Record<string, { text: string; accept: string; decline: string; mana
   },
   en: {
     text:
-      "We measure site traffic (GA4) and, if you say yes, we also tune Meta ads. Nothing runs before you answer, and your choice sticks for 6 months.",
+      "We measure site traffic (GA4) and, if you say yes, we also tune Meta ads. Nothing is stored on your device before you answer, and your choice sticks for 6 months.",
     accept: "Accept",
     decline: "Decline",
     manage: "Manage",
@@ -64,7 +35,7 @@ const copy: Record<string, { text: string; accept: string; decline: string; mana
   },
   ar: {
     text:
-      "نقيس زيارات الموقع (GA4)، وإذا وافقت نضبط إعلانات Meta أيضًا. لا شيء يعمل قبل ردّك، واختيارك يبقى محفوظًا 6 أشهر.",
+      "نقيس زيارات الموقع (GA4)، وإذا وافقت نضبط إعلانات Meta أيضًا. لا يُحفظ شيء على جهازك قبل ردّك، واختيارك يبقى محفوظًا 6 أشهر.",
     accept: "أوافق",
     decline: "أرفض",
     manage: "إدارة",
@@ -73,30 +44,27 @@ const copy: Record<string, { text: string; accept: string; decline: string; mana
 };
 
 export default function ConsentBanner({ lang }: { lang: Locale }) {
-  // Ouvert par défaut : tant qu'on n'a pas lu le localStorage (donc dans le
-  // HTML rendu serveur, avant hydratation), on part du principe qu'aucun
-  // choix n'a encore été fait ; c'est le cas pour tout premier visiteur, et
-  // c'est justement le cas qui doit afficher le bandeau complet tout de
-  // suite plutôt qu'après coup.
-  const [open, setOpen] = useState(true);
-  const [hasChoice, setHasChoice] = useState(false);
+  // Le choix vit dans localStorage, pas dans ce composant : on le lit à la
+  // source. Le rendu serveur et la première passe d'hydratation voient
+  // « pas encore répondu », donc le bandeau complet, ce qui est justement
+  // l'état d'un premier visiteur.
+  const stored = useSyncExternalStore(subscribeConsent, readRawConsent, serverConsent);
+  const choice = parseConsent(stored);
+  const [reopened, setReopened] = useState(false);
+  const open = reopened || choice === null;
 
+  // Visiteur qui revient avec un accord déjà en mémoire : Consent Mode est
+  // reparti du refus par défaut au chargement, il faut lui repasser l'accord.
   useEffect(() => {
-    const stored = readChoice();
-    if (stored) {
-      pushConsentUpdate(stored);
-      setHasChoice(true);
-      setOpen(false);
-    }
+    const known = parseConsent(readRawConsent());
+    if (known) applyConsent(known);
   }, []);
 
   const t = copy[lang] ?? copy.en;
 
-  function respond(choice: Choice) {
-    writeChoice(choice);
-    pushConsentUpdate(choice);
-    setHasChoice(true);
-    setOpen(false);
+  function respond(next: Choice) {
+    saveConsent(next);
+    setReopened(false);
   }
 
   return (
@@ -104,7 +72,7 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
       {!open && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => setReopened(true)}
           aria-label={t.manage}
           style={{
             position: "fixed",
@@ -136,7 +104,7 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
             bottom: 14,
             zIndex: 70,
             maxWidth: 560,
-            margin: hasChoice ? "0 auto 0 14px" : undefined,
+            margin: choice !== null ? "0 auto 0 14px" : undefined,
             background: "#0f1115",
             border: "1px solid rgba(255,255,255,0.14)",
             borderRadius: 10,

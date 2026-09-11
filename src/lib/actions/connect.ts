@@ -150,7 +150,10 @@ export async function startConnectOnboardingAction(
  * justificatives, coordonnées bancaires). Ne marche qu'une fois le compte créé.
  */
 export async function openConnectDashboardAction(
-  locale: string = defaultLocale,
+  // Signature alignee sur startConnectOnboardingAction : le panneau formateur
+  // appelle les deux par la meme reference. Le lien de connexion Stripe ne
+  // prend pas d URL de retour, donc la locale ne sert pas ici.
+  _locale: string = defaultLocale,
 ): Promise<ConnectResult> {
   const stripe = getStripe();
   if (!stripe) return { ok: false, error: "paymentsOff" };
