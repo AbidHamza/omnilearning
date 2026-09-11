@@ -90,7 +90,7 @@ export default function Navbar() {
     path === href || path.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-line bg-bg">
       <div className="container-page flex h-[68px] items-center gap-4">
         <LocaleLink href="/" className="group flex shrink-0 items-center gap-2.5">
           <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-surface text-primary transition group-hover:border-primary">

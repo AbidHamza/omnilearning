@@ -95,12 +95,12 @@ export default function CourseCard({
           sizes="(min-width:1024px) 360px, 100vw"
           className="object-cover transition duration-500 group-hover:scale-[1.07]"
         />
-        <span className="absolute start-3 top-3 rounded-[3px] border border-line bg-bg/90 px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wide text-primary backdrop-blur">
+        <span className="absolute start-3 top-3 rounded-[3px] border border-line bg-bg px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wide text-primary">
           {course.category}
         </span>
         {price && (
           <span
-            className={`absolute end-3 top-3 rounded-[3px] border bg-bg/90 px-2.5 py-1 font-mono text-[11px] font-bold backdrop-blur ${
+            className={`absolute end-3 top-3 rounded-[3px] border bg-bg px-2.5 py-1 font-mono text-[11px] font-bold ${
               isFree ? "border-line text-muted" : "border-primary/50 text-ink"
             }`}
           >

@@ -325,7 +325,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               <ArrowRightIcon width={15} height={15} className="rtl:rotate-180" />
             </Link>
           </div>
-          <div className="no-scrollbar -mx-6 mt-8 flex gap-4 overflow-x-auto px-6 pb-2">
+          <div className="no-scrollbar bleed-page mt-8 flex gap-4 overflow-x-auto pb-2">
             {popular.map((c) => (
               <CourseCard
                 key={c.slug}
