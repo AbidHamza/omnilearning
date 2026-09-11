@@ -282,6 +282,13 @@ const fr = {
     text: "La page que vous cherchez n'existe pas ou a été déplacée.",
     back: "Retour à l'accueil",
   },
+  serverError: {
+    title: "Erreur côté serveur",
+    text: "Cette page n'a pas pu être affichée. L'erreur est enregistrée sur le serveur.",
+    retry: "Recharger la page",
+    back: "Retour à l'accueil",
+    ref: "Référence de l'incident",
+  },
   actions: {
     edit: "Modifier",
     delete: "Supprimer",

@@ -281,6 +281,13 @@ const en: Dict = {
     text: "The page you are looking for doesn't exist or has been moved.",
     back: "Back to home",
   },
+  serverError: {
+    title: "Server-side error",
+    text: "This page could not be rendered. The error is logged on the server.",
+    retry: "Reload the page",
+    back: "Back to home",
+    ref: "Incident reference",
+  },
   actions: {
     edit: "Edit",
     delete: "Delete",
