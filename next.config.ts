@@ -9,14 +9,20 @@ import type { NextConfig } from "next";
 // balise script injectée par le framework. Le reste de la politique reste serrée :
 // aucune origine de script inconnue, aucun plugin, aucune balise base réécrite,
 // et le site ne peut être encadré que par lui-même.
+//
+// Les trois origines Facebook servent le pixel Meta, qui ne se charge
+// qu'après un consentement explicite : `connect.facebook.net` pour le
+// script, `www.facebook.com` pour le hit `/tr` et l'image du `noscript`.
+// Sans elles le CSP coupait le script et le pixel ne remontait rien,
+// alors que la requête partait bien du navigateur.
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://www.googletagmanager.com https://www.google-analytics.com",
+  "img-src 'self' data: blob: https://images.unsplash.com https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com",
   "media-src 'self' blob:",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
+  "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://connect.facebook.net https://www.facebook.com",
   "frame-src 'self' https://www.googletagmanager.com",
   "form-action 'self' https://checkout.stripe.com",
   "frame-ancestors 'self'",
