@@ -50,7 +50,7 @@ export default function ApplyForm({ defaultName }: { defaultName: string }) {
 
   if (done) {
     return (
-      <div className="rounded-xl bg-success-soft px-5 py-6">
+      <div className="rounded-[3px] bg-success-soft px-5 py-6">
         <h3 className="font-display text-lg font-bold text-success">
           {t.successTitle}
         </h3>
@@ -125,7 +125,7 @@ export default function ApplyForm({ defaultName }: { defaultName: string }) {
 }
 
 const inputCls =
-  "w-full rounded-xl border border-line bg-bg px-4 py-3 text-sm outline-none transition focus:border-primary";
+  "w-full rounded-[3px] border border-line bg-bg px-4 py-3 text-sm outline-none transition focus:border-primary";
 
 function Field({
   label,

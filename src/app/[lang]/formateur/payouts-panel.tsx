@@ -88,7 +88,7 @@ export default function PayoutsPanel({
       </div>
 
       {justBack && (
-        <p className="mt-4 rounded-xl bg-bg px-4 py-3 text-sm text-muted">
+        <p className="mt-4 rounded-[3px] bg-bg px-4 py-3 text-sm text-muted">
           {p.backFromStripe}
         </p>
       )}
@@ -101,7 +101,7 @@ export default function PayoutsPanel({
           { label: p.platform, value: money(data.platformCents) },
           { label: p.sales, value: String(data.salesCount) },
         ].map((s) => (
-          <div key={s.label} className="rounded-xl bg-bg px-4 py-4">
+          <div key={s.label} className="rounded-[3px] bg-bg px-4 py-4">
             <div
               className={`font-display text-2xl font-extrabold ${s.strong ? "text-primary" : ""}`}
             >
@@ -119,7 +119,7 @@ export default function PayoutsPanel({
       )}
 
       {/* État du compte de versement */}
-      <div className="mt-6 rounded-xl bg-bg px-4 py-4">
+      <div className="mt-6 rounded-[3px] bg-bg px-4 py-4">
         <p className="text-sm">{stageText[data.stage]}</p>
 
         {data.hasAccount && (
@@ -143,7 +143,7 @@ export default function PayoutsPanel({
             <button
               onClick={() => run(refreshConnectStatusAction)}
               disabled={isPending}
-              className="rounded-full border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary disabled:opacity-50"
+              className="rounded-[3px] border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary disabled:opacity-50"
             >
               {p.ctaRefresh}
             </button>
@@ -162,7 +162,7 @@ export default function PayoutsPanel({
 
       {/* Dernières ventes */}
       {data.recent.length === 0 ? (
-        <p className="mt-6 rounded-xl bg-bg px-4 py-3.5 text-sm text-muted">
+        <p className="mt-6 rounded-[3px] bg-bg px-4 py-3.5 text-sm text-muted">
           {p.empty}
         </p>
       ) : (
@@ -204,7 +204,7 @@ export default function PayoutsPanel({
 function Badge({ on, on_, off }: { on: boolean; on_: string; off: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+      className={`inline-flex items-center gap-1.5 rounded-[3px] px-2.5 py-1 text-xs font-semibold ${
         on ? "bg-success-soft text-success" : "bg-warning/15 text-warning"
       }`}
     >

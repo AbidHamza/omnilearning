@@ -93,12 +93,14 @@ const en: Dict = {
       "Learn at your own pace, wherever you are and whenever you want.",
       "Benefit from the expertise of passionate, recognised instructors.",
       "Check what you have retained at every chapter: graded quizzes, experience points and badges.",
+      "Walk away with a certificate in your name as soon as the last lesson is done.",
     ],
     featureTitles: [
       "Open trial lessons",
       "At your own pace",
       "Expert instructors",
       "Quizzes and progress",
+      "Closing certificate",
     ],
 
     // Access (pricing section)

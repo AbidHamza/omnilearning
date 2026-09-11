@@ -179,7 +179,7 @@ export default function Navbar() {
               <button
                 aria-label="Menu"
                 onClick={() => setOpen((v) => !v)}
-                className="grid h-9 w-9 place-items-center rounded-lg text-ink lg:hidden"
+                className="grid h-9 w-9 place-items-center rounded-[3px] text-ink lg:hidden"
               >
                 {open ? <XIcon /> : <MenuIcon />}
               </button>
@@ -222,7 +222,7 @@ export default function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-surface"
+                className="block rounded-[3px] px-3 py-2 text-sm font-medium hover:bg-surface"
               >
                 {l.label}
               </LocaleLink>
@@ -232,13 +232,13 @@ export default function Navbar() {
                 <LocaleLink
                   href={"/parametres"}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-surface"
+                  className="block rounded-[3px] px-3 py-2 text-sm font-medium hover:bg-surface"
                 >
                   {t.nav.myAccount} · {user.name}
                 </LocaleLink>
                 <button
                   onClick={logout}
-                  className="block w-full rounded-lg px-3 py-2 text-start text-sm font-medium text-danger hover:bg-surface"
+                  className="block w-full rounded-[3px] px-3 py-2 text-start text-sm font-medium text-danger hover:bg-surface"
                 >
                   {t.auth.logout}
                 </button>
@@ -297,12 +297,12 @@ function LanguageSwitcher() {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute inset-inline-end-0 z-20 mt-2 w-40 rounded-xl border border-line bg-bg p-1.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.4)]">
+          <div className="absolute inset-inline-end-0 z-20 mt-2 w-40 rounded-[3px] border border-line bg-bg p-1.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.4)]">
             {locales.map((l) => (
               <button
                 key={l}
                 onClick={() => choose(l)}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-start text-sm transition ${
+                className={`flex w-full items-center justify-between rounded-[3px] px-2.5 py-2 text-start text-sm transition ${
                   l === locale
                     ? "bg-primary-soft font-semibold text-primary-dark"
                     : "hover:bg-surface"
@@ -346,7 +346,7 @@ function AccountMenu({
     <div className="relative hidden md:block">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 rounded-full py-1 ps-1 pe-2.5 transition hover:bg-surface"
+        className="flex items-center gap-2.5 rounded-[3px] py-1 ps-1 pe-2.5 transition hover:bg-surface"
         aria-haspopup="menu"
         aria-expanded={open}
       >
@@ -362,7 +362,7 @@ function AccountMenu({
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div
             role="menu"
-            className="absolute inset-inline-end-0 z-20 mt-2 w-60 rounded-xl border border-line bg-bg p-1.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.4)]"
+            className="absolute inset-inline-end-0 z-20 mt-2 w-60 rounded-[3px] border border-line bg-bg p-1.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.4)]"
           >
             <div className="flex items-center gap-3 px-2.5 py-2.5">
               <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-sm font-bold text-primary-dark">
@@ -382,14 +382,14 @@ function AccountMenu({
             <LocaleLink
               href={settingsHref}
               onClick={() => setOpen(false)}
-              className="block rounded-lg px-2.5 py-2 text-sm font-medium transition hover:bg-surface"
+              className="block rounded-[3px] px-2.5 py-2 text-sm font-medium transition hover:bg-surface"
               role="menuitem"
             >
               {settingsLabel}
             </LocaleLink>
             <button
               onClick={onLogout}
-              className="mt-1 flex w-full items-center rounded-lg border-t border-line px-2.5 py-2 text-start text-sm font-medium text-danger transition hover:bg-surface"
+              className="mt-1 flex w-full items-center rounded-[3px] border-t border-line px-2.5 py-2 text-start text-sm font-medium text-danger transition hover:bg-surface"
               role="menuitem"
             >
               {logoutLabel}

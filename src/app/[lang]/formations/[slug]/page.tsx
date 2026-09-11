@@ -282,7 +282,7 @@ export default async function CoursePage(
             {course.skills.map((s) => (
               <span
                 key={s}
-                className="rounded-full bg-surface px-4 py-2 text-sm font-medium text-ink"
+                className="rounded-[3px] bg-surface px-4 py-2 text-sm font-medium text-ink"
               >
                 {s}
               </span>
@@ -299,7 +299,7 @@ export default async function CoursePage(
             {course.contentTypes.map((ct) => (
               <span
                 key={ct}
-                className="rounded-full border border-line px-4 py-2 text-sm"
+                className="rounded-[3px] border border-line px-4 py-2 text-sm"
               >
                 {ct}
               </span>

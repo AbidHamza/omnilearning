@@ -170,7 +170,6 @@ export default function ConnexionPage() {
       {/* Panneau de marque terminal (pas de photo stock générique). */}
       <div className="section-dark relative hidden overflow-hidden border-s border-line lg:flex lg:flex-col lg:justify-between lg:p-14">
         <div className="pointer-events-none absolute inset-0 hero-grid opacity-60" />
-        <div className="pointer-events-none absolute -top-24 end-0 h-72 w-72 rounded-full bg-brand-soft blur-3xl" />
 
         <div className="relative flex items-center gap-2.5 text-ink">
           <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-bg text-primary">

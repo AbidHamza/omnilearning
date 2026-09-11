@@ -108,7 +108,7 @@ export default function FormateurClient({
                     <td className="py-4 pe-4 font-semibold">{c.title}</td>
                     <td className="py-4 pe-4">
                       <span
-                        className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${statusCls[c.status]}`}
+                        className={`inline-block rounded-[3px] px-2.5 py-1 text-xs font-semibold ${statusCls[c.status]}`}
                       >
                         {statusLabel[c.status]}
                       </span>
@@ -182,7 +182,7 @@ function RowBtn({ href, children }: { href: string; children: React.ReactNode })
   return (
     <LocaleLink
       href={href}
-      className="rounded-full border border-line bg-bg px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark"
+      className="rounded-[3px] border border-line bg-bg px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark"
     >
       {children}
     </LocaleLink>

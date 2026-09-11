@@ -99,7 +99,7 @@ export default function GamificationPanel({
               <div
                 key={b.slug}
                 title={b.description}
-                className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-sm ring-1 ${
+                className={`flex items-center gap-2 rounded-[3px] px-3 py-1.5 text-sm ring-1 ${
                   tierRing[b.tier] ?? tierRing.bronze
                 }`}
               >
@@ -118,7 +118,7 @@ export default function GamificationPanel({
                 <div
                   key={b.slug}
                   title={b.description}
-                  className="flex items-center gap-2 rounded-full border border-line bg-bg px-3 py-1.5 text-sm opacity-60"
+                  className="flex items-center gap-2 rounded-[3px] border border-line bg-bg px-3 py-1.5 text-sm opacity-60"
                 >
                   <span className="text-base grayscale">{badgeIcon[b.icon] ?? "⭐"}</span>
                   <span className="text-muted">{b.label}</span>

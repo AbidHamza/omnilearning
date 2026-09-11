@@ -129,7 +129,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
                           ? `/formations/${e.slug}/${resume.id}`
                           : `/formations/${e.slug}`,
                       )}
-                      className="shrink-0 rounded-full border border-line bg-bg px-5 py-1.5 text-sm font-semibold transition hover:border-primary hover:text-primary-dark"
+                      className="shrink-0 rounded-[3px] border border-line bg-bg px-5 py-1.5 text-sm font-semibold transition hover:border-primary hover:text-primary-dark"
                     >
                       {d.resume}
                     </Link>
@@ -168,7 +168,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
           <h2 className="font-display text-xl font-bold">{d.progressionHeading}</h2>
           <Link
             href={localePath(locale, "/formations")}
-            className="rounded-full border border-line bg-bg px-4 py-1.5 text-sm font-semibold transition hover:border-primary"
+            className="rounded-[3px] border border-line bg-bg px-4 py-1.5 text-sm font-semibold transition hover:border-primary"
           >
             {d.seeMore}
           </Link>

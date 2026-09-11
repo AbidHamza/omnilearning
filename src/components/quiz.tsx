@@ -121,7 +121,7 @@ export default function Quiz({
         </p>
         <button
           onClick={restart}
-          className="mt-6 rounded-full border border-line px-6 py-2.5 text-sm font-semibold transition hover:bg-surface"
+          className="mt-6 rounded-[3px] border border-line px-6 py-2.5 text-sm font-semibold transition hover:bg-surface"
         >
           {t.quiz.restart}
         </button>
