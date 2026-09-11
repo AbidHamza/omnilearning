@@ -106,10 +106,17 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { lang } = await props.params;
   const locale = isLocale(lang) ? lang : defaultLocale;
-  // Titre et description viennent du layout ; la page ne pose que son adresse.
+  // Titre et description viennent du layout. `openGraph` en revanche remplace
+  // celui du layout au lieu de le compléter : sans `type` ni `siteName` ici,
+  // l'accueil sortait sans og:type et sans og:site_name.
   return {
     alternates: alternatesFor(locale),
-    openGraph: { url: pageUrl(locale), images: [shareCard(locale)] },
+    openGraph: {
+      type: "website",
+      siteName,
+      url: pageUrl(locale),
+      images: [shareCard(locale)],
+    },
   };
 }
 
