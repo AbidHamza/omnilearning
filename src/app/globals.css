@@ -235,6 +235,22 @@ h3,
 }
 
 /*
+ * Bande qui déborde jusqu'au bord de l'écran (carrousels). La marge négative
+ * doit valoir exactement le retrait de .container-page : à 24px fixes la page
+ * gagnait 8px de large sous 640px, et en arabe elle se décalait de 8px.
+ */
+.bleed-page {
+  margin-inline: -1.5rem;
+  padding-inline: 1.5rem;
+}
+@media (max-width: 640px) {
+  .bleed-page {
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+  }
+}
+
+/*
  * Champs de formulaire, registre terminal : tranchant (pas de pilule),
  * bordure hairline, focus accent + glow phosphore. mono.
  */
@@ -310,10 +326,11 @@ textarea.field {
  */
 .hero-mesh {
   background-color: var(--color-bg);
-  background-image:
-    radial-gradient(120% 80% at 78% -8%, var(--color-brand-soft), transparent 60%),
-    radial-gradient(46rem 30rem at 4% 4%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 55%),
-    radial-gradient(140% 100% at 50% 0%, transparent 55%, color-mix(in srgb, var(--color-bg) 92%, #000) 100%);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-brand-soft) 70%, var(--color-bg)),
+    var(--color-bg) 62%
+  );
 }
 
 /*

@@ -1,0 +1,3 @@
+# git archive depuis Windows exportait les scripts en CRLF : bash lisait un
+# retour chariot colle a pipefail et refusait de demarrer le deploiement.
+*.sh text eol=lf

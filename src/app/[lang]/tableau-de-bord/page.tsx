@@ -199,7 +199,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
             ? d.recommendBecause.replace("{title}", enrolled[0].course.title)
             : d.recommendDefault}
         </p>
-        <div className="no-scrollbar -mx-6 mt-5 flex gap-4 overflow-x-auto px-6 pb-1">
+        <div className="no-scrollbar bleed-page mt-5 flex gap-4 overflow-x-auto pb-1">
           {recommended.map((c) => (
             <CourseCard
               key={c.slug}
