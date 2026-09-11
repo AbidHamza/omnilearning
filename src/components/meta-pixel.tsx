@@ -1,43 +1,20 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+import { parseConsent, readRawConsent, serverConsent, subscribeConsent } from "@/lib/consent";
 
 // Meta Pixel (Facebook/Instagram Ads) pour omnilearn.org.
-// Ne s'initialise JAMAIS au chargement : on attend soit un choix "granted"
-// déjà en mémoire (localStorage, posé par consent-banner.tsx), soit
-// l'événement "olm-consent" émis quand le visiteur clique "J'accepte".
-// Lu depuis NEXT_PUBLIC_META_PIXEL_ID (voir .env.example).
+// Il ne s'initialise jamais au chargement : le composant ne rend rien tant
+// que le choix stocké par le bandeau ne vaut pas "granted". Contrairement à
+// GA4, Meta n'a pas de mode sans cookie, donc ici c'est tout ou rien.
+// Identifiant lu depuis NEXT_PUBLIC_META_PIXEL_ID (voir .env.example).
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "1505740464038855";
-const STORAGE_KEY = "olm_consent";
-const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 30 * 6;
-
-function hasStoredConsent(): boolean {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return false;
-    const parsed = JSON.parse(raw) as { choice: string; ts: number };
-    return parsed.choice === "granted" && Date.now() - parsed.ts <= SIX_MONTHS_MS;
-  } catch {
-    return false;
-  }
-}
 
 export function MetaPixel() {
-  const [ready, setReady] = useState(false);
+  const stored = useSyncExternalStore(subscribeConsent, readRawConsent, serverConsent);
 
-  useEffect(() => {
-    if (!PIXEL_ID) return;
-    if (hasStoredConsent()) setReady(true);
-    const onConsent = (event: Event) => {
-      const detail = (event as CustomEvent<string>).detail;
-      if (detail === "granted") setReady(true);
-    };
-    window.addEventListener("olm-consent", onConsent);
-    return () => window.removeEventListener("olm-consent", onConsent);
-  }, []);
-
-  if (!PIXEL_ID || !ready) return null;
+  if (!PIXEL_ID || parseConsent(stored) !== "granted") return null;
 
   return (
     <>
