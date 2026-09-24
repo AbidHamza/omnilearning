@@ -169,7 +169,7 @@ export default function Navbar() {
         )}
 
         {bare && (
-          <div className="ms-auto flex items-center gap-3">
+          <div className="ms-auto flex items-center gap-1.5 sm:gap-3">
             <ThemeToggle />
             <LanguageSwitcher />
             <LocaleLink
