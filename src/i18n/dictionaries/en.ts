@@ -32,9 +32,21 @@ const en: Dict = {
     formateur: "Instructor",
     admin: "Administrator",
   },
+  // Clé : libellé stocké en base (français). Absent de la table : affiché tel quel.
+  categoryNames: {
+    "Développement Web": "Web development",
+    "Data engineering": "Data engineering",
+    "Cybersécurité": "Cybersecurity",
+    "Intelligence Artificielle": "Artificial intelligence",
+    "Cloud Computing": "Cloud computing",
+    "Design UX": "UX design",
+    "Gestion de projet": "Project management",
+    "Objets connectés (IoT)": "Connected devices (IoT)",
+    "Infrastructure": "Infrastructure",
+  },
   footer: {
     tagline:
-      "Gamified tech courses for people who learn seriously. The first two lessons of every course are open to everyone.",
+      "Courses written by independent instructors and reviewed before publication. The first two lessons of each one open without an account.",
     colPages: "Pages",
     colFormations: "Courses",
     colAccount: "Account",
@@ -49,104 +61,74 @@ const en: Dict = {
     privacy: "Privacy",
     instructorTerms: "Instructor terms",
     rights: "© 2026 OmniLearn. All rights reserved.",
-    motto: "Learn. Practice. Progress.",
+    motto: "Every course is read by a person before it goes live.",
   },
   home: {
-    heroBadge: "The first 2 lessons of every course are open",
-    heroTitle: "Learn the tech skills",
-    heroHighlight: "of tomorrow",
+    heroTitle: "Learn a skill from someone who uses it at work.",
     heroSubtitle:
-      "Videos, courses and quizzes built by experts. Progress at your own pace, earn XP and keep track of what you have mastered.",
-    heroCtaPrimary: "Try a lesson",
-    heroCtaSecondary: "Browse courses",
-    heroReassurance: "The first two lessons of every course open without an account",
-    heroAlt: "Learners in a course",
+      "Courses on OmniLearn are written by independent instructors and read by our team before they go live. The first two lessons of each one open without an account or a card.",
+    ctaBrowse: "Browse the catalog",
+    ctaTeach: "Apply to teach one of the first courses",
 
-    // Hero product mockup
-    mockTitle: "Cybersecurity",
-    mockSubtitle: "Module 2 · Identifying threats",
-    mockProgressLabel: "Progress",
-    mockLessonVideo: "Understanding threats and their impact",
-    mockLessonText: "Securing your personal information",
-    mockLessonQuiz: "Quiz: cybersecurity threats",
-    mockDuration: "6 h of content",
-    mockLevel: "Beginner level",
+    ledgerTitle: "The catalog today",
+    ledgerCourses: "published courses",
+    ledgerLessons: "lessons",
+    ledgerOpen: "lessons open without an account",
+    ledgerEmpty:
+      "No course is published yet. The first ones will come from instructors who apply now, and each one is reviewed before it goes live.",
 
-    // Stats band
-    statsTitle: "What the platform holds today",
-    statCourses: "Published courses",
-    statLessons: "Lessons",
-    statHours: "Hours of content",
-    statFree: "Lessons open without an account",
-
-    popularTitle: "Popular courses among learners",
-    popularSubtitle:
-      "The most-followed courses this month, picked by our community.",
-    themesTitle: "Explore by topic",
-    themesSubtitle: "Nine fields, one place to grow your skills.",
-
-    whyTitle: "Why learn with OmniLearn?",
-    whySubtitle:
-      "Everything you need to learn seriously, without the price of a school.",
-    features: [
-      "Try every course freely: the first two lessons are open, no account needed.",
-      "Learn at your own pace, wherever you are and whenever you want.",
-      "Benefit from the expertise of passionate, recognised instructors.",
-      "Check what you have retained at every chapter: graded quizzes, experience points and badges.",
-      "Walk away with a certificate in your name as soon as the last lesson is done.",
-    ],
-    featureTitles: [
-      "Open trial lessons",
-      "At your own pace",
-      "Expert instructors",
-      "Quizzes and progress",
-      "Closing certificate",
+    howTitle: "How a course works here",
+    how: [
+      {
+        t: "Two lessons before any sign-up",
+        d: "Open the first two lessons of any course without an account. If the teaching style isn't for you, you have lost ten minutes, not money.",
+      },
+      {
+        t: "Quizzes that count",
+        d: "Chapters end with a graded quiz. At 70% or more the lesson counts as passed and the XP lands on your profile.",
+      },
+      {
+        t: "Progress that follows you",
+        d: "Sign in on your phone after starting on a laptop and you are back on the same lesson.",
+      },
+      {
+        t: "A certificate in your name",
+        d: "Finish every lesson and the course issues a printable certificate of completion. It records what you did on OmniLearn; it is not college credit.",
+      },
     ],
 
-    // Access (pricing section)
-    pricingTitle: "Try first, sign up after.",
-    pricingSubtitle:
-      "The first two lessons of every course are open without an account. An account opens the rest of the free courses, the graded quizzes and saved progress. Paid courses are bought one at a time, and each one shows its price.",
-    pricingPlan: "Learner account",
-    pricingPrice: "€0",
-    pricingPeriod: "no commitment",
-    pricingIncludes: [
-      "Every lesson of every free course",
-      "Graded quizzes, XP, streaks and badges",
-      "Progress tracking across all your devices",
-      "Interface in French, English and Arabic",
-      "No advertising",
-    ],
-    pricingCta: "Create my account",
-    pricingNote: "Sign up in under a minute.",
+    latestTitle: "Latest in the catalog",
 
-    // FAQ
-    faqTitle: "Frequently asked questions",
-    faqSubtitle: "Everything you want to know before you start.",
+    teachTitle: "Teach here and keep 70% of each sale.",
+    teachBody:
+      "The platform keeps the other 30%. That share pays for payment processing, hosting, and a read-through of your course before it is published. You set the price, or publish it for free.",
+    teachTopics: "Topics we are looking for instructors in",
+    teachCta: "Apply to teach",
+    teachTerms: "Read the instructor terms",
+
+    faqTitle: "Questions people ask first",
     faq: [
       {
-        q: "What can I view without an account?",
-        a: "The first two lessons of every course, freely. The remaining lessons, graded quizzes and progress tracking require a learner account, which costs nothing to create. On paid courses, marked with their price, the rest opens once you buy it.",
+        q: "What can I open without an account?",
+        a: "The first two lessons of every course. The remaining lessons, the graded quizzes and saved progress need a learner account, which is free to create.",
       },
       {
-        q: "Do I need a credit card to sign up?",
-        a: "Not to sign up: an email address is enough, and several courses stay free. A card only comes in when you buy a paid course, once, with no subscription.",
+        q: "Do I need a card to sign up?",
+        a: "No. An email address or a Google account is enough. A card only comes in if you buy a paid course, once, with no subscription.",
       },
       {
-        q: "How are the quizzes marked?",
-        a: "Each quiz gives one point per correct answer. From 70% upwards the lesson counts as passed and the experience is credited to your account.",
+        q: "Who writes the courses?",
+        a: "Independent instructors. They apply, build the course in our editor, and someone on our team reads it before it is published.",
       },
       {
-        q: "Can I learn at my own pace?",
-        a: "Yes. Courses stay available at any time and your progress is saved. You pick up exactly where you left off, on any device.",
+        q: "How are quizzes graded?",
+        a: "One point per correct answer. From 70% up the lesson counts as passed and the experience points are added to your account.",
+      },
+      {
+        q: "Is the certificate accredited?",
+        a: "No. It shows you completed the lessons and quizzes of a course on OmniLearn. It is not a state diploma or college credit.",
       },
     ],
-
-    // Final CTA
-    ctaTitle: "Ready to learn something new?",
-    ctaSubtitle:
-      "Join the learners building their skills every day. Start with an open lesson.",
-    ctaButton: "Get started now",
   },
   card: {
     levelPrefix: "Level:",
@@ -157,7 +139,7 @@ const en: Dict = {
   },
   catalog: {
     metaDescription:
-      "The full catalogue: development, cybersecurity, AI, data, design. The first lessons of every course are open to everyone, no account needed.",
+      "Courses published on OmniLearn, written by independent instructors and reviewed before they go live. The first two lessons of each one open without an account.",
     searchPlaceholder: "Search for a course",
     filterLevel: "Difficulty level",
     filterDuration: "Video length",
@@ -174,6 +156,10 @@ const en: Dict = {
     durGt6: "More than 6 hours",
     resultsFor: "result(s) for",
     empty: "No course matches your filters.",
+    emptyCatalogTitle: "The catalog opens with its first instructors.",
+    emptyCatalogBody:
+      "Nothing is published yet. Every course is read by our team before it goes live, so the first ones will appear here as they pass review.",
+    emptyCatalogCta: "Apply to teach one of them",
     defaultLabel: "all courses",
   },
   curriculum: {
@@ -230,7 +216,7 @@ const en: Dict = {
     lockedPrompt: "access denied :: authentication required",
     lockedTitle: "The rest is for members",
     lockedText:
-      "Create an account to unlock the full course, save your progress and take the graded quizzes.",
+      "Create an account to open the full course, save your progress and take the graded quizzes.",
     lockedCreate: "Create a free account",
     lockedSignIn: "Sign in",
     completedLabel: "Lesson completed",
@@ -656,12 +642,12 @@ const en: Dict = {
     previewNoDesc: "No description provided.",
   },
   teach: {
-    metaTitle: "Teach on OmniLearning",
+    metaTitle: "Teach on OmniLearn",
     metaDescription:
-      "Sell your courses on OmniLearning. You set the price, you keep 70% of every sale, Stripe pays straight into your account.",
+      "Sell your courses on OmniLearn. You set the price, you keep 70% of every sale, Stripe pays straight into your account.",
     kicker: "instructors",
     titleLead: "Sell your courses on",
-    titleAccent: "OmniLearning",
+    titleAccent: "OmniLearn",
     intro:
       "You keep 70% of every sale. The platform handles payment, hosting, quizzes and learner tracking.",
     shareTitle: "What you take home",
@@ -745,6 +731,7 @@ const en: Dict = {
     wrongAddress: "Wrong address? Edit it",
   },
   signup: {
+    emailPlaceholder: "you@email.com",
     mismatch: "The passwords don't match.",
     title: "Create your account",
     subtitle:

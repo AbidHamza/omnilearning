@@ -26,7 +26,7 @@ const inputCls =
   "mt-2 w-full rounded-[3px] border border-line bg-bg px-3.5 py-2.5 text-sm outline-none transition focus:border-primary";
 const panelCls = "border-t border-line py-4 text-sm";
 const primaryBtn =
-  "rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:opacity-50";
+  "rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50";
 const ghostBtn =
   "rounded-[3px] border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary disabled:opacity-50";
 const rowLink =
@@ -164,7 +164,7 @@ function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
   return (
     <div className="space-y-10">
       <form onSubmit={saveProfile}>
-        <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+        <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
           <UserIcon width={18} height={18} />
           {s.profileHeading}
         </h2>
@@ -191,7 +191,7 @@ function ProfileTab({ user, billing }: { user: User; billing: BillingState }) {
       </form>
 
       <form onSubmit={savePassword}>
-        <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+        <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
           <ShieldIcon width={18} height={18} />
           {s.changePwHeading}
         </h2>
@@ -254,7 +254,7 @@ function SuiviTab({
   }));
   return (
     <div>
-      <h2 className="font-display text-lg font-bold">{s.trackingHeading}</h2>
+      <h2 className="font-display text-lg font-semibold">{s.trackingHeading}</h2>
       <ul className="mt-5 border-b border-line">
         {enrolled.length === 0 ? (
           <li className={`${panelCls} text-muted`}>{s.noTracking}</li>
@@ -294,7 +294,7 @@ function PurchasesTab({ purchases }: { purchases: PurchaseRow[] }) {
   const statusLabel: Record<string, string> = s.purchaseStatus;
   return (
     <div>
-      <h2 className="font-display text-lg font-bold">{s.tabPurchases}</h2>
+      <h2 className="font-display text-lg font-semibold">{s.tabPurchases}</h2>
       {purchases.length === 0 ? (
         <p className={`mt-5 ${panelCls} border-b text-muted`}>{s.noPurchases}</p>
       ) : (
@@ -362,7 +362,7 @@ function FormationsCreesTab({ user }: { user: User }) {
 
   return (
     <div>
-      <h2 className="font-display text-lg font-bold">{s.createdHeading}</h2>
+      <h2 className="font-display text-lg font-semibold">{s.createdHeading}</h2>
       <p className="mt-1 text-sm text-muted">{s.createdSubtitle}</p>
       {error && <p className="mt-3 text-sm text-danger">{error}</p>}
       <ul className="mt-5 border-b border-line">
@@ -418,7 +418,7 @@ function StatsTab({ user }: { user: User }) {
   const created = user.created ?? [];
   return (
     <div>
-      <h2 className="font-display text-lg font-bold">{s.statsHeading}</h2>
+      <h2 className="font-display text-lg font-semibold">{s.statsHeading}</h2>
       <ul className="mt-5 space-y-3">
         <StatRow icon={<LayersIcon width={18} height={18} />} value={stats.started}>
           {s.statStarted}
@@ -480,7 +480,7 @@ function StatRow({
         {icon}
       </span>
       <span>
-        <span className="font-display text-lg font-bold">{value}</span>{" "}
+        <span className="font-display text-lg font-semibold">{value}</span>{" "}
         <span className="text-sm text-muted">{children}</span>
       </span>
     </li>

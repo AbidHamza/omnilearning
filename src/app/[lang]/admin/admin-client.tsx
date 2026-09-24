@@ -102,7 +102,7 @@ export default function AdminClient({
             className={`flex items-baseline justify-between gap-6 border-b border-line py-3 ${s.highlight ? "text-primary-dark" : ""}`}
           >
             <dt className="text-sm text-muted">{s.label}</dt>
-            <dd className="font-display text-2xl font-extrabold">{s.value}</dd>
+            <dd className="font-display text-2xl">{s.value}</dd>
           </div>
         ))}
       </dl>
@@ -117,7 +117,7 @@ export default function AdminClient({
       {/* File de validation */}
       <section className="mt-6 rounded-[var(--radius-card)] border border-line bg-bg p-6 sm:p-7">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">
+          <h2 className="font-display text-xl font-semibold">
             {m.queueTitle}
           </h2>
           <span className="rounded-[3px] bg-surface px-3 py-1 text-xs font-semibold text-muted">
@@ -175,7 +175,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decide(c, true)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-[3px] bg-success px-3.5 py-1.5 text-xs font-semibold text-[#04130a] transition hover:opacity-90 disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[3px] bg-success px-3.5 py-1.5 text-xs font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
                         >
                           <CheckIcon width={14} height={14} />
                           {m.approve}
@@ -217,7 +217,7 @@ export default function AdminClient({
       {/* Candidatures formateur */}
       <section className="mt-6 rounded-[var(--radius-card)] border border-line bg-bg p-6 sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-display text-xl font-bold">{m.applyTitle}</h2>
+          <h2 className="font-display text-xl font-semibold">{m.applyTitle}</h2>
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-xs font-semibold text-muted">
               {m.applyShareLabel}
@@ -286,7 +286,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decideApplication(a, true)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-[3px] bg-success px-3.5 py-1.5 text-xs font-semibold text-[#04130a] transition hover:opacity-90 disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[3px] bg-success px-3.5 py-1.5 text-xs font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
                         >
                           <CheckIcon width={14} height={14} />
                           {m.approve}
@@ -311,7 +311,7 @@ export default function AdminClient({
 
       {/* Derniers inscrits */}
       <section className="mt-6 rounded-[var(--radius-card)] border border-line bg-bg p-6 sm:p-7">
-        <h2 className="font-display text-xl font-bold">{m.recentTitle}</h2>
+        <h2 className="font-display text-xl font-semibold">{m.recentTitle}</h2>
         <ul className="mt-5 divide-y divide-line">
           {recentUsers.map((u) => (
             <li key={`${u.name}-${u.joined}`} className="flex items-center gap-4 py-3.5">

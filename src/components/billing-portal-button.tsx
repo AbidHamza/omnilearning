@@ -27,7 +27,7 @@ export default function BillingPortalButton({
 
   return (
     <div>
-      <h2 className="mt-10 font-display text-lg font-bold">{billing.heading}</h2>
+      <h2 className="mt-10 font-display text-lg font-semibold">{billing.heading}</h2>
       <p className="mt-1 text-sm text-muted">
         {hasCustomer ? billing.descActive : billing.descInactive}
       </p>

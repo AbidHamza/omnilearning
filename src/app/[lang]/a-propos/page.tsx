@@ -35,7 +35,7 @@ export default async function AProposPage({
       <div className="flex flex-wrap gap-3">
         <LocaleLink
           href="/formations"
-          className="inline-flex rounded-[3px] bg-primary px-6 py-3 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+          className="inline-flex rounded-[3px] bg-primary px-6 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
         >
           {labels.courses}
         </LocaleLink>

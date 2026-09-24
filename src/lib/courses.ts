@@ -345,12 +345,4 @@ export function allLessons(course: Course) {
     p.lessons.map((l) => ({ ...l, partTitle: p.title })),
   );
 }
-
-export const popularSlugs = [
-  "commencer-le-html",
-  "javascript-cours-expert",
-  "figma-avance",
-  "prompt-engineering-ia",
-  "cybersecurite",
-  "devenir-product-owner",
-];
+

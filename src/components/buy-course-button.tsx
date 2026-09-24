@@ -41,7 +41,7 @@ export default function BuyCourseButton({
         disabled={pending}
         className={
           className ??
-          "inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep disabled:opacity-60"
+          "inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep disabled:opacity-60"
         }
       >
         {pending ? dict.course.buyPending : label}

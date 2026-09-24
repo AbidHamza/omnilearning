@@ -23,7 +23,7 @@ export default function MotDePasseOubliePage() {
             <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand-soft text-primary-dark">
               <MailIcon width={26} height={26} />
             </span>
-            <h1 className="mt-5 text-2xl font-extrabold tracking-tight">
+            <h1 className="mt-5 font-display text-2xl">
               {f.title}
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-muted">{f.desc}</p>
@@ -42,7 +42,7 @@ export default function MotDePasseOubliePage() {
 
             <button
               type="submit"
-              className="mt-6 w-full rounded-[3px] bg-primary py-3 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+              className="mt-6 w-full rounded-[3px] bg-primary py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
             >
               {f.send}
             </button>
@@ -59,7 +59,7 @@ export default function MotDePasseOubliePage() {
             <span className="mx-auto grid h-14 w-14 place-items-center rounded-[3px] bg-success-soft text-success">
               <MailIcon width={26} height={26} />
             </span>
-            <h1 className="mt-5 text-2xl font-extrabold tracking-tight">
+            <h1 className="mt-5 font-display text-2xl">
               {f.sentTitle}
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-muted">

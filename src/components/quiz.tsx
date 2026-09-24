@@ -132,7 +132,7 @@ export default function Quiz({
   return (
     <div className="rounded-[var(--radius-card)] border border-line bg-bg p-6 sm:p-8">
       <div className="flex items-start justify-between gap-4">
-        <h3 className="font-display text-xl font-bold">
+        <h3 className="font-display text-xl font-semibold">
           {t.quiz.questionOf} {index + 1} {t.quiz.questionSep} {questions.length}
         </h3>
         <div className="flex shrink-0 gap-2">
@@ -224,14 +224,14 @@ export default function Quiz({
             onClick={check}
             disabled={selected === null || pending}
             aria-busy={pending}
-            className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:cursor-not-allowed disabled:opacity-50"
           >
             {pending ? t.quiz.checking : t.quiz.validate}
           </button>
         ) : (
           <button
             onClick={next}
-            className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+            className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
           >
             {isLast ? t.quiz.showResult : t.quiz.next}
           </button>

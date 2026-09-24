@@ -4,7 +4,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   ChevronDown,
-  GraduationIcon,
   GlobeIcon,
   MenuIcon,
   SearchIcon,
@@ -93,11 +92,8 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 border-b border-line bg-bg">
       <div className="container-page flex h-[68px] items-center gap-4">
         <LocaleLink href="/" className="group flex shrink-0 items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-surface text-primary transition group-hover:border-primary">
-            <GraduationIcon width={18} height={18} />
-          </span>
-          <span className="hidden font-display text-[16px] font-extrabold tracking-tight sm:block">
-            <span className="text-primary">$</span> omni<span className="text-primary">learn</span>
+          <span className="font-display text-[22px] font-semibold tracking-tight text-ink">
+            Omni<span className="italic text-primary">Learn</span>
           </span>
         </LocaleLink>
 
@@ -125,18 +121,10 @@ export default function Navbar() {
                 <LocaleLink
                   key={l.href}
                   href={l.href}
-                  className={`group flex items-center gap-1 text-sm transition-colors hover:text-ink ${
-                    isActive(l.href) ? "font-semibold text-ink" : "text-muted"
+                  className={`border-b-2 py-1 text-sm transition-colors hover:text-ink ${
+                    isActive(l.href) ? "border-primary font-semibold text-ink" : "border-transparent text-muted"
                   }`}
                 >
-                  <span
-                    className={`text-primary transition-opacity ${
-                      isActive(l.href) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                    }`}
-                    aria-hidden
-                  >
-                    &gt;
-                  </span>
                   {l.label}
                 </LocaleLink>
               ))}
@@ -169,7 +157,7 @@ export default function Navbar() {
                   </LocaleLink>
                   <LocaleLink
                     href="/creer-compte"
-                    className="rounded-[3px] border border-primary/40 bg-brand-soft px-3.5 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a]"
+                    className="rounded-[3px] bg-primary px-3.5 py-2 text-sm font-semibold text-on-primary transition hover:bg-primary-dark"
                   >
                     {t.common.signUp}
                   </LocaleLink>
@@ -255,7 +243,7 @@ export default function Navbar() {
                 <LocaleLink
                   href="/creer-compte"
                   onClick={() => setOpen(false)}
-                  className="flex-1 rounded-[3px] border border-primary/40 bg-brand-soft py-2 text-center text-sm font-semibold text-primary"
+                  className="flex-1 rounded-[3px] bg-primary py-2 text-center text-sm font-semibold text-on-primary"
                 >
                   {t.common.signUp}
                 </LocaleLink>

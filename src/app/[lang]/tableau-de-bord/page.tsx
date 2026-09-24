@@ -8,6 +8,7 @@ import { getGamification, getXpByDay } from "@/lib/gamification";
 import { allLessons } from "@/lib/courses";
 import type { Course } from "@/lib/types";
 import CourseCard from "@/components/course-card";
+import { categoryName } from "@/i18n/category-name";
 import GamificationPanel from "@/components/gamification-panel";
 import ProgressChart from "@/components/progress-chart";
 import { BoltIcon, ClockIcon, LayersIcon } from "@/components/icons";
@@ -79,10 +80,8 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
 
   return (
     <div className="container-page py-10">
-      <p className="font-mono text-xs text-muted-soft">
-        <span className="text-primary">$</span> whoami # {currentUser.name.split(" ")[0]}
-      </p>
-      <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight">
+      <p className="text-sm text-muted">{currentUser.name.split(" ")[0]}</p>
+      <h1 className="mt-1 font-display text-4xl tracking-tight">
         {d.titleLead} <span className="text-primary">{d.titleAccent}</span>
       </h1>
 
@@ -100,7 +99,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
               return (
                 <div key={e.slug}>
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display text-lg font-bold">
+                    <h3 className="font-display text-lg font-semibold">
                       {e.course.title}
                     </h3>
                     <span className="shrink-0 text-xs text-muted">
@@ -165,7 +164,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
       {/* Progression */}
       <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">{d.progressionHeading}</h2>
+          <h2 className="font-display text-xl font-semibold">{d.progressionHeading}</h2>
           <Link
             href={localePath(locale, "/formations")}
             className="rounded-[3px] border border-line bg-bg px-4 py-1.5 text-sm font-semibold transition hover:border-primary"
@@ -193,7 +192,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
 
       {/* Suivre de nouvelles formations */}
       <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6">
-        <h2 className="font-display text-xl font-bold">{d.recommendTitle}</h2>
+        <h2 className="font-display text-xl font-semibold">{d.recommendTitle}</h2>
         <p className="mt-1 text-sm text-muted">
           {enrolled[0]
             ? d.recommendBecause.replace("{title}", enrolled[0].course.title)
@@ -203,7 +202,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
           {recommended.map((c) => (
             <CourseCard
               key={c.slug}
-              course={c}
+              course={{ ...c, category: categoryName(dict, c.category) }}
               labels={dict.card}
               locale={locale}
               variant="compact"

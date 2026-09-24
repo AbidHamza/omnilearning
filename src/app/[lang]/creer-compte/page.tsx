@@ -4,7 +4,7 @@ import { useState } from "react";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
 import { useT } from "@/i18n/provider";
 import { signupAction } from "@/lib/actions/auth";
-import { GraduationIcon, CheckIcon } from "@/components/icons";
+import { CheckIcon } from "@/components/icons";
 
 // Cible de retour passée par une page verrouillée (?next=/formations/...).
 // Lue au moment du submit (pas de useSearchParams → pas de Suspense imposée).
@@ -60,7 +60,7 @@ export default function CreerComptePage() {
           <label className="mt-6 block text-sm font-medium">
             {t.settings.emailLabel}
           </label>
-          <input type="email" name="email" required placeholder="vous@email.com" className="field mt-2" />
+          <input type="email" name="email" required placeholder={s.emailPlaceholder} className="field mt-2" />
 
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div>
@@ -100,9 +100,8 @@ export default function CreerComptePage() {
           <button
             type="submit"
             disabled={pending}
-            className="mt-7 inline-flex w-full items-center justify-center gap-1.5 rounded-[3px] border border-primary/40 bg-brand-soft py-3 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a] disabled:opacity-60"
+            className="mt-7 inline-flex w-full items-center justify-center gap-1.5 rounded-[3px] bg-primary py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-dark disabled:opacity-60"
           >
-            <span className="opacity-70">$</span>
             {s.submit}
           </button>
 
@@ -115,38 +114,26 @@ export default function CreerComptePage() {
         </form>
       </div>
 
-      {/* Panneau de marque terminal : ce que l'on gagne en rejoignant OmniLearn. */}
-      <div className="section-dark relative hidden overflow-hidden border-s border-line lg:flex lg:flex-col lg:justify-between lg:p-14">
-        <div className="pointer-events-none absolute inset-0 hero-grid opacity-60" />
+      <div className="section-dark hidden border-s border-line lg:flex lg:flex-col lg:justify-between lg:p-14">
+        <span className="font-display text-[22px] font-semibold tracking-tight text-ink">
+          Omni<span className="italic text-primary">Learn</span>
+        </span>
 
-        <div className="relative flex items-center gap-2.5 text-ink">
-          <span className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-bg text-primary">
-            <GraduationIcon width={18} height={18} />
-          </span>
-          <span className="font-display text-base font-extrabold tracking-tight">
-            <span className="text-primary">$</span> omni<span className="text-primary">learn</span>
-          </span>
-        </div>
-
-        <div className="relative">
-          <p className="font-mono text-xs text-muted-soft"># useradd --role student</p>
-          <p className="mt-3 font-display text-3xl font-extrabold leading-tight tracking-tight text-ink">
-            {s.panelTitleLead}{" "}
-            <span className="text-primary">{s.panelTitleAccent}</span>.
+        <div>
+          <p className="font-display text-[2rem] leading-tight text-ink">
+            {s.panelTitleLead} <em>{s.panelTitleAccent}</em>.
           </p>
-          <ul className="mt-7 space-y-3.5">
+          <ul className="mt-7 space-y-3">
             {s.panelBenefits.map((item) => (
-              <li key={item} className="flex items-center gap-3 font-sans text-sm text-muted">
-                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-[3px] bg-brand-soft text-primary">
-                  <CheckIcon width={13} height={13} />
-                </span>
+              <li key={item} className="flex items-start gap-3 text-[15px] text-muted">
+                <CheckIcon width={15} height={15} className="mt-1 shrink-0 text-primary" />
                 {item}
               </li>
             ))}
           </ul>
         </div>
 
-        <p className="relative font-mono text-xs uppercase tracking-[0.14em] text-muted-soft">
+        <p className="text-xs text-muted-soft">
           {t.footer.motto}
         </p>
       </div>

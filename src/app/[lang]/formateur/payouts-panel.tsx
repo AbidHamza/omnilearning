@@ -103,7 +103,7 @@ export default function PayoutsPanel({
         ].map((s) => (
           <div key={s.label} className="rounded-[3px] bg-bg px-4 py-4">
             <div
-              className={`font-display text-2xl font-extrabold ${s.strong ? "text-primary" : ""}`}
+              className={`font-display text-2xl ${s.strong ? "text-primary" : ""}`}
             >
               {s.value}
             </div>
@@ -134,7 +134,7 @@ export default function PayoutsPanel({
             <button
               onClick={() => run(cta.fn)}
               disabled={isPending}
-              className="rounded-[3px] bg-primary px-4 py-2 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:opacity-50"
+              className="rounded-[3px] bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50"
             >
               {isPending ? p.pending : cta.label}
             </button>

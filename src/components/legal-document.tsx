@@ -37,18 +37,18 @@ export default function LegalDocument({
   return (
     <div className="container-page py-16">
       <article className="mx-auto max-w-3xl">
-        <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
           {page.title}
         </h1>
         {page.updated && (
-          <p className="mt-3 font-mono text-xs text-muted-soft">{page.updated}</p>
+          <p className="mt-3 text-xs text-muted-soft">{page.updated}</p>
         )}
         <p className="mt-5 text-lg leading-relaxed text-muted">{page.lead}</p>
 
         <div className="mt-12 space-y-10">
           {page.sections.map((section) => (
             <section key={section.heading}>
-              <h2 className="font-display text-xl font-bold tracking-tight text-ink">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
                 {section.heading}
               </h2>
               <div className="mt-3 space-y-3">
