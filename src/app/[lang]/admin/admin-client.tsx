@@ -108,7 +108,7 @@ export default function AdminClient({
       </dl>
 
       {flash && (
-        <div className="mt-6 flex items-center gap-2 rounded-[3px] bg-success-soft px-4 py-3 text-sm font-medium text-success">
+        <div className="mt-6 flex items-center gap-2 rounded-[16px] bg-success-soft px-4 py-3 text-sm font-medium text-success">
           <CheckIcon width={16} height={16} />
           {flash}
         </div>
@@ -120,13 +120,13 @@ export default function AdminClient({
           <h2 className="font-display text-xl font-semibold">
             {m.queueTitle}
           </h2>
-          <span className="rounded-[3px] bg-surface px-3 py-1 text-xs font-semibold text-muted">
+          <span className="rounded-[16px] bg-surface px-3 py-1 text-xs font-semibold text-muted">
             {m.queueCount.replace("{n}", String(queue.length))}
           </span>
         </div>
 
         {queue.length === 0 ? (
-          <p className="mt-6 rounded-[3px] bg-surface p-6 text-center text-sm text-muted">
+          <p className="mt-6 rounded-[16px] bg-surface p-6 text-center text-sm text-muted">
             {m.queueEmpty}
           </p>
         ) : (
@@ -162,7 +162,7 @@ export default function AdminClient({
                             setPrices((prev) => ({ ...prev, [c.id]: e.target.value }))
                           }
                           disabled={isPending}
-                          className="w-24 rounded-[3px] border border-line bg-surface px-2 py-1 text-xs outline-none focus:border-primary disabled:opacity-50"
+                          className="w-24 rounded-[16px] border border-line bg-surface px-2 py-1 text-xs outline-none focus:border-primary disabled:opacity-50"
                         />
                         {Number(prices[c.id] ?? c.priceCents) > 0 ? null : (
                           <span className="text-xs text-muted">{m.priceFree}</span>
@@ -175,7 +175,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decide(c, true)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-[3px] bg-success px-3.5 py-1.5 text-xs font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[16px] bg-success px-3.5 py-1.5 text-xs font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
                         >
                           <CheckIcon width={14} height={14} />
                           {m.approve}
@@ -183,7 +183,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decide(c, false)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-[3px] border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[16px] border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
                         >
                           <XIcon width={14} height={14} />
                           {m.refuse}
@@ -192,7 +192,7 @@ export default function AdminClient({
                           type="button"
                           onClick={() => setOpen((o) => ({ ...o, [c.id]: !o[c.id] }))}
                           aria-expanded={!!open[c.id]}
-                          className="inline-flex items-center gap-1.5 rounded-[3px] border border-line px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary"
+                          className="inline-flex items-center gap-1.5 rounded-[16px] border border-line px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary"
                         >
                           {open[c.id] ? m.previewClose : m.preview}
                         </button>
@@ -227,18 +227,18 @@ export default function AdminClient({
                 max={95}
                 value={share}
                 onChange={(e) => setShare(Number(e.target.value))}
-                className="w-20 rounded-[3px] border border-line bg-surface px-3 py-1 text-center text-xs font-semibold outline-none focus:border-primary"
+                className="w-20 rounded-[16px] border border-line bg-surface px-3 py-1 text-center text-xs font-semibold outline-none focus:border-primary"
               />
               %
             </label>
-            <span className="rounded-[3px] bg-surface px-3 py-1 text-xs font-semibold text-muted">
+            <span className="rounded-[16px] bg-surface px-3 py-1 text-xs font-semibold text-muted">
               {m.applyCount.replace("{n}", String(applyQueue.length))}
             </span>
           </div>
         </div>
 
         {applyQueue.length === 0 ? (
-          <p className="mt-6 rounded-[3px] bg-surface p-6 text-center text-sm text-muted">
+          <p className="mt-6 rounded-[16px] bg-surface p-6 text-center text-sm text-muted">
             {m.applyEmpty}
           </p>
         ) : (
@@ -286,7 +286,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decideApplication(a, true)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-[3px] bg-success px-3.5 py-1.5 text-xs font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[16px] bg-success px-3.5 py-1.5 text-xs font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
                         >
                           <CheckIcon width={14} height={14} />
                           {m.approve}
@@ -294,7 +294,7 @@ export default function AdminClient({
                         <button
                           onClick={() => decideApplication(a, false)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-1.5 rounded-[3px] border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-[16px] border border-danger/40 px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger-soft disabled:opacity-50"
                         >
                           <XIcon width={14} height={14} />
                           {m.refuse}
@@ -320,7 +320,7 @@ export default function AdminClient({
               </span>
               <span className="flex-1 font-semibold">{u.name}</span>
               <span
-                className={`rounded-[3px] px-2.5 py-1 text-xs font-semibold ${
+                className={`rounded-[16px] px-2.5 py-1 text-xs font-semibold ${
                   u.role === "Formateur"
                     ? "bg-primary-soft text-primary-dark"
                     : "bg-surface text-muted"

@@ -147,12 +147,12 @@ export default async function LessonPage(
         </Link>
 
         <div className="mt-3 flex items-center gap-2 text-sm text-muted">
-          <span className="rounded-[3px] bg-surface px-2.5 py-0.5">
+          <span className="rounded-[16px] bg-surface px-2.5 py-0.5">
             {t.lessonType[lesson.type]}
           </span>
           <span>· {lesson.duration}</span>
           {locked && (
-            <span className="inline-flex items-center gap-1.5 rounded-[3px] border border-line px-2.5 py-0.5 text-xs">
+            <span className="inline-flex items-center gap-1.5 rounded-[16px] border border-line px-2.5 py-0.5 text-xs">
               <LockIcon width={12} height={12} />
               {c.lockedBadge}
             </span>
@@ -197,14 +197,14 @@ export default async function LessonPage(
                   <div className="mt-5 flex flex-wrap items-center gap-3">
                     <Link
                       href={lp(`/creer-compte?next=${nextParam}`)}
-                      className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
+                      className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
                     >
                       {c.lockedCreate}
                       <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
                     </Link>
                     <Link
                       href={lp(`/connexion?next=${nextParam}`)}
-                      className="inline-flex items-center gap-2 rounded-[3px] border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
+                      className="inline-flex items-center gap-2 rounded-[16px] border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
                     >
                       {c.lockedSignIn}
                     </Link>
@@ -278,7 +278,7 @@ export default async function LessonPage(
           {prev ? (
             <Link
               href={lp(`/formations/${course.slug}/${prev.id}`)}
-              className="inline-flex items-center gap-2 rounded-[3px] border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
+              className="inline-flex items-center gap-2 rounded-[16px] border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
             >
               <ArrowLeftIcon width={16} height={16} className="rtl:rotate-180" />
               {c.prevLesson}
@@ -289,7 +289,7 @@ export default async function LessonPage(
           {next ? (
             <Link
               href={lp(`/formations/${course.slug}/${next.id}`)}
-              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
             >
               {c.nextLesson}
               <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
@@ -297,7 +297,7 @@ export default async function LessonPage(
           ) : (
             <Link
               href={lp("/tableau-de-bord")}
-              className="inline-flex items-center gap-2 rounded-[3px] bg-success px-5 py-2.5 text-sm font-semibold text-on-primary hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-[16px] bg-success px-5 py-2.5 text-sm font-semibold text-on-primary hover:opacity-90"
             >
               {c.finish}
               <CheckIcon width={16} height={16} />

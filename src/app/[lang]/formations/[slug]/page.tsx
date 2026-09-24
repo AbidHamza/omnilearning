@@ -185,7 +185,7 @@ export default async function CoursePage(
           {course.prerequisites.map((p) => (
             <span
               key={p}
-              className="rounded-[3px] border border-line bg-surface px-2.5 py-1 text-xs text-muted"
+              className="rounded-[16px] border border-line bg-surface px-2.5 py-1 text-xs text-muted"
             >
               {p}
             </span>
@@ -207,7 +207,7 @@ export default async function CoursePage(
         </div>
         <div className="mt-4 sm:mt-0">
           {access.hasPurchase || access.isOwner ? (
-            <p className="inline-flex items-center gap-2 rounded-[3px] border border-success/40 bg-success/10 px-4 py-2.5 text-sm font-semibold text-success">
+            <p className="inline-flex items-center gap-2 rounded-[16px] border border-success/40 bg-success/10 px-4 py-2.5 text-sm font-semibold text-success">
               <CheckIcon width={16} height={16} />
               {c.owned}
             </p>
@@ -216,7 +216,7 @@ export default async function CoursePage(
           ) : needsPurchase ? (
             <Link
               href={lp(`/creer-compte?next=${encodeURIComponent(`/formations/${course.slug}`)}`)}
-              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
             >
               <LockIcon width={16} height={16} />
               {c.lockedCreate}
@@ -230,7 +230,7 @@ export default async function CoursePage(
         {(achat === "ok" || achat === "annule") && (
           <p
             role="status"
-            className={`mt-4 rounded-[3px] px-4 py-3 text-sm font-semibold ${achat === "ok" ? "bg-success-soft text-success" : "bg-warning/15 text-warning"}`}
+            className={`mt-4 rounded-[16px] px-4 py-3 text-sm font-semibold ${achat === "ok" ? "bg-success-soft text-success" : "bg-warning/15 text-warning"}`}
           >
             {achat === "ok" ? c.purchaseSuccess : c.purchaseCancelled}
           </p>
@@ -277,7 +277,7 @@ export default async function CoursePage(
             {course.skills.map((s) => (
               <span
                 key={s}
-                className="rounded-[3px] bg-surface px-4 py-2 text-sm font-medium text-ink"
+                className="rounded-[16px] bg-surface px-4 py-2 text-sm font-medium text-ink"
               >
                 {s}
               </span>
@@ -294,7 +294,7 @@ export default async function CoursePage(
             {course.contentTypes.map((ct) => (
               <span
                 key={ct}
-                className="rounded-[3px] border border-line px-4 py-2 text-sm"
+                className="rounded-[16px] border border-line px-4 py-2 text-sm"
               >
                 {ct}
               </span>
@@ -343,12 +343,12 @@ export default async function CoursePage(
             <BuyCourseButton
               slug={course.slug}
               label={`${c.buyCta} · ${price}`}
-              className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-60"
+              className="rounded-full bg-primary px-10 py-3.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-60"
             />
           ) : (
             <Link
               href={lp(`/formations/${course.slug}/${firstLesson.id}`)}
-              className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
+              className="rounded-full bg-primary px-10 py-3.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
             >
               {c.start}
             </Link>

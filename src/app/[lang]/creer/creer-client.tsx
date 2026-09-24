@@ -26,17 +26,17 @@ interface Upload {
 
 const labelCls = "block text-sm font-semibold";
 const inputCls =
-  "mt-2 w-full rounded-[3px] border border-line bg-bg px-3.5 py-2.5 text-sm outline-none transition focus:border-primary";
+  "mt-2 w-full rounded-[16px] border border-line bg-bg px-3.5 py-2.5 text-sm outline-none transition focus:border-primary";
 const areaCls = `${inputCls} min-h-28 resize-y`;
 const smallInput = `${inputCls} mt-0`;
 const addBtn =
-  "inline-flex items-center gap-2 rounded-[3px] border border-line px-3.5 py-2 text-sm font-semibold transition hover:border-primary";
+  "inline-flex items-center gap-2 rounded-[16px] border border-line px-3.5 py-2 text-sm font-semibold transition hover:border-primary";
 const iconBtn =
   "grid h-8 w-8 shrink-0 place-items-center border border-line text-muted hover:border-danger hover:text-danger";
 const primaryBtn =
-  "rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50";
+  "rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50";
 const ghostBtn =
-  "rounded-[3px] border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-primary disabled:opacity-50";
+  "rounded-[16px] border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-primary disabled:opacity-50";
 
 interface Activity {
   id: number;

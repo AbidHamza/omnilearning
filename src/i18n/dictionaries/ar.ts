@@ -17,6 +17,7 @@ const ar: Dict = {
     formations: "الدورات",
     dashboard: "لوحة التحكم",
     support: "ادعم المنصة",
+    teach: "درِّس معنا",
     moderation: "الإشراف",
     myAccount: "حسابي",
     settings: "الإعدادات",
@@ -98,6 +99,14 @@ const ar: Dict = {
     ],
 
     latestTitle: "أحدث الدورات في الكتالوج",
+    searchLabel: "أداة، مهنة، مهارة",
+    searchSubmit: "بحث",
+    topicsLabel: "المجالات",
+    topicsTitle: "تسعة مجالات، اخترناها لما تفتحه من فرص عمل",
+    topicsBody:
+      "ينشر المدربون دوراتهم في أحد هذه المجالات. افتح مجالًا لترى ما نُشر فيه.",
+    topicCountOne: "دورة",
+    topicCountMany: "دورات",
 
     teachTitle: "درّس هنا واحتفظ بـ 70 % من كل عملية بيع.",
     teachBody:
@@ -161,6 +170,12 @@ const ar: Dict = {
       "لم يُنشر شيء بعد. يراجع فريقنا كلّ دورة قبل نشرها، وستظهر الدورات الأولى هنا تباعًا بعد قبولها.",
     emptyCatalogCta: "اقترح إحداها",
     defaultLabel: "كل الدورات",
+    filterAll: "كل المجالات",
+    clearFilters: "مسح الفلاتر",
+    emptyTopicTitle: "لم يُنشر شيء بعد في {topic}.",
+    emptyTopicBody:
+      "ستأتي أول دورة في هذا المجال من شخص يمارسه يوميًا. إن كان هذا عملك، يمكنك أن تقترحها.",
+    otherTopics: "مجالات أخرى",
   },
   curriculum: {
     lessonsCount: "دروس",
@@ -345,7 +360,7 @@ const ar: Dict = {
       noSubscription: "لا يوجد اشتراك لإدارته.",
     },
     subtitle:
-      "{siteName} مجانية للجميع. دعمك يموّل إنشاء دورات جديدة ويُبقي المعرفة في متناول الجميع.",
+      "يبقى أوّل درسين من كل دورة مفتوحين دون حساب. تموّل المساهمة الشهرية مراجعة الدورات الجديدة قبل نشرها.",
     popular: "الأكثر رواجًا",
     perMonth: "/شهريًا",
     choose: "اختيار {name}",

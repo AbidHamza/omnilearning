@@ -6,7 +6,7 @@ import { useI18n } from "@/i18n/provider";
 import { useLocaleRouter } from "@/i18n/navigation";
 
 const fieldCls =
-  "mt-1 w-full rounded-[3px] border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-primary";
+  "mt-1 w-full rounded-[16px] border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-primary";
 const stars = [1, 2, 3, 4, 5];
 
 /**
@@ -97,7 +97,7 @@ export default function ReviewForm({ slug }: { slug: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-4 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep disabled:opacity-60"
+        className="mt-4 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep disabled:opacity-60"
       >
         {pending ? dict.common.loading : r.submit}
       </button>

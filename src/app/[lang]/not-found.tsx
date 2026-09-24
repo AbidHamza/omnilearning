@@ -13,7 +13,7 @@ export default function NotFound() {
         <p className="mt-2 text-muted">{t.notFound.text}</p>
         <LocaleLink
           href="/"
-          className="mt-6 inline-block rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
+          className="mt-6 inline-block rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
         >
           {t.notFound.back}
         </LocaleLink>

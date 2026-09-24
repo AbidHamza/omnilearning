@@ -9,7 +9,6 @@ import { siteUrl } from "@/lib/site";
 const publicPaths = [
   "",
   "/formations",
-  "/soutenir",
   "/devenir-formateur",
   "/a-propos",
   "/contact",

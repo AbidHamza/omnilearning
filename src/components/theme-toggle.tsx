@@ -76,7 +76,7 @@ export default function ThemeToggle() {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className="grid h-9 w-9 place-items-center rounded-[3px] border border-line bg-surface text-muted transition hover:border-primary hover:text-ink"
+      className="grid h-10 w-10 place-items-center rounded-full bg-surface-2 text-ink transition hover:bg-line"
     >
       {/* Avant l'hydratation, theme === null : on réserve la place pour éviter
           tout saut de mise en page. */}

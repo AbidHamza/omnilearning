@@ -98,13 +98,13 @@ export default async function BecomeInstructorPage({
             <div className="mt-5 flex flex-wrap gap-3">
               <LocaleLink
                 href="/creer-compte"
-                className="rounded-[3px] bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
+                className="rounded-full bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
               >
                 {dict.signup.title}
               </LocaleLink>
               <LocaleLink
                 href="/connexion"
-                className="rounded-[3px] border border-line px-8 py-3 text-sm font-semibold transition hover:border-primary"
+                className="rounded-[16px] border border-line px-8 py-3 text-sm font-semibold transition hover:border-primary"
               >
                 {dict.auth.loginTitle}
               </LocaleLink>
@@ -122,7 +122,7 @@ export default async function BecomeInstructorPage({
             </h2>
             <LocaleLink
               href="/formateur"
-              className="mt-5 inline-flex rounded-[3px] bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
+              className="mt-5 inline-flex rounded-full bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
             >
               {dict.nav.dashboard}
             </LocaleLink>

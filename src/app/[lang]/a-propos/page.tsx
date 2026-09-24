@@ -17,9 +17,9 @@ export async function generateMetadata({
 }
 
 const cta = {
-  fr: { courses: "Parcourir les formations", support: "Soutenir la plateforme" },
-  en: { courses: "Browse the courses", support: "Support the platform" },
-  ar: { courses: "تصفّح الدورات", support: "ادعم المنصّة" },
+  fr: { courses: "Parcourir les formations", support: "Devenir formateur" },
+  en: { courses: "Browse the courses", support: "Teach on OmniLearn" },
+  ar: { courses: "تصفّح الدورات", support: "درِّس على OmniLearn" },
 } as const;
 
 export default async function AProposPage({
@@ -35,13 +35,13 @@ export default async function AProposPage({
       <div className="flex flex-wrap gap-3">
         <LocaleLink
           href="/formations"
-          className="inline-flex rounded-[3px] bg-primary px-6 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
+          className="btn-red px-6 text-sm"
         >
           {labels.courses}
         </LocaleLink>
         <LocaleLink
-          href="/soutenir"
-          className="inline-flex rounded-[3px] border border-line px-6 py-3 text-sm font-semibold text-ink transition hover:border-primary hover:text-primary"
+          href="/devenir-formateur"
+          className="btn-soft px-6"
         >
           {labels.support}
         </LocaleLink>

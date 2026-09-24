@@ -35,7 +35,7 @@ export default function BillingPortalButton({
         type="button"
         onClick={onClick}
         disabled={pending}
-        className="mt-4 inline-flex items-center gap-2 rounded-[3px] border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-primary hover:text-primary-dark disabled:opacity-60"
+        className="mt-4 inline-flex items-center gap-2 rounded-[16px] border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-primary hover:text-primary-dark disabled:opacity-60"
       >
         {pending ? billing.opening : billing.manage}
       </button>

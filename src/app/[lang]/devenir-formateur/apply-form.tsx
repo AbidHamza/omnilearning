@@ -50,7 +50,7 @@ export default function ApplyForm({ defaultName }: { defaultName: string }) {
 
   if (done) {
     return (
-      <div className="rounded-[3px] bg-success-soft px-5 py-6">
+      <div className="rounded-[16px] bg-success-soft px-5 py-6">
         <h3 className="font-display text-lg font-semibold text-success">
           {t.successTitle}
         </h3>
@@ -116,7 +116,7 @@ export default function ApplyForm({ defaultName }: { defaultName: string }) {
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-[3px] bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50"
+        className="rounded-full bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50"
       >
         {isPending ? t.sending : t.submit}
       </button>
@@ -125,7 +125,7 @@ export default function ApplyForm({ defaultName }: { defaultName: string }) {
 }
 
 const inputCls =
-  "w-full rounded-[3px] border border-line bg-bg px-4 py-3 text-sm outline-none transition focus:border-primary";
+  "w-full rounded-[16px] border border-line bg-bg px-4 py-3 text-sm outline-none transition focus:border-primary";
 
 function Field({
   label,

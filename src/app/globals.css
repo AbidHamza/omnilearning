@@ -3,95 +3,233 @@
 /*
  * OmniLearn design tokens.
  *
- * Light "paper" is the default; `.dark` on <html> is the opt-in night theme
+ * Light is the default; `.dark` on <html> is the opt-in night theme
  * (set before first paint by the inline script in [lang]/layout.tsx).
  * Components only consume the semantic tokens below, never raw hex values.
  *
- * Palette: warm paper and ink, one brick-red accent for actions, an ochre
- * used sparingly for highlights. Type: Public Sans for UI and reading,
- * Newsreader for headings, Cairo for Arabic, JetBrains Mono for code only.
+ * Image-first: flat off-white surfaces, photos carry the colour, one warm
+ * red for the actions that matter. No shadows; depth comes from surface
+ * steps and 16px corners on everything that holds a picture.
+ * Type: Schibsted Grotesk for headings, Public Sans for reading, Cairo for
+ * Arabic, JetBrains Mono for code only.
  */
 
 @theme {
-  --color-bg: #f6f3ec;
-  --color-surface: #fffdf8;
-  --color-surface-2: #efeae0;
+  --color-bg: #fbfbf9;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f0eb;
 
-  --color-ink: #1d1a16;
-  --color-muted: #5a544b;
-  --color-muted-soft: #857d71;
+  --color-ink: #1c1b18;
+  --color-muted: #5f5e57;
+  --color-muted-soft: #8d8c86;
 
-  --color-line: #ddd6c8;
-  --color-line-soft: #e9e3d7;
+  --color-line: #dcdbd4;
+  --color-line-soft: #e9e8e2;
 
-  --color-brand: #9b2c1f;
-  --color-brand-soft: #f3e1db;
-  --color-brand-band: #efeae0;
+  --color-brand: #d42a1f;
+  --color-brand-soft: #fbe3df;
+  --color-brand-band: #f1f0eb;
 
-  --color-primary: #9b2c1f;
-  --color-primary-soft: #f3e1db;
-  --color-primary-dark: #7a2016;
-  --color-primary-deep: #7a2016;
-  --color-on-primary: #fffdf8;
+  --color-primary: #d42a1f;
+  --color-primary-soft: #fbe3df;
+  --color-primary-dark: #b31f16;
+  --color-primary-deep: #9a1a12;
+  --color-on-primary: #ffffff;
+
+  --color-night: #262622;
+  --color-on-night: #f4f3ee;
+  --color-on-night-muted: #b9b8b0;
 
   --color-accent: #8a5a00;
   --color-accent-soft: #f4e8cf;
   --color-violet: #2d5a7b;
 
-  --color-success: #2f6b3a;
-  --color-success-soft: #e0ecdf;
+  --color-success: #1d5c3a;
+  --color-success-soft: #d6f0e0;
   --color-warning: #8a5a00;
-  --color-danger: #b3261e;
-  --color-danger-soft: #f7e0dc;
+  --color-danger: #a8150f;
+  --color-danger-soft: #f9e0dc;
 
-  --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --font-display: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--font-public-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
   --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 4px;
+  --radius-card: 16px;
+  --radius-tile: 16px;
+  --radius-panel: 32px;
 
-  --shadow-card: 0 1px 2px rgba(40, 30, 15, 0.06);
+  --shadow-card: none;
 }
 
 .dark {
-  --color-bg: #16130f;
-  --color-surface: #1f1b16;
-  --color-surface-2: #29241d;
+  --color-bg: #141412;
+  --color-surface: #1d1d1a;
+  --color-surface-2: #282824;
 
-  --color-ink: #ece6da;
-  --color-muted: #b3aa9a;
-  --color-muted-soft: #857d71;
+  --color-ink: #efeee8;
+  --color-muted: #b3b2aa;
+  --color-muted-soft: #86857e;
 
-  --color-line: #3a332a;
-  --color-line-soft: #2b261f;
+  --color-line: #3a3935;
+  --color-line-soft: #2a2a26;
 
-  --color-brand: #e0775f;
-  --color-brand-soft: #3b211b;
-  --color-brand-band: #1f1b16;
+  --color-brand: #f2665c;
+  --color-brand-soft: #3d1c19;
+  --color-brand-band: #1d1d1a;
 
-  --color-primary: #e0775f;
-  --color-primary-soft: #3b211b;
-  --color-primary-dark: #eb9380;
-  --color-primary-deep: #c75f48;
-  --color-on-primary: #16130f;
+  --color-primary: #f2665c;
+  --color-primary-soft: #3d1c19;
+  --color-primary-dark: #f68a82;
+  --color-primary-deep: #d94b41;
+  --color-on-primary: #1a0907;
+
+  --color-night: #232320;
+  --color-on-night: #f4f3ee;
+  --color-on-night-muted: #b9b8b0;
 
   --color-accent: #d9a74a;
   --color-accent-soft: #33291a;
   --color-violet: #8fb6d4;
 
-  --color-success: #7fb087;
-  --color-success-soft: #1f2d21;
+  --color-success: #7fc49a;
+  --color-success-soft: #1a2e22;
   --color-warning: #d9a74a;
-  --color-danger: #ef8a80;
+  --color-danger: #f08a80;
   --color-danger-soft: #3a1f1c;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-card: none;
 }
 
 /* Raised band (footer, stats strip, closing call). */
 .section-dark {
   background-color: var(--color-surface-2);
+}
+
+/*
+ * Photo wall. CSS columns give the staggered heights without a script; the
+ * order reads top to bottom per column, which is fine for pictures and
+ * labels that are not ranked.
+ */
+.wall {
+  column-gap: 0.75rem;
+}
+.wall > * {
+  break-inside: avoid;
+  margin-bottom: 0.75rem;
+}
+@media (min-width: 768px) {
+  .wall {
+    column-gap: 1rem;
+  }
+  .wall > * {
+    margin-bottom: 1rem;
+  }
+}
+
+.tile-img {
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.3s ease;
+}
+.group:hover .tile-img {
+  transform: scale(1.035);
+  filter: brightness(0.92);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile-img,
+  .group:hover .tile-img {
+    transition: none;
+    transform: none;
+  }
+}
+
+@layer components {
+/* Filled red action. One per view, two at most. */
+.btn-red {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.75rem;
+  padding-inline: 1.25rem;
+  border-radius: 9999px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+.btn-red:hover {
+  background: var(--color-primary-dark);
+}
+.btn-soft {
+  display: inline-flex;
+  align-items: center;
+  height: 2.5rem;
+  padding-inline: 1rem;
+  border-radius: 9999px;
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.15s;
+}
+.btn-soft:hover {
+  background: var(--color-line);
+}
+
+/* Filter / topic chip. `aria-pressed`, `aria-current` or `.is-on` flips it to ink. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2.25rem;
+  padding-inline: 0.9rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-line);
+  color: var(--color-ink);
+  font-size: 14px;
+  white-space: nowrap;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.chip:hover {
+  border-color: var(--color-ink);
+}
+.chip[aria-pressed="true"],
+.chip[aria-current="page"],
+.chip.is-on {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bg);
+}
+
+/* Pill search field: icon, bare input, optional button, all inside. */
+.search-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-surface-2);
+  padding: 0.3rem;
+  padding-inline-start: 1.1rem;
+}
+.search-pill:focus-within {
+  box-shadow: 0 0 0 2px var(--color-ink);
+}
+.search-pill input {
+  min-width: 0;
+  flex: 1;
+  height: 2.6rem;
+  background: transparent;
+  font-size: 16px;
+  color: var(--color-ink);
+  outline: none;
+}
+.search-pill input::placeholder {
+  color: var(--color-muted-soft);
+}
+.search-pill input:focus-visible {
+  outline: none;
+}
 }
 
 .theme-transition,
@@ -150,29 +288,23 @@ h2,
 h3,
 .font-display {
   font-family: var(--font-display);
-  font-weight: 560;
-  letter-spacing: -0.012em;
-  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.08;
 }
 
-/* Headings used to paint one word in the accent colour; in this system the
-   emphasis is an italic of the same ink. */
+/* One word of a heading may take the accent colour, never a second one. */
 h1 .text-primary,
 h2 .text-primary,
 .font-accent {
-  color: inherit;
-  font-style: italic;
-  font-weight: inherit;
-}
-[dir="rtl"] h1 .text-primary,
-[dir="rtl"] h2 .text-primary,
-[dir="rtl"] .font-accent {
+  color: var(--color-primary);
   font-style: normal;
+  font-weight: inherit;
 }
 
 .container-page {
   width: 100%;
-  max-width: 1180px;
+  max-width: 1280px;
   margin-inline: auto;
   padding-inline: 1.5rem;
   position: relative;
@@ -202,7 +334,7 @@ h2 .text-primary,
 .field {
   height: 2.9rem;
   width: 100%;
-  border-radius: 3px;
+  border-radius: 12px;
   border: 1px solid var(--color-line);
   background: var(--color-surface);
   padding-inline: 0.85rem;
@@ -274,7 +406,7 @@ select:focus-visible,
 textarea:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: 6px;
 }
 .field:focus-visible {
   outline: none;
@@ -378,4 +510,13 @@ details > summary::-webkit-details-marker {
 }
 .md-table tbody tr:hover td {
   background: color-mix(in srgb, var(--color-surface-2) 60%, transparent);
+}
+
+@layer components {
+.menu-panel {
+  border-radius: 16px;
+  background: var(--color-surface);
+  padding: 0.5rem;
+  box-shadow: 0 16px 40px -18px rgba(28, 27, 24, 0.35), 0 0 0 1px var(--color-line);
+}
 }
