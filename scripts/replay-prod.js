@@ -1,3 +1,5 @@
+// OBSOLETE depuis 2026-09-24 : la prod ne contient plus aucun cours (purge des cours et donnees non reelles),
+// les 12 cours sur lesquels ce rejeu s appuie n existent plus. A reecrire contre le catalogue reel avant usage.
 // Rejeu des parcours etudiant / formateur / admin contre https://omnilearn.org
 // avec des comptes crees pour l'occasion puis supprimes. Le paiement passe par
 // le vrai Stripe Checkout en mode test (carte 4242) et le vrai webhook.
