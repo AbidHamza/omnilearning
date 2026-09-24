@@ -50,16 +50,20 @@ export function parseConsent(raw: string | null): Choice | null {
 
 // Consent Mode v2 : on ne remonte que l'accord. Le refus est déjà l'état par
 // défaut écrit en dur dans le HTML par gtm.tsx, le repousser ne changerait
-// rien.
+// rien. L'accord charge aussi GTM, qui n'est jamais téléchargé avant.
 export function applyConsent(choice: Choice) {
   if (choice !== "granted") return;
-  const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
-  gtag?.("consent", "update", {
+  const w = window as unknown as {
+    gtag?: (...args: unknown[]) => void;
+    __olmLoadGtm?: () => void;
+  };
+  w.gtag?.("consent", "update", {
     ad_storage: "granted",
     analytics_storage: "granted",
     ad_user_data: "granted",
     ad_personalization: "granted",
   });
+  w.__olmLoadGtm?.();
 }
 
 export function saveConsent(choice: Choice) {

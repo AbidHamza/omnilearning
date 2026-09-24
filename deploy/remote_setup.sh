@@ -44,6 +44,7 @@ echo "===> 8. seed"
 npx tsx -r dotenv/config prisma/seed.ts || npx tsx prisma/seed.ts
 
 echo "===> 9. build (standalone)"
+rm -rf .next/cache  # cache Turbopack perime : casse la resolution next/font (vu 2026-09-24)
 NODE_OPTIONS="--max-old-space-size=2048" npm run build
 
 echo "===> DONE remote_setup"
