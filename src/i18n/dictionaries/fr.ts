@@ -103,7 +103,7 @@ const fr = {
     topicsLabel: "Domaines",
     topicsTitle: "Neuf domaines, choisis pour le travail qu'ils ouvrent",
     topicsBody:
-      "Les formateurs publient dans l'un de ces domaines. Ouvrez-en un pour voir ce qui y est publié.",
+      "Choisissez un domaine et allez droit à ses cours.",
     topicCountOne: "cours",
     topicCountMany: "cours",
 
@@ -347,7 +347,7 @@ const fr = {
     titleAccent: "classement",
     intro:
       "On met en avant l'effort, pas la performance brute. Chaque leçon terminée et chaque quiz réussi rapporte de l'XP. Revenez chaque jour pour entretenir votre série.",
-    emptyText: "Personne n'a encore gagné d'XP. Soyez le premier :",
+    emptyText: "Terminez une leçon pour gagner vos premiers XP :",
     emptyLink: "choisissez une formation",
     you: "vous",
     levelPrefix: "Niveau",

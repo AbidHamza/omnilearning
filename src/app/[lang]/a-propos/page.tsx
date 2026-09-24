@@ -39,12 +39,6 @@ export default async function AProposPage({
         >
           {labels.courses}
         </LocaleLink>
-        <LocaleLink
-          href="/devenir-formateur"
-          className="btn-soft px-6"
-        >
-          {labels.support}
-        </LocaleLink>
       </div>
     </LegalDocument>
   );
