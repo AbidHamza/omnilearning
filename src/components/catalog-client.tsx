@@ -1,13 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { Category, Course } from "@/lib/types";
 import CourseCard from "./course-card";
-import { ChevronUp, SearchIcon } from "./icons";
+import { SearchIcon } from "./icons";
 import { useI18n } from "@/i18n/provider";
 import { categoryName } from "@/i18n/category-name";
 import { localePath } from "@/i18n/config";
+import { scenePhotos, topicPhoto } from "@/lib/topic-images";
 
 // Les valeurs des niveaux correspondent aux données (fr) ; seul l'affichage est traduit.
 const levelValues = ["Débutant", "Intermédiaire", "Avancé"] as const;
@@ -31,6 +33,7 @@ export default function CatalogClient({
 }) {
   const { locale, dict: t } = useI18n();
   const tc = t.catalog;
+  const lp = (path: string) => localePath(locale, path);
 
   const levelLabels: Record<string, string> = {
     Débutant: tc.levelBeginner,
@@ -50,19 +53,25 @@ export default function CatalogClient({
     gt6: tc.durGt6,
   };
 
+  const knownCat = categories.some((c) => c.label === initialCat) ? initialCat : "";
   const [q, setQ] = useState(initialQ);
+  const [cat, setCat] = useState(knownCat);
   const [selLevels, setSelLevels] = useState<string[]>([]);
   const [selDur, setSelDur] = useState<string[]>([]);
   const [selPrice, setSelPrice] = useState<string[]>([]);
-  const [selCats, setSelCats] = useState<string[]>(
-    initialCat ? [initialCat] : []
-  );
 
-  const toggle = (
-    arr: string[],
-    set: (v: string[]) => void,
-    value: string
-  ) => set(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
+  // Keep the address shareable: the topic and the query live in the URL.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (cat) url.searchParams.set("cat", cat);
+    else url.searchParams.delete("cat");
+    if (q.trim()) url.searchParams.set("q", q.trim());
+    else url.searchParams.delete("q");
+    window.history.replaceState(null, "", url);
+  }, [cat, q]);
+
+  const toggle = (arr: string[], set: (v: string[]) => void, value: string) =>
+    set(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -74,188 +83,204 @@ export default function CatalogClient({
         c.category.toLowerCase().includes(needle);
       const matchLevel = !selLevels.length || selLevels.includes(c.level);
       const isPaid = c.accessType === "PAID" && (c.priceCents ?? 0) > 0;
-      const matchPrice =
-        !selPrice.length || selPrice.includes(isPaid ? "paid" : "free");
-      const matchCat = !selCats.length || selCats.includes(c.category);
+      const matchPrice = !selPrice.length || selPrice.includes(isPaid ? "paid" : "free");
+      const matchCat = !cat || c.category === cat;
       const matchDur =
         !selDur.length ||
         selDur.some((id) => {
           const d = durationDefs.find((x) => x.id === id)!;
           const min = "min" in d ? d.min : undefined;
           const max = "max" in d ? d.max : undefined;
-          return (
-            (min === undefined || c.hours >= min) &&
-            (max === undefined || c.hours < max)
-          );
+          return (min === undefined || c.hours >= min) && (max === undefined || c.hours < max);
         });
       return matchQ && matchLevel && matchCat && matchDur && matchPrice;
     });
-  }, [courses, q, selLevels, selDur, selCats, selPrice]);
+  }, [courses, q, selLevels, selDur, cat, selPrice]);
 
-  const label = q || initialCat || tc.defaultLabel;
+  const inTopic = cat ? courses.filter((c) => c.category === cat).length : 0;
+  const filtersOn = selLevels.length + selDur.length + selPrice.length > 0 || q.trim() !== "";
+  const clearAll = () => {
+    setQ("");
+    setSelLevels([]);
+    setSelDur([]);
+    setSelPrice([]);
+  };
 
-  // No published course: filters over an empty list would be dead controls.
-  if (courses.length === 0) {
-    return (
-      <div className="container-page py-16 lg:py-24">
-        <div className="max-w-xl border-t-2 border-ink pt-5">
-          <h1 className="font-display text-3xl leading-tight text-ink sm:text-[2.1rem]">
-            {tc.emptyCatalogTitle}
-          </h1>
-          <p className="mt-4 text-[15px] leading-relaxed text-muted">{tc.emptyCatalogBody}</p>
-          <Link
-            href={localePath(locale, "/devenir-formateur")}
-            className="mt-7 inline-block rounded-[3px] bg-primary px-5 py-3 text-[15px] font-semibold text-on-primary transition hover:bg-primary-dark"
+  const topicChips = (
+    <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
+        <button type="button" className="chip" aria-pressed={!cat} onClick={() => setCat("")}>
+          {tc.filterAll}
+        </button>
+        {categories.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            className="chip"
+            aria-pressed={cat === c.label}
+            onClick={() => setCat(cat === c.label ? "" : c.label)}
           >
-            {tc.emptyCatalogCta}
-          </Link>
+            {categoryName(t, c.label)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // An empty topic, or an empty catalog: say what is missing, show the
+  // topics that exist, and give the one action that fills the gap.
+  if (courses.length === 0 || (cat && inTopic === 0)) {
+    const topicName = cat ? categoryName(t, cat) : "";
+    const photo = cat ? topicPhoto(cat) : scenePhotos.desk;
+    const others = categories.filter((c) => c.label !== cat);
+    return (
+      <div className="container-page pb-20 pt-8 lg:pb-28 lg:pt-12">
+        <h1 className="text-[2.2rem] leading-[1.05] text-ink sm:text-5xl">{t.nav.formations}</h1>
+        <div className="mt-6">{topicChips}</div>
+
+        <div className="mt-10 grid items-center gap-8 md:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+          <Image
+            src={photo.src}
+            width={photo.w}
+            height={photo.h}
+            alt=""
+            priority
+            sizes="(min-width:768px) 420px, 100vw"
+            className="aspect-[4/3] w-full rounded-[24px] object-cover md:aspect-[4/5]"
+          />
+          <div className="max-w-lg">
+            <h2 className="text-3xl leading-tight text-ink sm:text-[2.4rem]">
+              {cat ? tc.emptyTopicTitle.replace("{topic}", topicName) : tc.emptyCatalogTitle}
+            </h2>
+            <p className="mt-4 text-[16px] leading-relaxed text-muted">
+              {cat ? tc.emptyTopicBody : tc.emptyCatalogBody}
+            </p>
+            <Link href={lp("/devenir-formateur")} className="btn-red mt-8 px-6">
+              {tc.emptyCatalogCta}
+            </Link>
+          </div>
         </div>
+
+        {others.length > 0 && (
+          <section className="mt-16 lg:mt-20">
+            <h2 className="text-2xl text-ink">{tc.otherTopics}</h2>
+            <div className="wall mt-6 columns-2 sm:columns-3 lg:columns-5">
+              {others.map((c, i) => {
+                const ph = topicPhoto(c.label);
+                return (
+                  <button key={c.id} type="button" onClick={() => setCat(c.label)} className="group block w-full text-start">
+                    <span
+                      className="block overflow-hidden rounded-[16px] bg-surface-2"
+                      style={{ aspectRatio: i % 3 === 1 ? "4/5" : i % 3 === 2 ? "1/1" : "3/4" }}
+                    >
+                      <Image
+                        src={ph.src}
+                        width={ph.w}
+                        height={ph.h}
+                        alt=""
+                        sizes="(min-width:1024px) 240px, (min-width:640px) 33vw, 50vw"
+                        className="tile-img h-full w-full object-cover"
+                      />
+                    </span>
+                    <span className="block px-1 pb-1 pt-2 font-display text-[15px] text-ink">
+                      {categoryName(t, c.label)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
     );
   }
 
+  const label = q.trim() || (cat ? categoryName(t, cat) : tc.defaultLabel);
+
   return (
-    <div className="container-page grid gap-10 py-10 lg:grid-cols-[240px_1fr]">
-      <aside className="lg:sticky lg:top-24 lg:self-start">
-        <div className="relative mb-7 lg:hidden">
-          <SearchIcon
-            width={17}
-            height={17}
-            className="pointer-events-none absolute inset-inline-start-4 top-1/2 -translate-y-1/2 text-muted-soft"
-          />
+    <div className="container-page pb-20 pt-8 lg:pb-28 lg:pt-12">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <h1 className="text-[2.2rem] leading-[1.05] text-ink sm:text-5xl">{t.nav.formations}</h1>
+        <div role="search" className="search-pill w-full max-w-md">
+          <SearchIcon width={18} height={18} className="shrink-0 text-muted" aria-hidden="true" />
           <input
+            type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={tc.searchPlaceholder}
             aria-label={tc.searchPlaceholder}
-            className="h-11 w-full rounded-[3px] border border-line bg-surface ps-11 pe-4 text-sm outline-none focus:border-primary focus:bg-bg"
           />
         </div>
+      </div>
 
-        <FilterGroup title={tc.filterLevel}>
-          {levelValues.map((l) => (
-            <Check
-              key={l}
-              label={levelLabels[l]}
-              checked={selLevels.includes(l)}
-              onChange={() => toggle(selLevels, setSelLevels, l)}
-            />
-          ))}
-        </FilterGroup>
+      <div className="mt-6">{topicChips}</div>
 
-        <FilterGroup title={tc.filterPrice}>
-          {["free", "paid"].map((p) => (
-            <Check
-              key={p}
-              label={priceLabels[p]}
-              checked={selPrice.includes(p)}
-              onChange={() => toggle(selPrice, setSelPrice, p)}
-            />
-          ))}
-        </FilterGroup>
-
-        <FilterGroup title={tc.filterDuration}>
-          {durationDefs.map((d) => (
-            <Check
-              key={d.id}
-              label={durationLabels[d.id]}
-              checked={selDur.includes(d.id)}
-              onChange={() => toggle(selDur, setSelDur, d.id)}
-            />
-          ))}
-        </FilterGroup>
-
-        <FilterGroup title={tc.filterCategory}>
-          {categories.map((c) => (
-            <Check
-              key={c.id}
-              label={categoryName(t, c.label)}
-              checked={selCats.includes(c.label)}
-              onChange={() => toggle(selCats, setSelCats, c.label)}
-            />
-          ))}
-        </FilterGroup>
-      </aside>
-
-      <div>
-        <h1 className="font-display text-3xl tracking-tight sm:text-[2.1rem]">
-          {filtered.length} {tc.resultsFor}{" "}
-          <span className="text-primary">«&nbsp;{label}&nbsp;»</span>
-        </h1>
-
-        {filtered.length === 0 ? (
-          <div className="mt-10 rounded-[6px] border border-dashed border-line p-12 text-center text-muted">
-            {tc.empty}
-          </div>
-        ) : (
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {filtered.map((c) => (
-              <CourseCard key={c.slug} course={{ ...c, category: categoryName(t, c.category) }} labels={t.card} locale={locale} />
-            ))}
-          </div>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {levelValues.map((l) => (
+          <button
+            key={l}
+            type="button"
+            className="chip"
+            aria-pressed={selLevels.includes(l)}
+            onClick={() => toggle(selLevels, setSelLevels, l)}
+          >
+            {levelLabels[l]}
+          </button>
+        ))}
+        <span aria-hidden="true" className="mx-1 h-5 w-px bg-line" />
+        {["free", "paid"].map((p) => (
+          <button
+            key={p}
+            type="button"
+            className="chip"
+            aria-pressed={selPrice.includes(p)}
+            onClick={() => toggle(selPrice, setSelPrice, p)}
+          >
+            {priceLabels[p]}
+          </button>
+        ))}
+        <span aria-hidden="true" className="mx-1 h-5 w-px bg-line" />
+        {durationDefs.map((d) => (
+          <button
+            key={d.id}
+            type="button"
+            className="chip"
+            aria-pressed={selDur.includes(d.id)}
+            onClick={() => toggle(selDur, setSelDur, d.id)}
+          >
+            {durationLabels[d.id]}
+          </button>
+        ))}
+        {filtersOn && (
+          <button type="button" onClick={clearAll} className="ms-1 text-sm text-muted underline underline-offset-4 hover:text-ink">
+            {tc.clearFilters}
+          </button>
         )}
       </div>
-    </div>
-  );
-}
 
-function FilterGroup({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(true);
-  return (
-    <div className="border-b border-line py-5 first:pt-0">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between text-left"
-      >
-        <span className="font-display text-[15px] font-semibold">{title}</span>
-        <ChevronUp
-          width={16}
-          height={16}
-          className={`text-muted transition-transform ${open ? "" : "rotate-180"}`}
-        />
-      </button>
-      {open && <div className="mt-4 space-y-3">{children}</div>}
-    </div>
-  );
-}
+      <p className="mt-8 text-sm text-muted">
+        {filtered.length} {tc.resultsFor} «&nbsp;{label}&nbsp;»
+      </p>
 
-function Check({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
-}) {
-  return (
-    <label className="flex cursor-pointer items-center gap-3 text-sm text-muted">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={onChange}
-        className="peer sr-only"
-      />
-      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[3px] border border-line bg-bg transition peer-checked:border-primary peer-checked:bg-primary text-on-primary">
-        {checked && (
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M20 6 9 17l-5-5"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+      {filtered.length === 0 ? (
+        <div className="mt-6 rounded-[24px] bg-surface-2 px-6 py-14 text-center">
+          <p className="text-[16px] text-ink">{tc.empty}</p>
+          <button type="button" onClick={clearAll} className="btn-soft mt-5">
+            {tc.clearFilters}
+          </button>
+        </div>
+      ) : (
+        <div className="mt-5 grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-x-4 gap-y-10">
+          {filtered.map((c) => (
+            <CourseCard
+              key={c.slug}
+              course={{ ...c, category: categoryName(t, c.category) }}
+              labels={t.card}
+              locale={locale}
             />
-          </svg>
-        )}
-      </span>
-      <span className={checked ? "text-ink" : ""}>{label}</span>
-    </label>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

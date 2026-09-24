@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { GoogleIcon } from "@/components/icons";
 import { LocaleLink, useLocaleRouter } from "@/i18n/navigation";
 import { useI18n, useT } from "@/i18n/provider";
@@ -8,6 +9,7 @@ import { localePath } from "@/i18n/config";
 import { homeByRole } from "@/lib/session";
 import { loginAction } from "@/lib/actions/auth";
 import { oauthSignIn } from "@/lib/actions/oauth";
+import { scenePhotos } from "@/lib/topic-images";
 
 // Cible de retour passée par une page verrouillée (?next=/formations/...).
 // Lue au moment du clic (pas de useSearchParams → pas de Suspense imposée).
@@ -105,7 +107,7 @@ export default function ConnexionPage() {
           <button
             type="submit"
             disabled={pending}
-            className="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-[3px] bg-primary py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-dark disabled:opacity-60"
+            className="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-primary py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-dark disabled:opacity-60"
           >
             {t.auth.loginTitle}
           </button>
@@ -136,7 +138,7 @@ export default function ConnexionPage() {
                 localePath(locale, nextFromLocation() ?? "/tableau-de-bord"),
               )
             }
-            className="mt-3 flex h-12 w-full items-center justify-center gap-3 rounded-[3px] border border-line bg-surface text-sm font-medium text-ink transition hover:border-ink"
+            className="mt-3 flex h-12 w-full items-center justify-center gap-3 rounded-[16px] border border-line bg-surface text-sm font-medium text-ink transition hover:border-ink"
           >
             <GoogleIcon width={20} height={20} aria-hidden="true" />
             Google
@@ -148,6 +150,15 @@ export default function ConnexionPage() {
         <span className="font-display text-[22px] font-semibold tracking-tight text-ink">
           Omni<span className="italic text-primary">Learn</span>
         </span>
+
+        <Image
+          src={scenePhotos.reader.src}
+          width={scenePhotos.reader.w}
+          height={scenePhotos.reader.h}
+          alt=""
+          sizes="(min-width:1024px) 40vw, 0px"
+          className="my-8 aspect-[4/3] w-full max-w-md rounded-[24px] object-cover"
+        />
 
         <div>
           <p className="font-display text-[2rem] leading-tight text-ink">

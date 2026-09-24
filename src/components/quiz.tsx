@@ -121,7 +121,7 @@ export default function Quiz({
         </p>
         <button
           onClick={restart}
-          className="mt-6 rounded-[3px] border border-line px-6 py-2.5 text-sm font-semibold transition hover:bg-surface"
+          className="mt-6 rounded-[16px] border border-line px-6 py-2.5 text-sm font-semibold transition hover:bg-surface"
         >
           {t.quiz.restart}
         </button>
@@ -174,7 +174,7 @@ export default function Quiz({
               key={i}
               disabled={checked || pending}
               onClick={() => setSelected(i)}
-              className={`flex w-full items-center gap-3 rounded-[3px] border p-3.5 text-start text-sm transition ${ring} ${
+              className={`flex w-full items-center gap-3 rounded-[16px] border p-3.5 text-start text-sm transition ${ring} ${
                 !checked ? "hover:border-primary" : ""
               }`}
             >
@@ -197,7 +197,7 @@ export default function Quiz({
                   />
                 )}
                 {checked && isCorrect && !isSelected && (
-                  <span className="h-2.5 w-2.5 rounded-[3px] bg-success" />
+                  <span className="h-2.5 w-2.5 rounded-[16px] bg-success" />
                 )}
               </span>
               <span className="flex-1">{opt}</span>
@@ -207,7 +207,7 @@ export default function Quiz({
       </div>
 
       {verdict?.explanation && (
-        <p className="mt-4 rounded-[3px] bg-surface p-4 text-sm text-muted">
+        <p className="mt-4 rounded-[16px] bg-surface p-4 text-sm text-muted">
           {verdict.explanation}
         </p>
       )}
@@ -224,14 +224,14 @@ export default function Quiz({
             onClick={check}
             disabled={selected === null || pending}
             aria-busy={pending}
-            className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full bg-primary px-10 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:cursor-not-allowed disabled:opacity-50"
           >
             {pending ? t.quiz.checking : t.quiz.validate}
           </button>
         ) : (
           <button
             onClick={next}
-            className="rounded-[3px] bg-primary px-10 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
+            className="rounded-full bg-primary px-10 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
           >
             {isLast ? t.quiz.showResult : t.quiz.next}
           </button>

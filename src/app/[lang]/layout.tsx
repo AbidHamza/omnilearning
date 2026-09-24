@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { JetBrains_Mono, Public_Sans, Newsreader, Cairo } from "next/font/google";
+import { JetBrains_Mono, Public_Sans, Schibsted_Grotesk, Cairo } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -21,8 +21,8 @@ const publicSans = Public_Sans({
   display: "swap",
 });
 
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
+const schibsted = Schibsted_Grotesk({
+  variable: "--font-schibsted",
   subsets: ["latin"],
   style: ["normal", "italic"],
   display: "swap",
@@ -114,7 +114,7 @@ export default async function RootLayout({
       lang={lang}
       dir={dir}
       suppressHydrationWarning
-      className={`${publicSans.variable} ${newsreader.variable} ${jetbrainsMono.variable} ${cairo.variable} h-full`}
+      className={`${publicSans.variable} ${schibsted.variable} ${jetbrainsMono.variable} ${cairo.variable} h-full`}
     >
       <head>
         {/* Light by default; `.dark` only when the visitor picked it. Runs

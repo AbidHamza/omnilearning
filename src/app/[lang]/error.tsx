@@ -41,7 +41,7 @@ export default function RouteError({
           <button
             type="button"
             onClick={reessayer}
-            className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
+            className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
           >
             {t.serverError.retry}
           </button>

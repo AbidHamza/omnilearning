@@ -27,6 +27,8 @@ export async function generateMetadata(
     title,
     description,
     alternates: alternatesFor(locale, "/soutenir"),
+    // Hors navigation tant que les paiements ne sont pas ouverts.
+    robots: { index: false, follow: true },
     openGraph: {
       type: "website",
       siteName,
@@ -50,7 +52,7 @@ export default async function SupportPage({ params }: PageProps<"/[lang]">) {
   return (
     <div className="container-page py-16">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="text-[2.2rem] leading-[1.05] text-ink sm:text-5xl">
           {dict.nav.support}
         </h1>
         <p className="mt-4 text-lg text-muted">
@@ -66,13 +68,8 @@ export default async function SupportPage({ params }: PageProps<"/[lang]">) {
               t.featured ? "border-primary shadow-sm" : "border-line"
             }`}
           >
-            {t.featured && (
-              <span className="mb-3 w-fit rounded-[3px] bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
-                {s.popular}
-              </span>
-            )}
-            <h3 className="font-semibold">{t.name}</h3>
-            <div className="mt-2 text-3xl font-bold">
+            <h3 className="font-display text-lg text-ink">{t.name}</h3>
+            <div className="mt-2 font-display text-3xl text-ink">
               {t.price}
               <span className="text-base font-normal text-muted"> {s.perMonth}</span>
             </div>

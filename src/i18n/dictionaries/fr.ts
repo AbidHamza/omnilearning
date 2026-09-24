@@ -16,6 +16,7 @@ const fr = {
     formations: "Formations",
     dashboard: "Tableau de bord",
     support: "Soutenir la plateforme",
+    teach: "Enseigner",
     moderation: "Modération",
     myAccount: "Mon compte",
     settings: "Paramètres",
@@ -97,6 +98,14 @@ const fr = {
     ],
 
     latestTitle: "Derniers cours publiés",
+    searchLabel: "Un outil, un métier, une compétence",
+    searchSubmit: "Chercher",
+    topicsLabel: "Domaines",
+    topicsTitle: "Neuf domaines, choisis pour le travail qu'ils ouvrent",
+    topicsBody:
+      "Les formateurs publient dans l'un de ces domaines. Ouvrez-en un pour voir ce qui y est publié.",
+    topicCountOne: "cours",
+    topicCountMany: "cours",
 
     teachTitle: "Enseignez ici et gardez 70 % de chaque vente.",
     teachBody:
@@ -160,6 +169,12 @@ const fr = {
       "Rien n'est encore publié. Chaque cours est relu par notre équipe avant sa mise en ligne : les premiers apparaîtront ici au fil des validations.",
     emptyCatalogCta: "Proposer l'un d'eux",
     defaultLabel: "toutes les formations",
+    filterAll: "Tous les domaines",
+    clearFilters: "Effacer les filtres",
+    emptyTopicTitle: "Rien n'est encore publié en {topic}.",
+    emptyTopicBody:
+      "Le premier cours de ce domaine viendra d'un formateur qui l'exerce au quotidien. Si c'est votre métier, vous pouvez le proposer.",
+    otherTopics: "Les autres domaines",
   },
   curriculum: {
     lessonsCount: "leçons",
@@ -348,7 +363,7 @@ const fr = {
       noSubscription: "Aucun abonnement à gérer.",
     },
     subtitle:
-      "{siteName} est gratuit pour tous. Votre soutien finance la création de nouvelles formations et garde le savoir accessible à chacun.",
+      "Les deux premières leçons de chaque cours restent ouvertes sans compte. Une contribution mensuelle paie la relecture des nouveaux cours avant leur mise en ligne.",
     popular: "Le plus populaire",
     perMonth: "/mois",
     choose: "Choisir {name}",

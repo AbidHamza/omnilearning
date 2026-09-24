@@ -44,17 +44,16 @@ export default function Navbar() {
   const linksByRole: Record<Role, NavLink[]> = {
     visiteur: [
       { href: "/formations", label: t.nav.formations },
-      { href: "/soutenir", label: t.nav.support },
+      { href: "/devenir-formateur", label: t.nav.teach },
     ],
     etudiant: [
       { href: "/formations", label: t.nav.formations },
       { href: "/tableau-de-bord", label: t.nav.dashboard },
-      { href: "/soutenir", label: t.nav.support },
+      { href: "/devenir-formateur", label: t.nav.teach },
     ],
     formateur: [
       { href: "/formations", label: t.nav.formations },
       { href: "/formateur", label: t.nav.dashboard },
-      { href: "/soutenir", label: t.nav.support },
     ],
     admin: [
       { href: "/admin", label: t.nav.moderation },
@@ -90,7 +89,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg">
-      <div className="container-page flex h-[68px] items-center gap-4">
+      <div className="container-page flex h-16 items-center gap-4">
         <LocaleLink href="/" className="group flex shrink-0 items-center gap-2.5">
           <span className="font-display text-[22px] font-semibold tracking-tight text-ink">
             Omni<span className="italic text-primary">Learn</span>
@@ -99,31 +98,28 @@ export default function Navbar() {
 
         {!bare && (
           <>
-            <form
-              onSubmit={submit}
-              className="relative hidden flex-1 max-w-sm md:block"
-            >
+            <form onSubmit={submit} role="search" className="search-pill hidden max-w-sm flex-1 md:flex">
               <SearchIcon
                 width={17}
                 height={17}
-                className="pointer-events-none absolute inset-inline-start-4 top-1/2 -translate-y-1/2 text-muted-soft"
+                className="shrink-0 text-muted" aria-hidden="true"
               />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
+                type="search"
                 placeholder={t.common.search}
-                className="h-10 w-full rounded-[3px] border border-line bg-surface ps-11 pe-4 text-sm outline-none transition placeholder:text-muted-soft focus:border-primary focus:bg-bg"
+                aria-label={t.common.search}
               />
             </form>
 
-            <nav className="ms-auto hidden items-center gap-7 lg:flex">
+            <nav className="ms-auto hidden items-center gap-1 lg:flex">
               {links.map((l) => (
                 <LocaleLink
                   key={l.href}
                   href={l.href}
-                  className={`border-b-2 py-1 text-sm transition-colors hover:text-ink ${
-                    isActive(l.href) ? "border-primary font-semibold text-ink" : "border-transparent text-muted"
-                  }`}
+                  aria-current={isActive(l.href) ? "page" : undefined}
+                  className="chip border-transparent font-semibold"
                 >
                   {l.label}
                 </LocaleLink>
@@ -151,13 +147,13 @@ export default function Navbar() {
                 <div className="hidden items-center gap-2 md:flex">
                   <LocaleLink
                     href="/connexion"
-                    className="rounded-[3px] border border-transparent px-3.5 py-2 text-sm font-medium text-muted transition hover:border-line hover:text-ink"
+                    className="btn-soft px-4"
                   >
                     {t.common.signIn}
                   </LocaleLink>
                   <LocaleLink
                     href="/creer-compte"
-                    className="rounded-[3px] bg-primary px-3.5 py-2 text-sm font-semibold text-on-primary transition hover:bg-primary-dark"
+                    className="btn-red h-10 px-4 text-sm"
                   >
                     {t.common.signUp}
                   </LocaleLink>
@@ -167,7 +163,7 @@ export default function Navbar() {
               <button
                 aria-label="Menu"
                 onClick={() => setOpen((v) => !v)}
-                className="grid h-9 w-9 place-items-center rounded-[3px] text-ink lg:hidden"
+                className="grid h-10 w-10 place-items-center rounded-full text-ink hover:bg-surface-2 lg:hidden"
               >
                 {open ? <XIcon /> : <MenuIcon />}
               </button>
@@ -192,17 +188,18 @@ export default function Navbar() {
       {open && !bare && (
         <div className="border-t border-line bg-bg lg:hidden">
           <div className="container-page space-y-2 py-4">
-            <form onSubmit={submit} className="relative">
+            <form onSubmit={submit} role="search" className="search-pill">
               <SearchIcon
                 width={17}
                 height={17}
-                className="pointer-events-none absolute inset-inline-start-4 top-1/2 -translate-y-1/2 text-muted-soft"
+                className="shrink-0 text-muted" aria-hidden="true"
               />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
+                type="search"
                 placeholder={t.common.search}
-                className="h-10 w-full rounded-[3px] border border-line bg-surface ps-11 pe-4 text-sm outline-none focus:border-primary"
+                aria-label={t.common.search}
               />
             </form>
             {links.map((l) => (
@@ -210,7 +207,7 @@ export default function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="block rounded-[3px] px-3 py-2 text-sm font-medium hover:bg-surface"
+                className="block rounded-full px-4 py-2.5 text-[15px] font-medium hover:bg-surface-2"
               >
                 {l.label}
               </LocaleLink>
@@ -220,13 +217,13 @@ export default function Navbar() {
                 <LocaleLink
                   href={"/parametres"}
                   onClick={() => setOpen(false)}
-                  className="block rounded-[3px] px-3 py-2 text-sm font-medium hover:bg-surface"
+                  className="block rounded-full px-4 py-2.5 text-[15px] font-medium hover:bg-surface-2"
                 >
                   {t.nav.myAccount} · {user.name}
                 </LocaleLink>
                 <button
                   onClick={logout}
-                  className="block w-full rounded-[3px] px-3 py-2 text-start text-sm font-medium text-danger hover:bg-surface"
+                  className="block w-full rounded-full px-4 py-2.5 text-start text-[15px] font-medium text-danger hover:bg-surface-2"
                 >
                   {t.auth.logout}
                 </button>
@@ -236,14 +233,14 @@ export default function Navbar() {
                 <LocaleLink
                   href="/connexion"
                   onClick={() => setOpen(false)}
-                  className="flex-1 rounded-[3px] border border-line py-2 text-center text-sm font-semibold"
+                  className="btn-soft flex-1"
                 >
                   {t.common.signIn}
                 </LocaleLink>
                 <LocaleLink
                   href="/creer-compte"
                   onClick={() => setOpen(false)}
-                  className="flex-1 rounded-[3px] bg-primary py-2 text-center text-sm font-semibold text-on-primary"
+                  className="btn-red flex-1"
                 >
                   {t.common.signUp}
                 </LocaleLink>
@@ -274,7 +271,7 @@ function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-[3px] border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-primary hover:text-ink"
+        className="btn-soft h-10 gap-1.5 px-3 text-xs"
         aria-label={t.nav.language}
       >
         <GlobeIcon width={15} height={15} />
@@ -285,20 +282,20 @@ function LanguageSwitcher() {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute inset-inline-end-0 z-20 mt-2 w-40 rounded-[3px] border border-line bg-bg p-1.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.4)]">
+          <div className="absolute inset-inline-end-0 z-20 mt-2 w-40 menu-panel">
             {locales.map((l) => (
               <button
                 key={l}
                 onClick={() => choose(l)}
-                className={`flex w-full items-center justify-between rounded-[3px] px-2.5 py-2 text-start text-sm transition ${
+                className={`flex w-full items-center justify-between rounded-[10px] px-2.5 py-2 text-start text-sm transition ${
                   l === locale
-                    ? "bg-primary-soft font-semibold text-primary-dark"
-                    : "hover:bg-surface"
+                    ? "bg-surface-2 font-semibold text-ink"
+                    : "hover:bg-surface-2"
                 }`}
               >
                 {localeNames[l]}
                 {l === locale && (
-                  <span className="h-2 w-2 rounded-[3px] bg-primary" />
+                  <span className="h-2 w-2 rounded-full bg-primary" />
                 )}
               </button>
             ))}
@@ -334,7 +331,7 @@ function AccountMenu({
     <div className="relative hidden md:block">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 rounded-[3px] py-1 ps-1 pe-2.5 transition hover:bg-surface"
+        className="flex items-center gap-2.5 rounded-full py-1 ps-1 pe-2.5 transition hover:bg-surface-2"
         aria-haspopup="menu"
         aria-expanded={open}
       >
@@ -350,7 +347,7 @@ function AccountMenu({
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div
             role="menu"
-            className="absolute inset-inline-end-0 z-20 mt-2 w-60 rounded-[3px] border border-line bg-bg p-1.5 shadow-[0_18px_40px_-20px_rgba(10,21,29,0.4)]"
+            className="absolute inset-inline-end-0 z-20 mt-2 w-60 menu-panel"
           >
             <div className="flex items-center gap-3 px-2.5 py-2.5">
               <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-sm font-bold text-primary-dark">
@@ -362,22 +359,22 @@ function AccountMenu({
               </div>
             </div>
             <div className="mx-2.5 mb-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-[3px] bg-primary-soft px-2.5 py-1 text-[11px] font-bold text-primary-dark">
-                <span className="h-1.5 w-1.5 rounded-[3px] bg-primary" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-bold text-primary-dark">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 {roleLabel}
               </span>
             </div>
             <LocaleLink
               href={settingsHref}
               onClick={() => setOpen(false)}
-              className="block rounded-[3px] px-2.5 py-2 text-sm font-medium transition hover:bg-surface"
+              className="block rounded-[10px] px-2.5 py-2 text-sm font-medium transition hover:bg-surface-2"
               role="menuitem"
             >
               {settingsLabel}
             </LocaleLink>
             <button
               onClick={onLogout}
-              className="mt-1 flex w-full items-center rounded-[3px] border-t border-line px-2.5 py-2 text-start text-sm font-medium text-danger transition hover:bg-surface"
+              className="mt-1 flex w-full items-center rounded-[10px] px-2.5 py-2 text-start text-sm font-medium text-danger hover:bg-surface-2"
               role="menuitem"
             >
               {logoutLabel}

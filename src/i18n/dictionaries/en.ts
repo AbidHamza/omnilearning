@@ -17,6 +17,7 @@ const en: Dict = {
     formations: "Courses",
     dashboard: "Dashboard",
     support: "Support the platform",
+    teach: "Teach",
     moderation: "Moderation",
     myAccount: "My account",
     settings: "Settings",
@@ -98,6 +99,14 @@ const en: Dict = {
     ],
 
     latestTitle: "Latest in the catalog",
+    searchLabel: "A tool, a job, a skill",
+    searchSubmit: "Search",
+    topicsLabel: "Topics",
+    topicsTitle: "Nine topics, picked for the work they lead to",
+    topicsBody:
+      "Instructors publish in one of these topics. Open one to see what is in it.",
+    topicCountOne: "course",
+    topicCountMany: "courses",
 
     teachTitle: "Teach here and keep 70% of each sale.",
     teachBody:
@@ -161,6 +170,12 @@ const en: Dict = {
       "Nothing is published yet. Every course is read by our team before it goes live, so the first ones will appear here as they pass review.",
     emptyCatalogCta: "Apply to teach one of them",
     defaultLabel: "all courses",
+    filterAll: "All topics",
+    clearFilters: "Clear filters",
+    emptyTopicTitle: "Nothing is published in {topic} yet.",
+    emptyTopicBody:
+      "The first course here will come from someone who does this work every day. If that is you, you can pitch it.",
+    otherTopics: "Other topics",
   },
   curriculum: {
     lessonsCount: "lessons",
@@ -346,7 +361,7 @@ const en: Dict = {
       noSubscription: "No subscription to manage.",
     },
     subtitle:
-      "{siteName} is free for everyone. Your support funds new courses and keeps knowledge open to all.",
+      "The first two lessons of every course stay open without an account. A monthly contribution pays for reviewing new courses before they go live.",
     popular: "Most popular",
     perMonth: "/month",
     choose: "Choose {name}",

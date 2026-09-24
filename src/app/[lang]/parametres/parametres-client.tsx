@@ -23,14 +23,14 @@ import {
 } from "@/components/icons";
 
 const inputCls =
-  "mt-2 w-full rounded-[3px] border border-line bg-bg px-3.5 py-2.5 text-sm outline-none transition focus:border-primary";
+  "mt-2 w-full rounded-[16px] border border-line bg-bg px-3.5 py-2.5 text-sm outline-none transition focus:border-primary";
 const panelCls = "border-t border-line py-4 text-sm";
 const primaryBtn =
-  "rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50";
+  "rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50";
 const ghostBtn =
-  "rounded-[3px] border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary disabled:opacity-50";
+  "rounded-[16px] border border-line px-4 py-2 text-sm font-semibold transition hover:border-primary disabled:opacity-50";
 const rowLink =
-  "rounded-[3px] border border-line px-3 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark";
+  "rounded-[16px] border border-line px-3 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark";
 const thCls = "pb-3 pe-4 text-start text-xs font-semibold text-muted";
 const tdCls = "py-3 pe-4";
 
@@ -98,7 +98,7 @@ export default function ParametresClient({
             <button
               key={id}
               onClick={() => setTab(id)}
-              className={`shrink-0 rounded-[3px] px-4 py-2.5 text-start text-sm ${
+              className={`shrink-0 rounded-[16px] px-4 py-2.5 text-start text-sm ${
                 tab === id ? "bg-primary-soft font-bold text-primary-dark" : "text-muted hover:bg-surface"
               }`}
             >

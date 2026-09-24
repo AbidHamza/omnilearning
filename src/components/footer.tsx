@@ -13,7 +13,6 @@ export default function Footer() {
         { label: t.footer.home, href: "/" },
         { label: t.nav.formations, href: "/formations" },
         { label: t.nav.dashboard, href: "/tableau-de-bord" },
-        { label: t.nav.support, href: "/soutenir" },
       ],
     },
     {
@@ -37,8 +36,8 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="section-dark mt-24 border-t border-line text-ink">
-      <div className="container-page grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+    <footer className="mt-16 border-t border-line text-ink">
+      <div className="container-page grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr] lg:py-16">
         <div>
           <span className="font-display text-[22px] font-semibold tracking-tight">
             Omni<span className="italic text-primary">Learn</span>
@@ -57,7 +56,7 @@ export default function Footer() {
                 <li key={it.label}>
                   <LocaleLink
                     href={it.href}
-                    className="text-sm text-muted transition hover:text-primary"
+                    className="text-sm text-muted hover:text-ink hover:underline hover:underline-offset-4"
                   >
                     {it.label}
                   </LocaleLink>

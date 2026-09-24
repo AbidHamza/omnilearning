@@ -33,7 +33,7 @@ export default async function ContactPage({
     <LegalDocument page={getLegalPage(lang, "contact")}>
       <a
         href={`mailto:${legalEmail}`}
-        className="inline-flex rounded-[3px] bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
+        className="inline-flex rounded-full bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
       >
         {ctaLabel[locale]}
       </a>

@@ -50,7 +50,7 @@ export default function FormateurClient({
       <section className="mt-8 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">
         <h2 className="text-sm font-semibold text-muted">{i.actionsTitle}</h2>
         {actions.length === 0 ? (
-          <p className="mt-4 rounded-[3px] bg-bg px-4 py-3.5 text-sm text-muted">
+          <p className="mt-4 rounded-[16px] bg-bg px-4 py-3.5 text-sm text-muted">
             {i.noActions}
           </p>
         ) : (
@@ -58,13 +58,13 @@ export default function FormateurClient({
             {actions.map((c) => (
               <li
                 key={c.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-[3px] bg-bg px-4 py-3.5"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[16px] bg-bg px-4 py-3.5"
               >
                 <span className="font-display font-semibold">{c.title}</span>
                 {c.status === "draft" && c.draftId ? (
                   <LocaleLink
                     href={`/creer?draft=${c.draftId}`}
-                    className="rounded-[3px] bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
                   >
                     {i.continueCreating}
                   </LocaleLink>
@@ -106,7 +106,7 @@ export default function FormateurClient({
                     <td className="py-4 pe-4 font-semibold">{c.title}</td>
                     <td className="py-4 pe-4">
                       <span
-                        className={`inline-block rounded-[3px] px-2.5 py-1 text-xs font-semibold ${statusCls[c.status]}`}
+                        className={`inline-block rounded-[16px] px-2.5 py-1 text-xs font-semibold ${statusCls[c.status]}`}
                       >
                         {statusLabel[c.status]}
                       </span>
@@ -136,7 +136,7 @@ export default function FormateurClient({
         <div className="mt-6 flex justify-center">
           <LocaleLink
             href="/creer"
-            className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
+            className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
           >
             {i.createNew}
           </LocaleLink>
@@ -147,7 +147,7 @@ export default function FormateurClient({
         <h2 className="font-display text-xl font-semibold">{i.statsTitle}</h2>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[300px_1fr]">
-          <div className="rounded-[3px] bg-bg p-5">
+          <div className="rounded-[16px] bg-bg p-5">
             <p className="text-sm font-semibold text-muted">{i.total}</p>
             <ul className="mt-4 space-y-4">
               <StatRow icon={<LayersIcon width={18} height={18} />} value={stats.started}>
@@ -180,7 +180,7 @@ function RowBtn({ href, children }: { href: string; children: React.ReactNode })
   return (
     <LocaleLink
       href={href}
-      className="rounded-[3px] border border-line bg-bg px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark"
+      className="rounded-[16px] border border-line bg-bg px-3.5 py-1.5 text-xs font-semibold transition hover:border-primary hover:text-primary-dark"
     >
       {children}
     </LocaleLink>

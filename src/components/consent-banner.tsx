@@ -84,8 +84,8 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
             color: "var(--color-muted)",
             background: "var(--color-surface)",
             border: "1px solid var(--color-line)",
-            borderRadius: 3,
-            padding: "5px 9px",
+            borderRadius: 9999,
+            padding: "6px 12px",
             cursor: "pointer",
           }}
         >
@@ -107,9 +107,9 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
             margin: choice !== null ? "0 auto 0 14px" : undefined,
             background: "var(--color-surface)",
             border: "1px solid var(--color-line)",
-            borderRadius: 4,
-            padding: "14px 16px",
-            boxShadow: "0 6px 20px rgba(40,30,15,0.12)",
+            borderRadius: 20,
+            padding: "16px 18px",
+            boxShadow: "0 16px 40px -18px rgba(28,27,24,0.35)",
             display: "flex",
             flexDirection: "column",
             gap: 10,
@@ -118,37 +118,10 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
         >
           <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "var(--color-ink)" }}>{t.text}</p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button
-              type="button"
-              onClick={() => respond("denied")}
-              style={{
-                flex: "1 1 auto",
-                padding: "8px 14px",
-                borderRadius: 3,
-                border: "1px solid var(--color-line)",
-                background: "transparent",
-                color: "var(--color-ink)",
-                fontSize: 13,
-                cursor: "pointer",
-              }}
-            >
+            <button type="button" onClick={() => respond("denied")} className="btn-soft h-10 flex-1 justify-center">
               {t.decline}
             </button>
-            <button
-              type="button"
-              onClick={() => respond("granted")}
-              style={{
-                flex: "1 1 auto",
-                padding: "8px 14px",
-                borderRadius: 3,
-                border: "1px solid var(--color-primary)",
-                background: "var(--color-primary)",
-                color: "var(--color-on-primary)",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
+            <button type="button" onClick={() => respond("granted")} className="btn-red h-10 flex-1 text-sm">
               {t.accept}
             </button>
           </div>

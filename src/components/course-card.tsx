@@ -21,6 +21,11 @@ function priceLabel(course: Course, locale: Locale, freeLabel: string): string {
   return formatPrice(course.priceCents, course.currency ?? "eur", locale);
 }
 
+/**
+ * Carte en épingle : l'image porte la carte, le texte vit dessous sans cadre.
+ * La variante "catalog" ajoute niveau et durée ; "compact" s'en tient au titre
+ * et au prix.
+ */
 export default function CourseCard({
   course,
   labels,
@@ -29,7 +34,7 @@ export default function CourseCard({
   className = "",
 }: {
   course: Course;
-  // Requis pour la variante "catalog" (libellés niveau/heures/CTA).
+  // Requis pour la variante "catalog" (libellés niveau/heures).
   // Pour la variante "compact", seul `free` sert : sans labels, pas de prix.
   labels?: CardLabels;
   locale?: Locale;
@@ -38,95 +43,44 @@ export default function CourseCard({
 }) {
   const href = `/formations/${course.slug}`;
   const isFree = course.accessType !== "PAID" || !course.priceCents;
-
-  if (variant === "compact") {
-    const price = labels ? priceLabel(course, locale, labels.free) : null;
-    return (
-      <Link
-        href={href}
-        className={`group flex flex-col overflow-hidden rounded-[6px] bg-surface ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-primary/50 ${className}`}
-      >
-        <div className="relative aspect-[16/10] overflow-hidden">
-          <Image
-            src={course.image}
-            alt={course.title}
-            fill
-            sizes="240px"
-            className="object-cover transition duration-500 group-hover:scale-105"
-          />
-        </div>
-        <div className="flex flex-1 flex-col p-3.5">
-          <h3 className="font-display text-sm font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
-            {course.title}
-          </h3>
-          <p className="mt-1 line-clamp-2 font-sans text-xs leading-relaxed text-muted">
-            {course.tagline}
-          </p>
-          {price && (
-            <span className="mt-2 text-[11px] font-bold text-primary">
-              {price}
-            </span>
-          )}
-        </div>
-      </Link>
-    );
-  }
-
-  const cardLabels: CardLabels = labels ?? {
-    levelPrefix: "",
-    hoursUnit: "",
-    access: "",
-    free: "",
-  };
-  const price = priceLabel(course, locale, cardLabels.free);
+  const price = labels ? priceLabel(course, locale, labels.free) : null;
+  const compact = variant === "compact";
 
   return (
-    <Link
-      href={href}
-      className={`group relative flex flex-col overflow-hidden rounded-[8px] bg-surface ring-1 ring-line transition duration-300 hover:-translate-y-1 hover:ring-primary/50 hover:shadow-card ${className}`}
-    >
-      {/* Filet d'accent phosphore qui se révèle au survol, en haut de la carte. */}
-      <span className="absolute inset-x-0 top-0 z-10 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
-      <div className="relative aspect-[16/9] overflow-hidden">
+    <Link href={href} className={`group block ${className}`}>
+      <div className={`relative overflow-hidden rounded-[16px] bg-surface-2 ${compact ? "aspect-[4/5]" : "aspect-[5/4]"}`}>
         <Image
           src={course.image}
           alt={course.title}
           fill
-          sizes="(min-width:1024px) 360px, 100vw"
-          className="object-cover transition duration-500 group-hover:scale-[1.07]"
+          sizes={compact ? "(min-width:1024px) 300px, 50vw" : "(min-width:1024px) 400px, (min-width:640px) 50vw, 100vw"}
+          className="tile-img object-cover"
         />
-        <span className="absolute start-3 top-3 rounded-[3px] border border-line bg-bg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">
-          {course.category}
-        </span>
         {price && (
           <span
-            className={`absolute end-3 top-3 rounded-[3px] border bg-bg px-2.5 py-1 text-[11px] font-bold ${
-              isFree ? "border-line text-muted" : "border-primary/50 text-ink"
+            className={`absolute bottom-3 start-3 rounded-full px-3 py-1 text-[13px] font-semibold ${
+              isFree ? "bg-surface text-ink" : "bg-ink text-bg"
             }`}
           >
             {price}
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-display text-lg font-semibold leading-tight tracking-tight transition-colors group-hover:text-primary">
+      <div className="px-1 pt-2.5">
+        <p className="text-xs text-muted">{course.category}</p>
+        <h3 className="mt-0.5 font-display text-[15px] leading-snug text-ink group-hover:underline group-hover:decoration-line group-hover:underline-offset-4 sm:text-base">
           {course.title}
         </h3>
-        <p className="mt-1.5 line-clamp-2 font-sans text-sm leading-relaxed text-muted">
-          {course.tagline}
-        </p>
-        <div className="mt-4 flex items-center gap-3 text-xs text-muted">
-          <span>
-            {cardLabels.levelPrefix} {course.level}
-          </span>
-          <span className="h-1 w-1 rounded-full bg-muted-soft" />
-          <span>
-            {course.hours} {cardLabels.hoursUnit}
-          </span>
-        </div>
-        <span className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-[3px] border border-line bg-bg px-4 py-2 text-sm font-semibold text-ink transition group-hover:border-primary group-hover:bg-primary group-hover:text-on-primary">
-          {cardLabels.access}
-        </span>
+        {!compact && (
+          <>
+            <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted">{course.tagline}</p>
+            {labels && (
+              <p className="mt-2 text-xs text-muted">
+                {labels.levelPrefix} {course.level} · {course.hours} {labels.hoursUnit}
+              </p>
+            )}
+          </>
+        )}
       </div>
     </Link>
   );

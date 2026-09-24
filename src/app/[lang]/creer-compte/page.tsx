@@ -100,7 +100,7 @@ export default function CreerComptePage() {
           <button
             type="submit"
             disabled={pending}
-            className="mt-7 inline-flex w-full items-center justify-center gap-1.5 rounded-[3px] bg-primary py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-dark disabled:opacity-60"
+            className="mt-7 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-primary py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-dark disabled:opacity-60"
           >
             {s.submit}
           </button>
