@@ -41,6 +41,7 @@
   --color-on-night-muted: #b9b8b0;
 
   --color-accent: #8a5a00;
+  --color-spark: #f2b632;
   --color-accent-soft: #f4e8cf;
   --color-violet: #2d5a7b;
 
@@ -390,6 +391,17 @@ textarea.field {
 }
 
 /* Short rule under a section label. */
+.logo-dot {
+  position: absolute;
+  left: 50%;
+  top: 0.14em;
+  width: 0.24em;
+  height: 0.24em;
+  border-radius: 50%;
+  background: var(--color-spark);
+  transform: translateX(-50%);
+}
+
 .rule-accent {
   display: inline-block;
   width: 2.25rem;

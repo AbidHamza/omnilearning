@@ -10,6 +10,7 @@ import { homeByRole } from "@/lib/session";
 import { loginAction } from "@/lib/actions/auth";
 import { oauthSignIn } from "@/lib/actions/oauth";
 import { scenePhotos } from "@/lib/topic-images";
+import Logo from "@/components/logo";
 
 // Cible de retour passée par une page verrouillée (?next=/formations/...).
 // Lue au moment du clic (pas de useSearchParams → pas de Suspense imposée).
@@ -147,9 +148,7 @@ export default function ConnexionPage() {
       </div>
 
       <div className="section-dark hidden border-s border-line lg:flex lg:flex-col lg:justify-between lg:p-14">
-        <span className="font-display text-[22px] font-semibold tracking-tight text-ink">
-          Omni<span className="italic text-primary">Learn</span>
-        </span>
+        <Logo />
 
         <Image
           src={scenePhotos.reader.src}
