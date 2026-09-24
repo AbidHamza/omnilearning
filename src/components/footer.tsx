@@ -2,6 +2,7 @@
 
 import { LocaleLink } from "@/i18n/navigation";
 import { useT } from "@/i18n/provider";
+import Logo from "./logo";
 
 export default function Footer() {
   const t = useT();
@@ -39,9 +40,7 @@ export default function Footer() {
     <footer className="mt-16 border-t border-line text-ink">
       <div className="container-page grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr] lg:py-16">
         <div>
-          <span className="font-display text-[22px] font-semibold tracking-tight">
-            Omni<span className="italic text-primary">Learn</span>
-          </span>
+          <Logo />
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
             {t.footer.tagline}
           </p>

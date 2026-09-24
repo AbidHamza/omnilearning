@@ -23,6 +23,7 @@ import {
   stripLocale,
   type Locale,
 } from "@/i18n/config";
+import Logo from "./logo";
 
 type NavLink = { href: string; label: string };
 
@@ -89,9 +90,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 border-b border-line bg-bg">
       <div className="container-page flex h-16 items-center gap-4">
         <LocaleLink href="/" className="group flex shrink-0 items-center gap-2.5">
-          <span className="font-display text-[22px] font-semibold tracking-tight text-ink">
-            Omni<span className="italic text-primary">Learn</span>
-          </span>
+          <Logo />
         </LocaleLink>
 
         {!bare && (
