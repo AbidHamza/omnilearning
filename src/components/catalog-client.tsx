@@ -2,14 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import type { Category, Course } from "@/lib/types";
 import CourseCard from "./course-card";
 import { SearchIcon } from "./icons";
 import { useI18n } from "@/i18n/provider";
 import { categoryName } from "@/i18n/category-name";
-import { localePath } from "@/i18n/config";
-import { scenePhotos, topicPhoto } from "@/lib/topic-images";
+import { topicPhoto } from "@/lib/topic-images";
 
 // Les valeurs des niveaux correspondent aux données (fr) ; seul l'affichage est traduit.
 const levelValues = ["Débutant", "Intermédiaire", "Avancé"] as const;
@@ -33,7 +31,6 @@ export default function CatalogClient({
 }) {
   const { locale, dict: t } = useI18n();
   const tc = t.catalog;
-  const lp = (path: string) => localePath(locale, path);
 
   const levelLabels: Record<string, string> = {
     Débutant: tc.levelBeginner,
@@ -127,44 +124,17 @@ export default function CatalogClient({
     </div>
   );
 
-  // An empty topic, or an empty catalog: say what is missing, show the
-  // topics that exist, and give the one action that fills the gap.
+  // An empty topic, or an empty catalog: no apology, just the topics to browse.
   if (courses.length === 0 || (cat && inTopic === 0)) {
-    const topicName = cat ? categoryName(t, cat) : "";
-    const photo = cat ? topicPhoto(cat) : scenePhotos.desk;
     const others = categories.filter((c) => c.label !== cat);
     return (
       <div className="container-page pb-20 pt-8 lg:pb-28 lg:pt-12">
         <h1 className="text-[2.2rem] leading-[1.05] text-ink sm:text-5xl">{t.nav.formations}</h1>
         <div className="mt-6">{topicChips}</div>
 
-        <div className="mt-10 grid items-center gap-8 md:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-          <Image
-            src={photo.src}
-            width={photo.w}
-            height={photo.h}
-            alt=""
-            priority
-            sizes="(min-width:768px) 420px, 100vw"
-            className="aspect-[4/3] w-full rounded-[24px] object-cover md:aspect-[4/5]"
-          />
-          <div className="max-w-lg">
-            <h2 className="text-3xl leading-tight text-ink sm:text-[2.4rem]">
-              {cat ? tc.emptyTopicTitle.replace("{topic}", topicName) : tc.emptyCatalogTitle}
-            </h2>
-            <p className="mt-4 text-[16px] leading-relaxed text-muted">
-              {cat ? tc.emptyTopicBody : tc.emptyCatalogBody}
-            </p>
-            <Link href={lp("/devenir-formateur")} className="btn-red mt-8 px-6">
-              {tc.emptyCatalogCta}
-            </Link>
-          </div>
-        </div>
-
         {others.length > 0 && (
-          <section className="mt-16 lg:mt-20">
-            <h2 className="text-2xl text-ink">{tc.otherTopics}</h2>
-            <div className="wall mt-6 columns-2 sm:columns-3 lg:columns-5">
+          <section className="mt-10">
+            <div className="wall columns-2 sm:columns-3 lg:columns-5">
               {others.map((c, i) => {
                 const ph = topicPhoto(c.label);
                 return (

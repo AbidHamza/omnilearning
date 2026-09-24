@@ -104,7 +104,7 @@ const en: Dict = {
     topicsLabel: "Topics",
     topicsTitle: "Nine topics, picked for the work they lead to",
     topicsBody:
-      "Instructors publish in one of these topics. Open one to see what is in it.",
+      "Pick a topic and go straight to its courses.",
     topicCountOne: "course",
     topicCountMany: "courses",
 
@@ -345,7 +345,7 @@ const en: Dict = {
     titleAccent: "leaderboard",
     intro:
       "We reward effort, not raw performance. Every lesson you finish and every quiz you pass earns XP. Come back each day to keep your streak alive.",
-    emptyText: "Nobody has earned XP yet. Be the first:",
+    emptyText: "Finish a lesson to earn your first XP:",
     emptyLink: "pick a course",
     you: "you",
     levelPrefix: "Level",

@@ -171,8 +171,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             </nav>
           )}
 
+          {hasCatalog && (
           <div className="mt-8 max-w-xl border-t border-line pt-4">
-            {hasCatalog ? (
               <dl className="flex flex-wrap gap-x-8 gap-y-2">
                 {ledger.map((row) => (
                   <div key={row.label} className="flex flex-row-reverse items-baseline justify-end gap-2">
@@ -181,10 +181,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                   </div>
                 ))}
               </dl>
-            ) : (
-              <p className="text-sm leading-relaxed text-muted">{h.ledgerEmpty}</p>
-            )}
           </div>
+          )}
         </div>
 
         <div aria-hidden="true" className="h-[300px] overflow-hidden sm:h-[440px] lg:h-[600px]">
@@ -299,34 +297,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               ))}
             </ol>
           </div>
-        </div>
-      </section>
-
-      <section className="container-page py-16 lg:py-[5.5rem]">
-        <div className="grid overflow-hidden rounded-[32px] bg-night text-on-night md:grid-cols-[1.3fr_1fr]">
-          <div className="p-8 sm:p-12 lg:p-16">
-            <h2 className="max-w-lg text-3xl leading-tight sm:text-[2.6rem]">{h.teachTitle}</h2>
-            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-on-night-muted">{h.teachBody}</p>
-            <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
-              <Link href={lp("/devenir-formateur")} className="btn-red">
-                {h.teachCta}
-              </Link>
-              <Link
-                href={lp("/conditions-formateurs")}
-                className="text-sm underline decoration-on-night-muted underline-offset-4 hover:decoration-on-night"
-              >
-                {h.teachTerms}
-              </Link>
-            </div>
-          </div>
-          <Image
-            src={scenePhotos.whiteboard.src}
-            width={scenePhotos.whiteboard.w}
-            height={scenePhotos.whiteboard.h}
-            alt=""
-            sizes="(min-width:768px) 480px, 100vw"
-            className="h-64 w-full object-cover md:h-full"
-          />
         </div>
       </section>
 
