@@ -29,6 +29,8 @@ pm2 delete omnilearning 2>/dev/null || true
 PORT=3003 HOSTNAME=127.0.0.1 pm2 start "$APP/.next/standalone/server.js" \
   --name omnilearning \
   --update-env \
+  --max-memory-restart 700M \
+  --exp-backoff-restart-delay 200 \
   --cwd "$APP/.next/standalone"
 
 pm2 save
