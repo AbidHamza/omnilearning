@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { contentCourses as seedCourses } from "@/lib/content";
 import {
   allLessons,
   getCourse,
@@ -28,11 +27,7 @@ import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 
 export function generateStaticParams() {
-  return seedCourses.flatMap((c) =>
-    c.parts.flatMap((p) =>
-      p.lessons.map((l) => ({ slug: c.slug, lessonId: l.id }))
-    )
-  );
+  return [];
 }
 
 export async function generateMetadata(
