@@ -184,6 +184,7 @@ const en: Dict = {
     video: "Video",
     text: "Text",
     quiz: "Quiz",
+    scorm: "SCORM module",
   },
   quiz: {
     passed: "Quiz passed!",
@@ -476,6 +477,7 @@ const en: Dict = {
       quiz: "Lesson {where}: the quiz needs at least one question with two answers and one correct answer.",
       video: "Lesson {where}: the video has not been uploaded.",
       text: "Lesson {where}: the text content is empty.",
+      scorm: "Lesson {where}: the SCORM package has not been uploaded.",
     },
     builder: {
       moduleLabel: "Module",
@@ -484,8 +486,10 @@ const en: Dict = {
       typeVideo: "Video",
       typeText: "Text",
       typeQuiz: "Quiz",
+      typeScorm: "SCORM module",
       durationLabel: "Duration (min)",
       videoUpload: "Upload the video",
+      scormUpload: "Upload the SCORM package (.zip)",
       bodyPlaceholder: "Lesson content (text, links, instructions)",
       questionLabel: "Question",
       questionPlaceholder: "Question wording",

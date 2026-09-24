@@ -17,6 +17,7 @@ import Markdown from "@/components/markdown";
 import LessonTypeIcon from "@/components/lesson-type-icon";
 import LessonTracker from "@/components/lesson-tracker";
 import LessonVideo, { type CaptionTrack } from "@/components/lesson-video";
+import ScormPlayer from "@/components/scorm-player";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -256,18 +257,30 @@ export default async function LessonPage(
                   lessonKey={lesson.id}
                 />
               )}
+
+              {lesson.type === "scorm" && lesson.scormPackagePath && lesson.scormEntryPath && (
+                <ScormPlayer
+                  courseSlug={course.slug}
+                  lessonKey={lesson.id}
+                  entryPath={lesson.scormEntryPath}
+                  version={lesson.scormVersion}
+                  initialCmiJson={viewer.scormByKey[lesson.id]}
+                />
+              )}
             </div>
 
             {/* Auto-enrollment + point de reprise. La complétion automatique
                 ne vaut que pour une leçon écrite : un quiz se valide en le
                 réussissant, une vidéo en la regardant (le lecteur s'en charge
-                à 90 %). Marquer « terminé » une vidéo de 20 min au bout de
-                3 secondes ne mesurait rien du tout. */}
+                à 90 %), un SCORM en posant lui-même son statut de complétion.
+                Marquer « terminé » une vidéo de 20 min au bout de 3 secondes
+                ne mesurait rien du tout. */}
             <LessonTracker
               courseSlug={course.slug}
               lessonKey={lesson.id}
               markComplete={
                 lesson.type !== "quiz" &&
+                lesson.type !== "scorm" &&
                 !(lesson.type === "video" && Boolean(lesson.videoUrl))
               }
             />

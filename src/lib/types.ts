@@ -1,4 +1,4 @@
-export type LessonType = "video" | "text" | "quiz";
+export type LessonType = "video" | "text" | "quiz" | "scorm";
 
 export interface QuizQuestion {
   id: string;
@@ -38,6 +38,12 @@ export interface Lesson {
   /** Pistes de sous-titres par langue : { fr: "/videos/x.fr.vtt", en: "…" }. */
   captions?: Record<string, string>;
   questions?: QuizQuestion[];
+  /** Dossier du paquet SCORM décompressé sous public/uploads (ex: "scorm/l7"). */
+  scormPackagePath?: string;
+  /** Chemin de l'entrée relatif au dossier ci-dessus (imsmanifest.xml). */
+  scormEntryPath?: string;
+  /** "1.2" ou "2004" — décide quelle classe scorm-again instancier. */
+  scormVersion?: string;
   /** Accès libre sans compte (les 2 premières leçons de chaque cours). */
   isFree?: boolean;
 }

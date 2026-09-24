@@ -166,6 +166,9 @@ export async function moderateDraftAction(
           videoUrl: l.type === "video" ? (videoUrl ?? null) : null,
           videoDurationSec: l.type === "video" && l.durationMin ? l.durationMin * 60 : null,
           questions: questions?.length ? JSON.stringify(questions) : null,
+          scormPackagePath: l.type === "scorm" ? (l.scormPackagePath ?? null) : null,
+          scormEntryPath: l.type === "scorm" ? (l.scormEntryPath ?? null) : null,
+          scormVersion: l.type === "scorm" ? (l.scormVersion ?? null) : null,
           isFree: lessonIndex <= 2,
           order: lo,
         };

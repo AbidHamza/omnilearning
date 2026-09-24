@@ -179,7 +179,7 @@ model Lesson {
   // Clé "métier" stable utilisée dans les URLs (ex: "l1")
   key         String
   title       String
-  type        String // video | text | quiz
+  type        String // video | text | quiz | scorm
   duration    String
   body        String?
   videoLabel  String?
@@ -199,6 +199,14 @@ model Lesson {
   questions   String?
   // Traductions (en, ar) : { en: {title, body, videoLabel, questions:[...]}, ar: {...} }
   i18n        String?
+  // --- SCORM (leçons type="scorm") ---
+  // Dossier du paquet décompressé sous public/uploads, ex: "scorm/<lessonId>".
+  // Vide = la leçon affiche son texte au lieu d'un lecteur mort.
+  scormPackagePath String?
+  // Chemin de l'entrée relatif au dossier ci-dessus (depuis imsmanifest.xml), ex: "shared/launchpage.html".
+  scormEntryPath   String?
+  // "1.2" ou "2004" — décide quelle classe scorm-again instancier (Scorm12API / Scorm2004API).
+  scormVersion     String?
   // XP attribuée à la complétion de cette leçon (défaut appliqué côté logique si 0)
   xp          Int     @default(0)
   // Accès libre sans compte (les 2 premières leçons de chaque cours au seed)
@@ -240,6 +248,9 @@ model LessonProgress {
   lessonId     String
   isCompleted  Boolean   @default(false)
   completedAt  DateTime?
+  // État "cmi" SCORM sérialisé en JSON (renderCMIToJSONString) — permet de reprendre
+  // une leçon SCORM où l'apprenant l'a laissée (bookmark, score, suspend_data).
+  scormData    String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 

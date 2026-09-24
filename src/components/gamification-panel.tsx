@@ -1,21 +1,36 @@
 import Link from "next/link";
+import type { ReactElement, SVGProps } from "react";
 import type { GamificationView } from "@/lib/gamification";
 import type { Dict } from "@/i18n/dictionaries/fr";
+import {
+  FlameIcon,
+  TrophyIcon,
+  TargetIcon,
+  AwardIcon,
+  RocketIcon,
+  DocIcon,
+  BrainIcon,
+  StarIcon,
+  BoltIcon,
+  ShieldIcon,
+  CompassIcon,
+  SeedlingIcon,
+} from "./icons";
 
-// Icônes de badge : jeu de pictos simples et universels (rendus partout).
-const badgeIcon: Record<string, string> = {
-  flame: "🔥",
-  trophy: "🏆",
-  target: "🎯",
-  medal: "🥇",
-  rocket: "🚀",
-  book: "📚",
-  brain: "🧠",
-  star: "⭐",
-  bolt: "⚡",
-  shield: "🛡️",
-  compass: "🧭",
-  seedling: "🌱",
+// Icônes de badge : jeu de pictos SVG maison (pas d'emoji, rendu identique partout).
+const badgeIcon: Record<string, (p: SVGProps<SVGSVGElement>) => ReactElement> = {
+  flame: FlameIcon,
+  trophy: TrophyIcon,
+  target: TargetIcon,
+  medal: AwardIcon,
+  rocket: RocketIcon,
+  book: DocIcon,
+  brain: BrainIcon,
+  star: StarIcon,
+  bolt: BoltIcon,
+  shield: ShieldIcon,
+  compass: CompassIcon,
+  seedling: SeedlingIcon,
 };
 
 const tierRing: Record<string, string> = {
@@ -48,13 +63,16 @@ export default function GamificationPanel({
             <span className="text-sm text-muted">· {data.xp} XP</span>
           </div>
         </div>
-        <div className="text-end">
-          <div className="font-display text-2xl font-semibold">
-            {currentStreak} <span className="text-base">🔥</span>
+        <div className="flex items-center gap-1.5 text-end">
+          <FlameIcon className="h-5 w-5 text-primary" />
+          <div>
+            <div className="font-display text-2xl font-semibold leading-none">
+              {currentStreak}
+            </div>
+            <p className="text-xs text-muted">
+              {currentStreak <= 1 ? g.dayStreak : g.daysStreak}
+            </p>
           </div>
-          <p className="text-xs text-muted">
-            {currentStreak <= 1 ? g.dayStreak : g.daysStreak}
-          </p>
         </div>
       </div>
 
@@ -95,18 +113,21 @@ export default function GamificationPanel({
           <p className="mt-3 text-sm text-muted">{g.noBadges}</p>
         ) : (
           <div className="mt-3 flex flex-wrap gap-2.5">
-            {badges.map((b) => (
-              <div
-                key={b.slug}
-                title={b.description}
-                className={`flex items-center gap-2 rounded-[16px] px-3 py-1.5 text-sm ring-1 ${
-                  tierRing[b.tier] ?? tierRing.bronze
-                }`}
-              >
-                <span className="text-base">{badgeIcon[b.icon] ?? "⭐"}</span>
-                <span className="font-medium text-ink">{b.label}</span>
-              </div>
-            ))}
+            {badges.map((b) => {
+              const Icon = badgeIcon[b.icon] ?? StarIcon;
+              return (
+                <div
+                  key={b.slug}
+                  title={b.description}
+                  className={`flex items-center gap-2 rounded-[16px] px-3 py-1.5 text-sm ring-1 ${
+                    tierRing[b.tier] ?? tierRing.bronze
+                  }`}
+                >
+                  <Icon className="h-4 w-4 text-ink" />
+                  <span className="font-medium text-ink">{b.label}</span>
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -114,16 +135,19 @@ export default function GamificationPanel({
           <div className="mt-4">
             <p className="text-xs uppercase tracking-wide text-muted-soft">{g.toUnlock}</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {lockedBadges.slice(0, 6).map((b) => (
-                <div
-                  key={b.slug}
-                  title={b.description}
-                  className="flex items-center gap-2 rounded-[16px] border border-line bg-bg px-3 py-1.5 text-sm opacity-60"
-                >
-                  <span className="text-base grayscale">{badgeIcon[b.icon] ?? "⭐"}</span>
-                  <span className="text-muted">{b.label}</span>
-                </div>
-              ))}
+              {lockedBadges.slice(0, 6).map((b) => {
+                const Icon = badgeIcon[b.icon] ?? StarIcon;
+                return (
+                  <div
+                    key={b.slug}
+                    title={b.description}
+                    className="flex items-center gap-2 rounded-[16px] border border-line bg-bg px-3 py-1.5 text-sm opacity-60"
+                  >
+                    <Icon className="h-4 w-4 text-muted" />
+                    <span className="text-muted">{b.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

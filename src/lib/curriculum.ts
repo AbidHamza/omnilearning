@@ -2,7 +2,7 @@
 // ne la publie. Ce module est importé côté navigateur (l'assistant de création)
 // et côté serveur (brouillon, modération) : pas de dépendance à Prisma ici.
 
-export type DraftLessonType = "video" | "text" | "quiz";
+export type DraftLessonType = "video" | "text" | "quiz" | "scorm";
 
 export interface DraftQuestion {
   prompt: string;
@@ -22,6 +22,10 @@ export interface DraftLesson {
   videoUrl?: string;
   videoName?: string;
   questions?: DraftQuestion[];
+  /** Paquet SCORM envoyé par le formateur (dézippé par /api/upload/scorm). */
+  scormPackagePath?: string;
+  scormEntryPath?: string;
+  scormVersion?: string;
 }
 
 export interface DraftModule {
@@ -66,10 +70,13 @@ function cleanLesson(l: unknown): DraftLesson | null {
   const title = str(o.title, 200);
   if (!title) return null;
   const type: DraftLessonType =
-    o.type === "video" || o.type === "quiz" ? o.type : "text";
+    o.type === "video" || o.type === "quiz" || o.type === "scorm" ? o.type : "text";
   const body = str(o.body, 60_000);
   const videoUrl = str(o.videoUrl, 500);
   const videoName = str(o.videoName, 200);
+  const scormPackagePath = str(o.scormPackagePath, 500);
+  const scormEntryPath = str(o.scormEntryPath, 500);
+  const scormVersion = str(o.scormVersion, 20);
   const questions = Array.isArray(o.questions)
     ? o.questions.map(cleanQuestion).filter((q): q is DraftQuestion => q !== null).slice(0, MAX_QUESTIONS)
     : [];
@@ -81,6 +88,9 @@ function cleanLesson(l: unknown): DraftLesson | null {
     ...(videoUrl && videoUrl.startsWith("/") ? { videoUrl } : null),
     ...(videoName ? { videoName } : null),
     ...(type === "quiz" && questions.length ? { questions } : null),
+    ...(type === "scorm" && scormPackagePath.startsWith("/") ? { scormPackagePath } : null),
+    ...(type === "scorm" && scormEntryPath.startsWith("/") ? { scormEntryPath } : null),
+    ...(type === "scorm" && scormVersion ? { scormVersion } : null),
   };
 }
 
@@ -142,6 +152,9 @@ export function curriculumProblems(modules: DraftModule[]): string[] {
       }
       if (l.type === "text" && !l.body) {
         problems.push(`text:${where}`);
+      }
+      if (l.type === "scorm" && (!l.scormPackagePath || !l.scormEntryPath)) {
+        problems.push(`scorm:${where}`);
       }
     });
   });

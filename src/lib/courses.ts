@@ -63,6 +63,9 @@ type LessonRow = {
   videoPoster?: string | null;
   videoDurationSec?: number | null;
   captions?: string | null;
+  scormPackagePath?: string | null;
+  scormEntryPath?: string | null;
+  scormVersion?: string | null;
 };
 
 /**
@@ -156,6 +159,9 @@ function toUiCourse(c: CourseRow): Course {
         ...(l.videoDurationSec ? { videoDurationSec: l.videoDurationSec } : null),
         ...(captions ? { captions } : null),
         ...(questions ? { questions } : null),
+        ...(l.scormPackagePath ? { scormPackagePath: l.scormPackagePath } : null),
+        ...(l.scormEntryPath ? { scormEntryPath: l.scormEntryPath } : null),
+        ...(l.scormVersion ? { scormVersion: l.scormVersion } : null),
       };
     }),
   }));
@@ -345,4 +351,4 @@ export function allLessons(course: Course) {
     p.lessons.map((l) => ({ ...l, partTitle: p.title })),
   );
 }
-
+

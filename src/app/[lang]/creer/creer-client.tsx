@@ -607,6 +607,31 @@ function LessonEditor({
     }
   }
 
+  async function onScorm(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBusy(true);
+    setErr(null);
+    try {
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await fetch("/api/upload/scorm", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) setErr(data.error ?? c.uploadError);
+      else
+        onChange({
+          scormPackagePath: data.scormPackagePath,
+          scormEntryPath: data.scormEntryPath,
+          scormVersion: data.scormVersion,
+        });
+    } catch {
+      setErr(c.uploadError);
+    } finally {
+      setBusy(false);
+      e.target.value = "";
+    }
+  }
+
   const questions = lesson.questions ?? [];
   function patchQuestion(qi: number, patch: Partial<DraftQuestion>) {
     onChange({ questions: questions.map((q, i) => (i === qi ? { ...q, ...patch } : q)) });
@@ -631,6 +656,7 @@ function LessonEditor({
           <option value="video">{b.typeVideo}</option>
           <option value="text">{b.typeText}</option>
           <option value="quiz">{b.typeQuiz}</option>
+          <option value="scorm">{b.typeScorm}</option>
         </select>
         <label className="flex items-center gap-2 text-xs text-muted">
           {b.durationLabel}
@@ -659,7 +685,18 @@ function LessonEditor({
         </div>
       )}
 
-      {lesson.type !== "quiz" && (
+      {lesson.type === "scorm" && (
+        <div className="mt-3 ps-11">
+          <label className="inline-flex cursor-pointer items-center gap-2 border border-dashed border-line px-3 py-2 text-xs font-semibold hover:border-primary">
+            <UploadIcon width={14} height={14} />
+            {busy ? c.uploading : lesson.scormPackagePath ? lesson.scormVersion ?? b.typeScorm : b.scormUpload}
+            <input type="file" accept=".zip" className="hidden" onChange={onScorm} disabled={busy} />
+          </label>
+          {err && <p className="mt-1 text-xs text-danger">{err}</p>}
+        </div>
+      )}
+
+      {lesson.type !== "quiz" && lesson.type !== "scorm" && (
         <div className="mt-3 ps-11">
           <textarea
             value={lesson.body ?? ""}

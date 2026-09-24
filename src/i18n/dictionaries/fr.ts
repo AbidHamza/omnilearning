@@ -183,6 +183,7 @@ const fr = {
     video: "Vidéo",
     text: "Texte",
     quiz: "Quiz",
+    scorm: "Module SCORM",
   },
   quiz: {
     passed: "Quiz réussi !",
@@ -482,6 +483,7 @@ const fr = {
       quiz: "Leçon {where} : le quiz a besoin d'au moins une question avec deux réponses et une bonne réponse.",
       video: "Leçon {where} : la vidéo n'a pas été téléversée.",
       text: "Leçon {where} : le contenu texte est vide.",
+      scorm: "Leçon {where} : le paquet SCORM n'a pas été téléversé.",
     },
     builder: {
       moduleLabel: "Module",
@@ -490,8 +492,10 @@ const fr = {
       typeVideo: "Vidéo",
       typeText: "Texte",
       typeQuiz: "Quiz",
+      typeScorm: "Module SCORM",
       durationLabel: "Durée (min)",
       videoUpload: "Téléverser la vidéo",
+      scormUpload: "Téléverser le paquet SCORM (.zip)",
       bodyPlaceholder: "Contenu de la leçon (texte, liens, consignes)",
       questionLabel: "Question",
       questionPlaceholder: "Énoncé de la question",

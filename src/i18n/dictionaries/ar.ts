@@ -184,6 +184,7 @@ const ar: Dict = {
     video: "فيديو",
     text: "نص",
     quiz: "اختبار",
+    scorm: "وحدة SCORM",
   },
   quiz: {
     passed: "اجتزت الاختبار!",
@@ -474,6 +475,7 @@ const ar: Dict = {
       quiz: "الدرس {where}: يحتاج الاختبار إلى سؤال واحد على الأقل بإجابتين وإجابة صحيحة.",
       video: "الدرس {where}: لم يُرفع الفيديو.",
       text: "الدرس {where}: المحتوى النصي فارغ.",
+      scorm: "الدرس {where}: لم تُرفع حزمة SCORM.",
     },
     builder: {
       moduleLabel: "الوحدة",
@@ -482,8 +484,10 @@ const ar: Dict = {
       typeVideo: "فيديو",
       typeText: "نص",
       typeQuiz: "اختبار",
+      typeScorm: "وحدة SCORM",
       durationLabel: "المدة (دقيقة)",
       videoUpload: "رفع الفيديو",
+      scormUpload: "رفع حزمة SCORM (.zip)",
       bodyPlaceholder: "محتوى الدرس (نص، روابط، تعليمات)",
       questionLabel: "السؤال",
       questionPlaceholder: "نص السؤال",
