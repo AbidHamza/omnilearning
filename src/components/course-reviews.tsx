@@ -1,5 +1,5 @@
 import type { ReviewSummary } from "@/lib/courses";
-import { formatNumber } from "@/lib/intl";
+import { formatDate, formatNumber } from "@/lib/intl";
 
 function Stars({ rating, className = "" }: { rating: number; className?: string }) {
   // Étoiles pleines/vides, arrondi au demi près pour l'affichage agrégé.
@@ -81,6 +81,9 @@ export default function CourseReviews({
                   <p className="font-semibold">{r.authorName}</p>
                   <Stars rating={r.rating} className="text-sm" />
                 </div>
+                <span className="ms-auto shrink-0 text-xs text-muted-soft">
+                  {formatDate(r.createdAt, locale)}
+                </span>
               </div>
               {r.title && (
                 <p className="mt-3 font-display font-semibold">{r.title}</p>

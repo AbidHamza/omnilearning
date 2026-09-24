@@ -318,6 +318,58 @@ export const GithubIcon = (p: P) => (
   </svg>
 );
 
+/* Gamification glyphs */
+export const FlameIcon = (p: P) => (
+  <svg {...base} fill="currentColor" stroke="none" {...p}>
+    <path d="M12 2c1 3-3 4.5-3 8a3 3 0 0 0 6 0c1.2 1 2 2.7 2 4.5A5.5 5.5 0 0 1 6.5 20 6 6 0 0 1 6 8c1.5 2 2.5 1.5 2-1 0-2 1.5-3.8 4-5z" />
+  </svg>
+);
+
+export const TrophyIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M7 4h10v5a5 5 0 0 1-10 0z" />
+    <path d="M7 5H4v2a4 4 0 0 0 4 4M17 5h3v2a4 4 0 0 1-4 4M10 18h4M9 22h6M12 15v7" />
+  </svg>
+);
+
+export const TargetIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="5" />
+    <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const RocketIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M12 2c3 1.5 5 5 5 9 0 2-.7 4-1.5 5.5L12 19l-3.5-2.5C7.7 15 7 13 7 11c0-4 2-7.5 5-9z" />
+    <path d="M9 16.5 6.5 19M15 16.5 17.5 19M10.5 19.5v2M13.5 19.5v2" />
+  </svg>
+);
+
+export const SeedlingIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M12 21v-9" />
+    <path d="M12 12c0-4-3-6.5-8-6.5C4 10 6.5 13 11 13z" />
+    <path d="M12 12c0-4.5 3.5-7.5 9-7.5-.3 4.6-3 8-9 7.5z" />
+  </svg>
+);
+
+export const BrainIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5h1a3 3 0 0 0 2-1V6a2 2 0 0 0-.5-2z" />
+    <path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5h-1a3 3 0 0 1-2-1V6a2 2 0 0 1 .5-2z" />
+    <path d="M9 8h6M8.5 12h7M9 16h6" />
+  </svg>
+);
+
+export const CompassIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m15 9-2 6-4-2 2-6z" />
+  </svg>
+);
+
 export const AppleIcon = (p: P) => (
   <svg viewBox="0 0 24 24" width={20} height={20} fill="currentColor" {...p}>
     <path d="M16.4 12.7c0-2.2 1.8-3.3 1.9-3.3-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.5 0-2.8.8-3.6 2.2-1.5 2.7-.4 6.6 1.1 8.8.7 1 1.6 2.2 2.7 2.2 1 0 1.4-.7 2.7-.7s1.6.7 2.7.7c1.1 0 1.8-1 2.5-2 .8-1.2 1.1-2.3 1.1-2.3s-2.1-.8-2.1-3.2zM14.3 6.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.5.6-1 1.6-.9 2.5 1 .1 1.9-.5 2.5-1.1z" />

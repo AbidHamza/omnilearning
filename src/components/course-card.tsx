@@ -79,6 +79,11 @@ export default function CourseCard({
                 {labels.levelPrefix} {course.level} · {course.hours} {labels.hoursUnit}
               </p>
             )}
+            {/* Formateur : n'existe que pour les cours signés par une personne
+                réelle ; un cours produit par la LLC n'affiche rien ici. */}
+            {course.instructor && (
+              <p className="mt-0.5 text-xs text-muted-soft">{course.instructor}</p>
+            )}
           </>
         )}
       </div>

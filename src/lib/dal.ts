@@ -310,19 +310,30 @@ export const getCourseViewerState = cache(
     isEnrolled: boolean;
     hasReviewed: boolean;
     completedKeys: string[];
+    /** cmi SCORM (JSON) de la dernière fois, par key de leçon — pour reprendre où l'apprenant s'est arrêté. */
+    scormByKey: Record<string, string>;
   }> => {
     const session = await auth();
     const userId = session?.user?.id;
     if (!userId) {
-      return { isAuthenticated: false, isEnrolled: false, hasReviewed: false, completedKeys: [] };
+      return {
+        isAuthenticated: false,
+        isEnrolled: false,
+        hasReviewed: false,
+        completedKeys: [],
+        scormByKey: {},
+      };
     }
 
     const enrollment = await prisma.enrollment.findFirst({
       where: { userId, course: { slug: courseSlug } },
       select: {
         lessonProgress: {
-          where: { isCompleted: true },
-          select: { lesson: { select: { key: true } } },
+          select: {
+            isCompleted: true,
+            scormData: true,
+            lesson: { select: { key: true } },
+          },
         },
       },
     });
@@ -330,11 +341,15 @@ export const getCourseViewerState = cache(
       where: { userId, course: { slug: courseSlug } },
       select: { id: true },
     });
+    const progress = enrollment?.lessonProgress ?? [];
     return {
       isAuthenticated: true,
       isEnrolled: Boolean(enrollment),
       hasReviewed: Boolean(review),
-      completedKeys: enrollment?.lessonProgress.map((p) => p.lesson.key) ?? [],
+      completedKeys: progress.filter((p) => p.isCompleted).map((p) => p.lesson.key),
+      scormByKey: Object.fromEntries(
+        progress.filter((p) => p.scormData).map((p) => [p.lesson.key, p.scormData as string]),
+      ),
     };
   },
 );

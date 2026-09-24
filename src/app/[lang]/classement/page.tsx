@@ -5,6 +5,7 @@ import { requireRole } from "@/lib/dal";
 import { auth } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/gamification";
 import { formatNumber } from "@/lib/intl";
+import { AwardIcon } from "@/components/icons";
 import type { Metadata } from "next";
 
 // Écran privé : derrière une session, sans contenu public. Il n'a rien à faire
@@ -12,8 +13,8 @@ import type { Metadata } from "next";
 // contenu change avec le compte connecté.
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-
-const medal = ["🥇", "🥈", "🥉"];
+// Podium : trois teintes plutôt que trois emoji de médaille.
+const medalTint = ["text-yellow-500", "text-slate-400", "text-amber-700"];
 
 export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
@@ -54,8 +55,12 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
                   r.isCurrentUser ? "bg-primary-soft" : ""
                 }`}
               >
-                <span className="w-8 shrink-0 text-center font-display text-lg font-semibold text-muted">
-                  {r.rank <= 3 ? medal[r.rank - 1] : r.rank}
+                <span className="flex w-8 shrink-0 items-center justify-center font-display text-lg font-semibold text-muted">
+                  {r.rank <= 3 ? (
+                    <AwardIcon className={`h-5 w-5 ${medalTint[r.rank - 1]}`} />
+                  ) : (
+                    r.rank
+                  )}
                 </span>
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-soft text-sm font-bold text-primary-dark">
                   {r.initials}

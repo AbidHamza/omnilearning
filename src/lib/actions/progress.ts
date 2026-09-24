@@ -124,6 +124,67 @@ export async function markLessonCompleteAction(courseSlug: string, lessonKey: st
   return { ok: true as const, progress, reward };
 }
 
+/**
+ * Persiste l'état SCORM (cmi complet, sérialisé par scorm-again) à chaque
+ * LMSCommit/LMSFinish, et marque la leçon terminée quand le paquet le signale
+ * lui-même (cmi.core.lesson_status = "completed"/"passed") — jamais avant.
+ */
+export async function saveScormProgressAction(input: {
+  courseSlug: string;
+  lessonKey: string;
+  cmiJson: string;
+  isCompleted: boolean;
+}) {
+  const userId = await currentUserId();
+  if (!userId) return { ok: false as const };
+
+  const course = await prisma.course.findUnique({ where: { slug: input.courseSlug } });
+  if (!course) return { ok: false as const };
+  const lesson = await prisma.lesson.findFirst({
+    where: { key: input.lessonKey, part: { courseId: course.id } },
+  });
+  if (!lesson) return { ok: false as const };
+
+  const enrollment = await ensureEnrollment(userId, course.id);
+
+  const existing = await prisma.lessonProgress.findUnique({
+    where: { enrollmentId_lessonId: { enrollmentId: enrollment.id, lessonId: lesson.id } },
+    select: { isCompleted: true },
+  });
+
+  await prisma.lessonProgress.upsert({
+    where: { enrollmentId_lessonId: { enrollmentId: enrollment.id, lessonId: lesson.id } },
+    update: {
+      scormData: input.cmiJson,
+      ...(input.isCompleted ? { isCompleted: true, completedAt: new Date() } : null),
+    },
+    create: {
+      enrollmentId: enrollment.id,
+      lessonId: lesson.id,
+      scormData: input.cmiJson,
+      isCompleted: input.isCompleted,
+      completedAt: input.isCompleted ? new Date() : null,
+    },
+  });
+
+  await prisma.enrollment.update({
+    where: { id: enrollment.id },
+    data: { lastLesson: lesson.key, lastAccessedAt: new Date() },
+  });
+
+  const progress = await recomputeProgress(enrollment.id, course.id);
+
+  let reward = null;
+  if (input.isCompleted && !existing?.isCompleted) {
+    reward = await awardXp(userId, "lesson_complete", lesson.id);
+    if (progress >= 100) {
+      await awardXp(userId, "course_completed", course.id);
+    }
+  }
+
+  return { ok: true as const, progress, reward };
+}
+
 /** Enregistre une tentative de quiz et marque la leçon terminée si réussie. */
 export async function recordQuizAttemptAction(input: {
   courseSlug: string;

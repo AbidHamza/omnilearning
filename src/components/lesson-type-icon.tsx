@@ -1,11 +1,12 @@
 import type { LessonType } from "@/lib/types";
-import { DocIcon, PlayIcon, QuizIcon } from "./icons";
+import { DocIcon, LayersIcon, PlayIcon, QuizIcon } from "./icons";
 
 // Les libellés de type de leçon sont gérés via i18n (t.lessonType.*).
 const iconByType = {
   video: PlayIcon,
   text: DocIcon,
   quiz: QuizIcon,
+  scorm: LayersIcon,
 } as const;
 
 export default function LessonTypeIcon({
