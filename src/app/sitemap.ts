@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { courses } from "@/lib/data";
+import { prisma } from "@/lib/db";
 import { locales } from "@/i18n/config";
 import { siteUrl } from "@/lib/site";
 
@@ -23,7 +23,15 @@ function languagesFor(path: string): Record<string, string> {
   return Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}${path}`]));
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// Lu à chaque requête : un cours publié ou retiré apparaît ici sans rebuild.
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const courses = await prisma.course.findMany({
+    where: { status: "PUBLISHED" },
+    select: { slug: true, updatedAt: true },
+  });
+
   const entries: MetadataRoute.Sitemap = [];
 
   for (const path of publicPaths) {
@@ -42,6 +50,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     for (const locale of locales) {
       entries.push({
         url: `${siteUrl}/${locale}${path}`,
+        lastModified: course.updatedAt,
         changeFrequency: "monthly",
         priority: 0.8,
         alternates: { languages: languagesFor(path) },

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { contentCourses as seedCourses } from "@/lib/content";
 import { allLessons, getCourseOutline, getReviews } from "@/lib/courses";
 import { getCourseViewerState } from "@/lib/dal";
 import { getCourseAccess } from "@/lib/entitlements";
@@ -15,9 +14,10 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
 
+// Aucun pré-rendu : les fiches se rendent à la demande depuis la base, sinon un
+// cours retiré survivrait en page statique jusqu'au build suivant.
 export function generateStaticParams() {
-  // Slugs canoniques (seed) pour le pré-rendu ; le contenu est lu en DB au build.
-  return seedCourses.map((c) => ({ slug: c.slug }));
+  return [];
 }
 
 export async function generateMetadata(

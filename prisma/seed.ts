@@ -116,7 +116,9 @@ async function main() {
   }
 
   // --- Formations + parties + leçons ---
-  for (const course of contentCourses) {
+  // Fixtures locales du rejeu uniquement. En prod le catalogue vient des
+  // formateurs via la modération : le seed n'y écrit ni n'efface aucun cours.
+  for (const course of SEED_DEMO ? contentCourses : []) {
     // Le prix n'est écrit qu'à la CRÉATION. Le seed rejoue à chaque déploiement
     // et sa branche update écrase tout : y mettre le prix reviendrait à annuler
     // le tarif décidé en back-office à la mise en ligne suivante.
@@ -220,15 +222,7 @@ async function main() {
     }
   }
 
-  // Purge des cours obsolètes (anciens seeds) qui ne font plus partie du
-  // catalogue réel, cascade sur parties/leçons/avis/inscriptions.
-  const keepSlugs = contentCourses.map((c) => c.slug);
-  const removed = await prisma.course.deleteMany({
-    where: { slug: { notIn: keepSlugs } },
-  });
-  if (removed.count > 0)
-    console.log(`  ${removed.count} cours obsolètes retirés`);
-  console.log(`  ${contentCourses.length} formations`);
+  if (SEED_DEMO) console.log(`  ${contentCourses.length} formations de démo`);
 
   // --- Badges ---
   for (const b of badges) {
