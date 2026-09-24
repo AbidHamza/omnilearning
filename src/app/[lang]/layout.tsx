@@ -11,7 +11,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localeDir, locales, type Locale } from "@/i18n/config";
 import { shareCard, siteName, siteUrl } from "@/lib/site";
 import MetaPixel from "@/components/meta-pixel";
-import { GoogleTagManager, GoogleTagManagerNoscript } from "@/components/gtm";
+import { GoogleTagManager } from "@/components/gtm";
 import ConsentBanner from "@/components/consent-banner";
 
 const publicSans = Public_Sans({
@@ -128,7 +128,6 @@ export default async function RootLayout({
         <MetaPixel />
       </head>
       <body className="flex min-h-full flex-col">
-        <GoogleTagManagerNoscript />
         <I18nProvider locale={lang} dict={dict} dir={dir}>
           <SessionProvider serverRole={session?.role} serverUser={session?.user}>
             <Navbar />
