@@ -44,7 +44,7 @@ export default function ReviewForm({ slug }: { slug: string }) {
 
   return (
     <form onSubmit={submit} className="mt-8 max-w-xl border-t border-line pt-6">
-      <h3 className="font-display text-lg font-bold">{r.formTitle}</h3>
+      <h3 className="font-display text-lg font-semibold">{r.formTitle}</h3>
 
       <fieldset className="mt-4">
         <legend className="text-sm font-semibold">{r.ratingLabel}</legend>
@@ -97,7 +97,7 @@ export default function ReviewForm({ slug }: { slug: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-4 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep disabled:opacity-60"
+        className="mt-4 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep disabled:opacity-60"
       >
         {pending ? dict.common.loading : r.submit}
       </button>

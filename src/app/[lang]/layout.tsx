@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { JetBrains_Mono, IBM_Plex_Sans, Cairo } from "next/font/google";
+import { JetBrains_Mono, Public_Sans, Newsreader, Cairo } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -14,22 +14,25 @@ import MetaPixel from "@/components/meta-pixel";
 import { GoogleTagManager, GoogleTagManagerNoscript } from "@/components/gtm";
 import ConsentBanner from "@/components/consent-banner";
 
-// Design system « TERMINAL / DEV-STUDIO » :
-// - JetBrains Mono = LA VOIX (titres, nav, boutons, libellés UI, chiffres, code).
-// - IBM Plex Sans = prose longue UNIQUEMENT (paragraphes, leads, descriptions).
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains",
+const publicSans = Public_Sans({
+  variable: "--font-public-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "700", "800"],
   style: ["normal", "italic"],
   display: "swap",
 });
 
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-plex-sans",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Code blocks in lessons only.
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -42,19 +45,19 @@ const cairo = Cairo({
 
 const seoByLocale: Record<Locale, { title: string; description: string }> = {
   fr: {
-    title: "OmniLearn · Apprenez les compétences tech de demain",
+    title: "OmniLearn · Cours en ligne écrits par des praticiens",
     description:
-      "Formations tech gamifiées : développement, cybersécurité, data, design, IA. Les premières leçons de chaque cours sont en accès libre ; le compte débloque les quiz notés et le suivi de progression.",
+      "Des cours en ligne écrits par des formateurs indépendants et relus avant publication. Les deux premières leçons de chaque cours s'ouvrent sans compte ; un compte gratuit débloque les quiz notés et le suivi de progression.",
   },
   en: {
-    title: "OmniLearn · Learn tomorrow's tech skills",
+    title: "OmniLearn · Online courses written by practitioners",
     description:
-      "Gamified tech courses: development, cybersecurity, data, design, AI. The first lessons of every course are open to everyone; an account unlocks quizzes and progress tracking.",
+      "Online courses written by independent instructors and reviewed before they go live. The first two lessons of every course open without an account; a free account adds graded quizzes and saved progress.",
   },
   ar: {
-    title: "OmniLearn · تعلّم مهارات الغد التقنية",
+    title: "OmniLearn · دورات عبر الإنترنت يكتبها ممارسون",
     description:
-      "دورات تقنية بأسلوب الألعاب: تطوير، أمن سيبراني، بيانات، تصميم، ذكاء اصطناعي. الدروس الأولى من كل دورة متاحة للجميع، والحساب يفتح الاختبارات المقيَّمة وتتبّع التقدّم.",
+      "دورات عبر الإنترنت يكتبها مدرّبون مستقلّون وتُراجَع قبل نشرها. يُفتح أوّل درسين من كل دورة دون حساب، والحساب المجاني يفتح الاختبارات المقيَّمة وحفظ التقدّم.",
   },
 };
 
@@ -111,21 +114,20 @@ export default async function RootLayout({
       lang={lang}
       dir={dir}
       suppressHydrationWarning
-      className={`${jetbrainsMono.variable} ${plexSans.variable} ${cairo.variable} h-full`}
+      className={`${publicSans.variable} ${newsreader.variable} ${jetbrainsMono.variable} ${cairo.variable} h-full`}
     >
       <head>
-        {/* Terminal = dark-first : sombre par défaut. La classe `.light` (mode
-            « paper ») n'est posée que si l'utilisateur a EXPLICITEMENT choisi
-            clair. Appliqué avant la première peinture pour éviter tout flash. */}
+        {/* Light by default; `.dark` only when the visitor picked it. Runs
+            before first paint so there is no flash. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');}catch(e){}})();`,
+            __html: `(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
           }}
         />
         <GoogleTagManager />
         <MetaPixel />
       </head>
-      <body className="paper-grain flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col">
         <GoogleTagManagerNoscript />
         <I18nProvider locale={lang} dict={dict} dir={dir}>
           <SessionProvider serverRole={session?.role} serverUser={session?.user}>

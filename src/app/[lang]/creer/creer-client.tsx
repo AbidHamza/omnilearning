@@ -34,7 +34,7 @@ const addBtn =
 const iconBtn =
   "grid h-8 w-8 shrink-0 place-items-center border border-line text-muted hover:border-danger hover:text-danger";
 const primaryBtn =
-  "rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:opacity-50";
+  "rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-50";
 const ghostBtn =
   "rounded-[3px] border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-primary disabled:opacity-50";
 
@@ -196,7 +196,7 @@ export default function CreerFormationClient({
                 <span
                   className={`grid h-8 w-8 place-items-center rounded-full text-sm font-bold ${
                     i === step
-                      ? "bg-primary text-[#04130a]"
+                      ? "bg-primary text-on-primary"
                       : i < step
                         ? "bg-brand text-ink"
                         : "bg-surface text-muted"
@@ -220,7 +220,7 @@ export default function CreerFormationClient({
         {step === 0 && (
           <div className="space-y-10">
             <section>
-              <h2 className="font-display text-xl font-bold">{c.generalTitle}</h2>
+              <h2 className="font-display text-xl font-semibold">{c.generalTitle}</h2>
               <div className="mt-5 space-y-5">
                 <div>
                   <label className={labelCls}>{c.categoryLabel}</label>
@@ -290,7 +290,7 @@ export default function CreerFormationClient({
             </section>
 
             <section>
-              <h2 className="font-display text-xl font-bold">{c.objectivesTitle}</h2>
+              <h2 className="font-display text-xl font-semibold">{c.objectivesTitle}</h2>
               <div className="mt-5 space-y-5">
                 <div>
                   <label className={labelCls}>{c.skillsLabel}</label>
@@ -318,7 +318,7 @@ export default function CreerFormationClient({
         {step === 1 && (
           <div className="space-y-10">
             <section>
-              <h2 className="font-display text-xl font-bold">{c.contentTitle}</h2>
+              <h2 className="font-display text-xl font-semibold">{c.contentTitle}</h2>
               <p className="mt-2 text-sm text-muted">{c.builderIntro}</p>
               <CurriculumBuilder modules={modules} onChange={setModules} />
               <div className="mt-8">
@@ -379,7 +379,7 @@ export default function CreerFormationClient({
             </section>
 
             <section>
-              <h2 className="font-display text-xl font-bold">{c.visualTitle}</h2>
+              <h2 className="font-display text-xl font-semibold">{c.visualTitle}</h2>
               <div className="mt-5">
                 <label className={labelCls}>{c.coverLabel}</label>
                 <UploadZone
@@ -408,7 +408,7 @@ export default function CreerFormationClient({
 
         {step === 2 && (
           <section>
-            <h2 className="font-display text-xl font-bold">{c.recapTitle}</h2>
+            <h2 className="font-display text-xl font-semibold">{c.recapTitle}</h2>
             <dl className="mt-5 divide-y divide-line border-y border-line">
               <Recap label={c.recapCategory} value={category} />
               <Recap label={c.recapName} value={name} />
@@ -615,7 +615,7 @@ function LessonEditor({
   return (
     <div className="px-4 py-4">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="w-8 shrink-0 font-mono text-xs text-muted">{index}</span>
+        <span className="w-8 shrink-0 text-xs text-muted">{index}</span>
         <input
           value={lesson.title}
           onChange={(e) => onChange({ title: e.target.value })}

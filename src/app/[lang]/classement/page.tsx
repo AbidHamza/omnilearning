@@ -27,10 +27,8 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
 
   return (
     <div className="container-page py-10">
-      <p className="font-mono text-xs text-muted-soft">
-        <span className="text-primary">$</span> top # {t.kicker}
-      </p>
-      <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight">
+      <p className="text-sm font-medium text-primary">{t.kicker}</p>
+      <h1 className="mt-1 font-display text-4xl tracking-tight">
         {t.titleLead} <span className="text-primary">{t.titleAccent}</span>
       </h1>
       <p className="mt-2 max-w-xl text-sm text-muted">{t.intro}</p>
@@ -56,7 +54,7 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
                   r.isCurrentUser ? "bg-primary-soft" : ""
                 }`}
               >
-                <span className="w-8 shrink-0 text-center font-display text-lg font-bold text-muted">
+                <span className="w-8 shrink-0 text-center font-display text-lg font-semibold text-muted">
                   {r.rank <= 3 ? medal[r.rank - 1] : r.rank}
                 </span>
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-soft text-sm font-bold text-primary-dark">
@@ -75,7 +73,7 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
                     {t.levelPrefix} {r.level}
                   </p>
                 </div>
-                <span className="shrink-0 font-display text-lg font-bold text-primary">
+                <span className="shrink-0 font-display text-lg font-semibold text-primary">
                   {formatNumber(r.xp, locale)}
                   <span className="ms-1 text-xs font-normal text-muted">XP</span>
                 </span>

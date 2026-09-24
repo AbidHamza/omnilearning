@@ -36,7 +36,7 @@ export default function CourseReviews({
         {/* Bloc agrégé */}
         <div className="rounded-[var(--radius-card)] bg-surface p-5">
           <div className="flex items-baseline gap-2">
-            <span className="font-display text-4xl font-extrabold">
+            <span className="font-display text-4xl">
               {formatNumber(summary.average, locale)}
             </span>
             <span className="text-sm text-muted">/ 5</span>
@@ -83,7 +83,7 @@ export default function CourseReviews({
                 </div>
               </div>
               {r.title && (
-                <p className="mt-3 font-display font-bold">{r.title}</p>
+                <p className="mt-3 font-display font-semibold">{r.title}</p>
               )}
               <p className="mt-1.5 text-sm leading-relaxed text-muted">
                 {r.body}

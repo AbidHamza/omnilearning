@@ -42,14 +42,14 @@ export default function GamificationPanel({
         <div>
           <h2 className="text-sm text-muted">{dict.dashboard.progressTitle}</h2>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="font-display text-3xl font-extrabold text-primary">
+            <span className="font-display text-3xl text-primary">
               {dict.course.levelLabel} {level.level}
             </span>
             <span className="text-sm text-muted">· {data.xp} XP</span>
           </div>
         </div>
         <div className="text-end">
-          <div className="font-display text-2xl font-bold">
+          <div className="font-display text-2xl font-semibold">
             {currentStreak} <span className="text-base">🔥</span>
           </div>
           <p className="text-xs text-muted">

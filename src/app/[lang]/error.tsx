@@ -29,11 +29,11 @@ export default function RouteError({
   return (
     <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
       <div>
-        <div className="font-mono text-6xl font-bold text-primary">500</div>
+        <div className="text-6xl font-bold text-primary">500</div>
         <h1 className="mt-4 text-2xl font-bold">{t.serverError.title}</h1>
         <p className="mt-2 text-muted">{t.serverError.text}</p>
         {error.digest && (
-          <p className="mt-3 font-mono text-xs text-muted">
+          <p className="mt-3 text-xs text-muted">
             {t.serverError.ref} {error.digest}
           </p>
         )}
@@ -41,7 +41,7 @@ export default function RouteError({
           <button
             type="button"
             onClick={reessayer}
-            className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep"
+            className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
           >
             {t.serverError.retry}
           </button>

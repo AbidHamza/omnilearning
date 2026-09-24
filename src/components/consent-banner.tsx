@@ -80,11 +80,11 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
             bottom: 14,
             zIndex: 60,
             fontSize: 11,
-            fontFamily: "var(--font-jetbrains), monospace",
-            color: "rgba(255,255,255,0.55)",
-            background: "rgba(20,20,24,0.55)",
-            border: "1px solid rgba(255,255,255,0.14)",
-            borderRadius: 6,
+            fontFamily: "var(--font-sans)",
+            color: "var(--color-muted)",
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-line)",
+            borderRadius: 3,
             padding: "5px 9px",
             cursor: "pointer",
           }}
@@ -105,18 +105,18 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
             zIndex: 70,
             maxWidth: 560,
             margin: choice !== null ? "0 auto 0 14px" : undefined,
-            background: "#0f1115",
-            border: "1px solid rgba(255,255,255,0.14)",
-            borderRadius: 10,
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-line)",
+            borderRadius: 4,
             padding: "14px 16px",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
+            boxShadow: "0 6px 20px rgba(40,30,15,0.12)",
             display: "flex",
             flexDirection: "column",
             gap: 10,
-            fontFamily: "var(--font-plex-sans), system-ui, sans-serif",
+            fontFamily: "var(--font-sans)",
           }}
         >
-          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "rgba(255,255,255,0.82)" }}>{t.text}</p>
+          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "var(--color-ink)" }}>{t.text}</p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button
               type="button"
@@ -124,10 +124,10 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
               style={{
                 flex: "1 1 auto",
                 padding: "8px 14px",
-                borderRadius: 6,
-                border: "1px solid rgba(255,255,255,0.22)",
+                borderRadius: 3,
+                border: "1px solid var(--color-line)",
                 background: "transparent",
-                color: "rgba(255,255,255,0.85)",
+                color: "var(--color-ink)",
                 fontSize: 13,
                 cursor: "pointer",
               }}
@@ -140,10 +140,10 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
               style={{
                 flex: "1 1 auto",
                 padding: "8px 14px",
-                borderRadius: 6,
-                border: "1px solid #4ef08a",
-                background: "#4ef08a",
-                color: "#07090c",
+                borderRadius: 3,
+                border: "1px solid var(--color-primary)",
+                background: "var(--color-primary)",
+                color: "var(--color-on-primary)",
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: "pointer",

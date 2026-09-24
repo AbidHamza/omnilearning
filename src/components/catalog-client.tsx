@@ -1,10 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import type { Category, Course } from "@/lib/types";
 import CourseCard from "./course-card";
 import { ChevronUp, SearchIcon } from "./icons";
 import { useI18n } from "@/i18n/provider";
+import { categoryName } from "@/i18n/category-name";
+import { localePath } from "@/i18n/config";
 
 // Les valeurs des niveaux correspondent aux données (fr) ; seul l'affichage est traduit.
 const levelValues = ["Débutant", "Intermédiaire", "Avancé"] as const;
@@ -91,9 +94,28 @@ export default function CatalogClient({
 
   const label = q || initialCat || tc.defaultLabel;
 
+  // No published course: filters over an empty list would be dead controls.
+  if (courses.length === 0) {
+    return (
+      <div className="container-page py-16 lg:py-24">
+        <div className="max-w-xl border-t-2 border-ink pt-5">
+          <h1 className="font-display text-3xl leading-tight text-ink sm:text-[2.1rem]">
+            {tc.emptyCatalogTitle}
+          </h1>
+          <p className="mt-4 text-[15px] leading-relaxed text-muted">{tc.emptyCatalogBody}</p>
+          <Link
+            href={localePath(locale, "/devenir-formateur")}
+            className="mt-7 inline-block rounded-[3px] bg-primary px-5 py-3 text-[15px] font-semibold text-on-primary transition hover:bg-primary-dark"
+          >
+            {tc.emptyCatalogCta}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container-page grid gap-10 py-10 lg:grid-cols-[240px_1fr]">
-      {/* Sidebar filters */}
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <div className="relative mb-7 lg:hidden">
           <SearchIcon
@@ -147,7 +169,7 @@ export default function CatalogClient({
           {categories.map((c) => (
             <Check
               key={c.id}
-              label={c.label}
+              label={categoryName(t, c.label)}
               checked={selCats.includes(c.label)}
               onChange={() => toggle(selCats, setSelCats, c.label)}
             />
@@ -155,24 +177,20 @@ export default function CatalogClient({
         </FilterGroup>
       </aside>
 
-      {/* Results */}
       <div>
-        <p className="mb-2 font-mono text-xs text-muted-soft">
-          <span className="text-primary">$</span> omnilearn ls -la ./formations
-        </p>
-        <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-[2.1rem]">
+        <h1 className="font-display text-3xl tracking-tight sm:text-[2.1rem]">
           {filtered.length} {tc.resultsFor}{" "}
           <span className="text-primary">«&nbsp;{label}&nbsp;»</span>
         </h1>
 
         {filtered.length === 0 ? (
-          <div className="mt-10 rounded-[6px] border border-dashed border-line p-12 text-center font-mono text-muted">
+          <div className="mt-10 rounded-[6px] border border-dashed border-line p-12 text-center text-muted">
             {tc.empty}
           </div>
         ) : (
           <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {filtered.map((c) => (
-              <CourseCard key={c.slug} course={c} labels={t.card} locale={locale} />
+              <CourseCard key={c.slug} course={{ ...c, category: categoryName(t, c.category) }} labels={t.card} locale={locale} />
             ))}
           </div>
         )}
@@ -195,7 +213,7 @@ function FilterGroup({
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="font-display text-[15px] font-bold">{title}</span>
+        <span className="font-display text-[15px] font-semibold">{title}</span>
         <ChevronUp
           width={16}
           height={16}
@@ -224,12 +242,12 @@ function Check({
         onChange={onChange}
         className="peer sr-only"
       />
-      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[3px] border border-line bg-bg transition peer-checked:border-primary peer-checked:bg-primary">
+      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[3px] border border-line bg-bg transition peer-checked:border-primary peer-checked:bg-primary text-on-primary">
         {checked && (
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
             <path
               d="M20 6 9 17l-5-5"
-              stroke="#04130a"
+              stroke="currentColor"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"

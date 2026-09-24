@@ -42,10 +42,8 @@ export default function FormateurClient({
 
   return (
     <div className="container-page py-10">
-      <p className="font-mono text-xs text-muted-soft">
-        <span className="text-primary">$</span> sudo -u {firstName} omnilearn
-      </p>
-      <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight">
+      <p className="text-sm text-muted">{firstName}</p>
+      <h1 className="mt-1 font-display text-4xl tracking-tight">
         {i.titleLead} <span className="text-primary">{i.titleAccent}</span>
       </h1>
 
@@ -62,11 +60,11 @@ export default function FormateurClient({
                 key={c.id}
                 className="flex flex-wrap items-center justify-between gap-3 rounded-[3px] bg-bg px-4 py-3.5"
               >
-                <span className="font-display font-bold">{c.title}</span>
+                <span className="font-display font-semibold">{c.title}</span>
                 {c.status === "draft" && c.draftId ? (
                   <LocaleLink
                     href={`/creer?draft=${c.draftId}`}
-                    className="rounded-[3px] bg-primary px-4 py-2 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+                    className="rounded-[3px] bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
                   >
                     {i.continueCreating}
                   </LocaleLink>
@@ -138,7 +136,7 @@ export default function FormateurClient({
         <div className="mt-6 flex justify-center">
           <LocaleLink
             href="/creer"
-            className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+            className="rounded-[3px] bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
           >
             {i.createNew}
           </LocaleLink>
@@ -146,7 +144,7 @@ export default function FormateurClient({
       </section>
 
       <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6 sm:p-7">
-        <h2 className="font-display text-xl font-bold">{i.statsTitle}</h2>
+        <h2 className="font-display text-xl font-semibold">{i.statsTitle}</h2>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[300px_1fr]">
           <div className="rounded-[3px] bg-bg p-5">
@@ -204,7 +202,7 @@ function StatRow({
         {icon}
       </span>
       <span>
-        <span className="font-display text-lg font-bold">{value}</span>{" "}
+        <span className="font-display text-lg font-semibold">{value}</span>{" "}
         <span className="text-sm text-muted">{children}</span>
       </span>
     </li>

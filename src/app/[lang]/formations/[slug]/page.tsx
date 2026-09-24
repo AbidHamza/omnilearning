@@ -14,11 +14,9 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
 
-// Aucun pré-rendu : les fiches se rendent à la demande depuis la base, sinon un
-// cours retiré survivrait en page statique jusqu'au build suivant.
-export function generateStaticParams() {
-  return [];
-}
+// Rendu à chaque requête : la fiche lit la session (accès, avis) et un cours
+// retiré ne doit pas survivre en page statique jusqu'au build suivant.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: PageProps<"/[lang]/formations/[slug]">,
@@ -164,20 +162,17 @@ export default async function CoursePage(
       />
       <Link
         href={lp("/formations")}
-        className="font-mono text-sm text-muted transition hover:text-primary"
+        className="text-sm text-muted transition hover:text-primary"
       >
         ← {c.backToAll}
       </Link>
 
-      <p className="mt-4 font-mono text-xs text-muted-soft">
-        <span className="text-primary">$</span> cat ./formations/{course.slug}
-      </p>
-      <h1 className="mt-2 max-w-3xl font-display text-4xl font-extrabold leading-tight tracking-tight sm:text-[2.6rem]">
+      <h1 className="mt-2 max-w-3xl font-display text-4xl leading-tight tracking-tight sm:text-[2.6rem]">
         {course.title}
       </h1>
 
       {/* Méta */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-sm text-muted">
+      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted">
         {meta.map((m) => (
           <span key={m}>{m}</span>
         ))}
@@ -190,7 +185,7 @@ export default async function CoursePage(
           {course.prerequisites.map((p) => (
             <span
               key={p}
-              className="rounded-[3px] border border-line bg-surface px-2.5 py-1 font-mono text-xs text-muted"
+              className="rounded-[3px] border border-line bg-surface px-2.5 py-1 text-xs text-muted"
             >
               {p}
             </span>
@@ -201,7 +196,7 @@ export default async function CoursePage(
       {/* Prix et accès */}
       <div className="mt-8 rounded-[var(--radius-card)] border border-line bg-surface px-5 py-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
         <div>
-          <p className="text-3xl font-extrabold tracking-tight">
+          <p className="font-display text-3xl tabular-nums">
             {access.accessType === "PAID" ? price : c.priceFree}
           </p>
           <p className="mt-1 text-sm text-muted">
@@ -221,7 +216,7 @@ export default async function CoursePage(
           ) : needsPurchase ? (
             <Link
               href={lp(`/creer-compte?next=${encodeURIComponent(`/formations/${course.slug}`)}`)}
-              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep"
+              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
             >
               <LockIcon width={16} height={16} />
               {c.lockedCreate}
@@ -317,7 +312,7 @@ export default async function CoursePage(
               <UserIcon width={26} height={26} />
             </span>
             <div>
-              <div className="font-display font-bold">{course.instructor}</div>
+              <div className="font-display font-semibold">{course.instructor}</div>
               {course.instructorBio && (
                 <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted">
                   {course.instructorBio}
@@ -348,12 +343,12 @@ export default async function CoursePage(
             <BuyCourseButton
               slug={course.slug}
               label={`${c.buyCta} · ${price}`}
-              className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep disabled:opacity-60"
+              className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep disabled:opacity-60"
             />
           ) : (
             <Link
               href={lp(`/formations/${course.slug}/${firstLesson.id}`)}
-              className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+              className="rounded-[3px] bg-primary px-10 py-3.5 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
             >
               {c.start}
             </Link>

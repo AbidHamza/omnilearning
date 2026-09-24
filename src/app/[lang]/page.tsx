@@ -1,47 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CourseCard from "@/components/course-card";
-import CategoryIcon from "@/components/category-icon";
-import { getCategories, getCourses, popularSlugs } from "@/lib/courses";
-import {
-  ArrowRightIcon,
-  CheckIcon,
-  ChevronDown,
-  ClockIcon,
-  DocIcon,
-  LayersIcon,
-  PlayIcon,
-  QuizIcon,
-  StarIcon,
-} from "@/components/icons";
+import { getCategories, getCourses } from "@/lib/courses";
+import { ChevronDown } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localePath, type Locale } from "@/i18n/config";
 import { intlTag } from "@/lib/intl";
+import { categoryName } from "@/i18n/category-name";
 import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
 import { notFound } from "next/navigation";
 
-const featureIcons = [LayersIcon, ClockIcon, StarIcon, QuizIcon, DocIcon];
-
 /**
- * Les quatre chiffres de la bande sont comptés sur le catalogue publié au
- * moment du rendu. Ils tenaient avant dans un tableau de constantes, ce qui
- * les laissait dériver de ce que la plateforme contient réellement.
+ * Counted from the published catalog at render time. With nothing published
+ * the ledger says so in words instead of printing a row of zeros.
  */
-function chiffresCatalogue(cours: { hours: number; parts: { lessons: { isFree?: boolean }[] }[] }[]) {
-  let lecons = 0;
-  let libres = 0;
-  for (const c of cours) {
+function catalogCounts(courses: { parts: { lessons: { isFree?: boolean }[] }[] }[]) {
+  let lessons = 0;
+  let open = 0;
+  for (const c of courses) {
     for (const p of c.parts) {
-      lecons += p.lessons.length;
-      libres += p.lessons.filter((l) => l.isFree).length;
+      lessons += p.lessons.length;
+      open += p.lessons.filter((l) => l.isFree).length;
     }
   }
-  return {
-    formations: cours.length,
-    lecons,
-    heures: cours.reduce((s, c) => s + c.hours, 0),
-    libres,
-  };
+  return { courses: courses.length, lessons, open };
 }
 
 const ORG_ID = `${siteUrl}/#organization`;
@@ -124,451 +106,159 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const t = await getDictionary(lang);
+  const h = t.home;
   const lp = (path: string) => localePath(lang, path);
 
-  const [allCourses, categories] = await Promise.all([getCourses(), getCategories()]);
-  const bySlug = new Map(allCourses.map((c) => [c.slug, c]));
-  const popular = popularSlugs
-    .map((s) => bySlug.get(s))
-    .filter((c): c is NonNullable<typeof c> => Boolean(c));
-
-  const n = chiffresCatalogue(allCourses);
+  const [courses, categories] = await Promise.all([getCourses(), getCategories()]);
+  const n = catalogCounts(courses);
   const nf = new Intl.NumberFormat(intlTag(lang));
-  const stats = [
-    { value: nf.format(n.formations), label: t.home.statCourses },
-    { value: nf.format(n.lecons), label: t.home.statLessons },
-    { value: `${nf.format(n.heures)} h`, label: t.home.statHours },
-    { value: nf.format(n.libres), label: t.home.statFree },
-  ];
+  // getCourses() is oldest first; the home page shows what arrived last.
+  const latest = courses.slice(-6).reverse();
+  const hasCatalog = courses.length > 0;
 
-  const jsonLd = donneesStructurees(lang);
+  const ledger = [
+    { value: n.courses, label: h.ledgerCourses },
+    { value: n.lessons, label: h.ledgerLessons },
+    { value: n.open, label: h.ledgerOpen },
+  ];
 
   return (
     <div>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(donneesStructurees(lang)) }}
       />
-      {/* ── Hero : mesh clair + mockup produit ─────────────────────── */}
-      <section className="relative overflow-hidden hero-mesh">
-        <div className="pointer-events-none absolute inset-0 hero-grid" />
-        <div className="container-page relative grid items-center gap-12 py-16 [&>div]:min-w-0 lg:grid-cols-[1.05fr_1fr] lg:py-24">
-          {/* Colonne texte */}
-          <div className="rise">
-            <span className="inline-flex items-center gap-2 rounded-[3px] border border-primary/30 bg-brand-soft px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-              <span className="term-live" aria-hidden />
-              {t.home.heroBadge}
-            </span>
-            <h1 className="mt-6 font-display text-[2.4rem] font-extrabold leading-[1.04] tracking-[-0.035em] text-ink sm:text-5xl lg:text-[3.4rem]">
-              {t.home.heroTitle}{" "}
-              <span className="relative whitespace-nowrap">
-                <span className="text-primary">{t.home.heroHighlight}</span>
-                <svg
-                  className="absolute -bottom-1.5 start-0 w-full text-primary"
-                  viewBox="0 0 300 14"
-                  fill="none"
-                  preserveAspectRatio="none"
-                  aria-hidden
-                >
-                  <path
-                    d="M3 9C61 4 147 3 297 7"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              <span className="term-cursor" aria-hidden />
-            </h1>
-            <p className="mt-5 max-w-lg font-sans text-base leading-relaxed text-muted sm:text-lg">
-              {t.home.heroSubtitle}
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href={lp("/creer-compte")}
-                className="inline-flex items-center gap-2 rounded-[3px] border border-primary/40 bg-brand-soft px-5 py-3 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a] hover:shadow-[0_0_22px_-2px_var(--color-brand-soft)]"
-              >
-                <span className="opacity-70">$</span>
-                {t.home.heroCtaPrimary}
-                <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
-              </Link>
+
+      <section className="container-page grid gap-12 pb-14 pt-14 lg:grid-cols-[1.35fr_1fr] lg:gap-20 lg:pb-20 lg:pt-20">
+        <div className="rise max-w-2xl">
+          <h1 className="text-[2.3rem] leading-[1.06] text-ink sm:text-5xl lg:text-[3.35rem]">
+            {h.heroTitle}
+          </h1>
+          <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-muted">
+            {h.heroSubtitle}
+          </p>
+          <Link
+            href={hasCatalog ? lp("/formations") : lp("/devenir-formateur")}
+            className="mt-9 inline-block rounded-[3px] bg-primary px-5 py-3 text-[15px] font-semibold text-on-primary transition hover:bg-primary-dark"
+          >
+            {hasCatalog ? h.ctaBrowse : h.ctaTeach}
+          </Link>
+        </div>
+
+        <aside className="self-end border-t-2 border-ink pt-4 lg:mb-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+            {h.ledgerTitle}
+          </p>
+          {hasCatalog ? (
+            <dl className="mt-3 divide-y divide-line">
+              {ledger.map((row) => (
+                <div key={row.label} className="flex items-baseline justify-between gap-6 py-3">
+                  <dt className="text-sm text-muted">{row.label}</dt>
+                  <dd className="font-display text-2xl tabular-nums text-ink">
+                    {nf.format(row.value)}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          ) : (
+            <p className="mt-3 font-display text-lg leading-snug text-ink">{h.ledgerEmpty}</p>
+          )}
+        </aside>
+      </section>
+
+      <section className="border-t border-line">
+        <div className="container-page py-14 lg:py-16">
+          <h2 className="text-3xl text-ink sm:text-[2.1rem]">{h.howTitle}</h2>
+          <ol className="mt-10 grid gap-x-14 gap-y-9 md:grid-cols-2">
+            {h.how.map((step, i) => (
+              <li key={step.t} className="flex gap-5">
+                <span className="font-display text-3xl italic leading-none text-primary tabular-nums">
+                  {nf.format(i + 1)}
+                </span>
+                <div>
+                  <h3 className="text-lg text-ink">{step.t}</h3>
+                  <p className="mt-2 max-w-md text-[15px] leading-relaxed text-muted">{step.d}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {hasCatalog && (
+        <section className="border-t border-line">
+          <div className="container-page py-14">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="text-3xl text-ink">{h.latestTitle}</h2>
               <Link
                 href={lp("/formations")}
-                className="inline-flex items-center gap-2 rounded-[3px] border border-line bg-surface px-5 py-3 font-mono text-sm font-semibold text-ink transition hover:border-primary hover:text-primary"
+                className="shrink-0 text-sm font-semibold text-primary underline-offset-4 hover:underline"
               >
-                {t.home.heroCtaSecondary}
+                {t.common.viewAll}
               </Link>
             </div>
-            <p className="mt-5 flex items-center gap-2 font-mono text-sm text-muted">
-              <CheckIcon width={16} height={16} className="text-success" />
-              {t.home.heroReassurance}
-            </p>
-          </div>
-
-          {/* Colonne mockup produit : fenêtre terminal */}
-          <div className="rise relative mx-auto w-full max-w-md lg:mx-0">
-            <div className="glass-card relative overflow-hidden rounded-[10px] border border-line-soft">
-              {/* Barre de fenêtre terminal */}
-              <div className="flex items-center gap-3 border-b border-line bg-bg/60 px-4 py-2.5">
-                <span className="term-dots" aria-hidden>
-                  <i /><i /><i />
-                </span>
-                <span className="truncate font-mono text-[11px] text-muted-soft">
-                  omnilearn run ./formation
-                </span>
-                <span className="ms-auto inline-flex items-center gap-1.5 font-mono text-[10px] text-primary">
-                  <span className="term-live" aria-hidden /> session active
-                </span>
-              </div>
-              {/* En-tête de la carte cours */}
-              <div className="flex items-center gap-3 px-5 pt-5">
-                <span className="grid h-11 w-11 place-items-center rounded-[3px] border border-line bg-bg text-primary">
-                  <PlayIcon width={20} height={20} />
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate font-display text-[14px] font-bold text-ink">
-                    {t.home.mockTitle}
-                  </p>
-                  <p className="truncate font-mono text-xs text-muted">
-                    {t.home.mockSubtitle}
-                  </p>
-                </div>
-                <span className="ms-auto rounded-[3px] border border-primary/30 bg-brand-soft px-2 py-1 font-mono text-[10px] font-bold uppercase text-primary">
-                  {t.common.free}
-                </span>
-              </div>
-
-              <div className="px-5 pb-5">
-                {/* Barre de progression. 67 % = les deux leçons marquées done
-                    sur les trois listées plus bas : la maquette doit rester
-                    cohérente avec elle-même, un chiffre décoratif se remarque. */}
-                <div className="mt-5">
-                  <div className="flex items-center justify-between font-mono text-[11px] font-semibold text-muted">
-                    <span>{t.home.mockProgressLabel}</span>
-                    <span className="text-primary">67%</span>
-                  </div>
-                  <div className="mt-1.5 h-2 overflow-hidden rounded-[2px] bg-surface-2">
-                    <div className="h-full w-[67%] rounded-[2px] bg-primary" />
-                  </div>
-                </div>
-
-                {/* Liste des leçons */}
-                <ul className="mt-5 space-y-2.5">
-                  <MockLesson
-                    icon={<PlayIcon width={16} height={16} />}
-                    label={t.home.mockLessonVideo}
-                    done
-                  />
-                  <MockLesson
-                    icon={<DocIcon width={16} height={16} />}
-                    label={t.home.mockLessonText}
-                    done
-                  />
-                  <MockLesson
-                    icon={<QuizIcon width={16} height={16} />}
-                    label={t.home.mockLessonQuiz}
-                    active
-                  />
-                </ul>
-
-                {/* Pied : meta */}
-                <div className="mt-5 flex items-center gap-4 border-t border-line pt-4 font-mono text-xs text-muted">
-                  <span className="inline-flex items-center gap-1.5">
-                    <ClockIcon width={14} height={14} />
-                    {t.home.mockDuration}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <LayersIcon width={14} height={14} />
-                    {t.home.mockLevel}
-                  </span>
-                </div>
-              </div>
+            <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
+              {latest.map((c) => (
+                <CourseCard key={c.slug} course={{ ...c, category: categoryName(t, c.category) }} labels={t.card} locale={lang} variant="compact" />
+              ))}
             </div>
-
-            {/* Une pastille flottante annonçait ici « Certificat de fin de
-                parcours · Progression 96% ». La plateforme ne délivre aucun
-                certificat (dal.ts renvoie une liste vide, la base n'a pas de
-                modèle), et le 96 % ne comptait rien. Retirée plutôt que
-                réécrite : la carte se suffit. */}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* ── Bande de stats ─────────────────────────────────────────── */}
       <section className="section-dark border-y border-line">
-        <div className="container-page flex flex-col gap-6 py-9 lg:flex-row lg:items-baseline lg:justify-between">
-          <p className="max-w-[15rem] text-sm leading-relaxed text-muted">
-            {t.home.statsTitle}
-          </p>
-          <dl className="flex flex-wrap items-baseline gap-x-10 gap-y-4">
-            {stats.map((s) => (
-              <div key={s.label} className="flex items-baseline gap-2">
-                <dd className="font-display text-2xl font-bold text-primary">{s.value}</dd>
-                <dt className="font-mono text-xs text-muted">{s.label}</dt>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
-
-      {/* ── Cours populaires ───────────────────────────────────────── */}
-      <section className="bg-brand-band">
-        <div className="container-page py-16">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <span className="rule-accent mb-4" />
-              <h2 className="text-3xl font-semibold text-ink sm:text-4xl">
-                {t.home.popularTitle}
-              </h2>
-              <p className="mt-2 max-w-xl text-sm text-muted sm:text-base">
-                {t.home.popularSubtitle}
-              </p>
+        <div className="container-page grid gap-10 py-14 lg:grid-cols-[1fr_1.1fr] lg:gap-16 lg:py-16">
+          <div>
+            <h2 className="text-3xl leading-tight text-ink sm:text-[2.1rem]">{h.teachTitle}</h2>
+            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted">{h.teachBody}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link
+                href={lp("/devenir-formateur")}
+                className="inline-block rounded-[3px] bg-primary px-5 py-3 text-[15px] font-semibold text-on-primary transition hover:bg-primary-dark"
+              >
+                {h.teachCta}
+              </Link>
+              <Link
+                href={lp("/conditions-formateurs")}
+                className="text-sm text-ink underline decoration-line underline-offset-4 hover:decoration-primary"
+              >
+                {h.teachTerms}
+              </Link>
             </div>
-            <Link
-              href={lp("/formations")}
-              className="hidden shrink-0 items-center gap-1 text-sm font-semibold text-primary-dark hover:underline sm:flex"
-            >
-              {t.common.viewAll}{" "}
-              <ArrowRightIcon width={15} height={15} className="rtl:rotate-180" />
-            </Link>
           </div>
-          <div className="no-scrollbar bleed-page mt-8 flex gap-4 overflow-x-auto pb-2">
-            {popular.map((c) => (
-              <CourseCard
-                key={c.slug}
-                course={c}
-                labels={t.card}
-                locale={lang}
-                variant="compact"
-                className="w-[230px] shrink-0"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Thèmes ─────────────────────────────────────────────────── */}
-      <section className="container-page py-16">
-        <div className="max-w-xl">
-          <span className="rule-accent mb-4" />
-          <h2 className="text-3xl font-semibold sm:text-4xl">
-            {t.home.themesTitle}
-          </h2>
-          <p className="mt-2 text-sm text-muted sm:text-base">
-            {t.home.themesSubtitle}
-          </p>
-        </div>
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              href={lp(`/formations?cat=${encodeURIComponent(cat.label)}`)}
-              className="group flex flex-col items-center gap-3 rounded-[3px] border border-line bg-bg px-4 py-7 text-center transition hover:-translate-y-0.5 hover:border-brand hover:shadow-[0_16px_36px_-20px_rgba(10,21,29,0.4)]"
-            >
-              <span className="grid h-12 w-12 place-items-center rounded-[3px] bg-brand-soft text-primary-dark transition group-hover:bg-brand group-hover:text-ink">
-                <CategoryIcon name={cat.icon} width={22} height={22} />
-              </span>
-              <span className="text-sm font-semibold leading-tight">
-                {cat.label}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Pourquoi OmniLearn ─────────────────────────────────────── */}
-      <section className="border-t border-line bg-surface">
-        <div className="container-page py-16">
-          <div className="max-w-xl">
-            <span className="rule-accent mb-4" />
-            <h2 className="text-3xl font-semibold sm:text-4xl">
-              {t.home.whyTitle}
-            </h2>
-            <p className="mt-2 text-sm text-muted sm:text-base">
-              {t.home.whySubtitle}
-            </p>
-          </div>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {t.home.features.map((text, i) => {
-              const Icon = featureIcons[i];
-              return (
-                <div
-                  key={i}
-                  className="flex flex-col gap-4 rounded-[3px] border border-line bg-bg p-6 transition hover:border-brand/60 hover:shadow-[0_16px_36px_-22px_rgba(10,21,29,0.4)]"
-                >
-                  <span className="grid h-12 w-12 place-items-center rounded-[3px] bg-brand-soft text-primary-dark">
-                    <Icon width={22} height={22} />
-                  </span>
-                  <div>
-                    <h3 className="font-display text-base font-bold text-ink">
-                      {t.home.featureTitles[i]}
-                    </h3>
-                    <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                      {text}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Accès gratuit (pricing) ────────────────────────────────── */}
-      <section className="border-t border-line bg-surface">
-        <div className="container-page py-16">
-          <div className="mx-auto max-w-xl text-center">
-            <span className="rule-accent mb-4" />
-            <h2 className="text-3xl font-semibold sm:text-4xl">
-              {t.home.pricingTitle}
-            </h2>
-            <p className="mt-2 text-sm text-muted sm:text-base">
-              {t.home.pricingSubtitle}
-            </p>
-          </div>
-
-          <div className="relative mx-auto mt-10 max-w-lg">
-            <div className="absolute -inset-2 rounded-[12px] bg-gradient-to-br from-brand-soft to-transparent blur-xl" />
-            <div className="relative overflow-hidden rounded-[10px] border border-primary/30 bg-surface p-8 shadow-card">
-              <span className="inline-flex items-center gap-2 rounded-[3px] border border-primary/30 bg-brand-soft px-3 py-1 font-mono text-xs font-bold uppercase tracking-[0.06em] text-primary">
-                <span className="opacity-70">$</span>
-                {t.home.pricingPlan}
-              </span>
-              <div className="mt-5 flex items-end gap-2">
-                <span className="font-display text-5xl font-extrabold tracking-tight text-ink">
-                  {t.home.pricingPrice}
-                </span>
-                <span className="pb-1.5 font-mono text-sm font-medium text-muted">
-                  {t.home.pricingPeriod}
-                </span>
-              </div>
-
-              <ul className="mt-7 space-y-3">
-                {t.home.pricingIncludes.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-[3px] bg-brand-soft text-primary">
-                      <CheckIcon width={13} height={13} />
-                    </span>
-                    <span className="font-sans text-sm leading-relaxed text-ink">
-                      {item}
-                    </span>
+          {categories.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+                {h.teachTopics}
+              </p>
+              <ul className="mt-4 columns-2 gap-8 text-[15px] leading-8 text-ink">
+                {categories.map((cat) => (
+                  <li key={cat.id} className="break-inside-avoid">
+                    {categoryName(t, cat.label)}
                   </li>
                 ))}
               </ul>
-
-              <Link
-                href={lp("/creer-compte")}
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-[3px] border border-primary/40 bg-brand-soft px-6 py-3.5 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a]"
-              >
-                <span className="opacity-70">$</span>
-                {t.home.pricingCta}
-                <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
-              </Link>
-              <p className="mt-3 text-center font-mono text-xs text-muted">
-                {t.home.pricingNote}
-              </p>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
-      {/* ── FAQ ────────────────────────────────────────────────────── */}
-      <section className="container-page py-16">
-        <div className="mx-auto max-w-2xl">
-          <div className="text-center">
-            <span className="rule-accent mb-4" />
-            <h2 className="text-3xl font-semibold sm:text-4xl">
-              {t.home.faqTitle}
-            </h2>
-            <p className="mt-2 text-sm text-muted sm:text-base">
-              {t.home.faqSubtitle}
-            </p>
-          </div>
-          <div className="mt-8 space-y-3">
-            {t.home.faq.map((item, i) => (
-              <details
-                key={i}
-                className="group rounded-[3px] border border-line bg-bg px-5 open:border-brand/50 open:shadow-[0_14px_34px_-24px_rgba(10,21,29,0.4)]"
-              >
-                <summary className="flex cursor-pointer items-center justify-between gap-4 py-4 text-start font-display text-[15px] font-bold text-ink">
+      <section className="container-page py-14 lg:py-16">
+        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.4fr] lg:gap-16">
+          <h2 className="text-3xl text-ink">{h.faqTitle}</h2>
+          <div className="divide-y divide-line border-y border-line">
+            {h.faq.map((item) => (
+              <details key={item.q} className="group">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 py-4 text-start text-[16px] font-semibold text-ink">
                   {item.q}
-                  <ChevronDown
-                    width={18}
-                    height={18}
-                    className="faq-chevron shrink-0 text-muted"
-                  />
+                  <ChevronDown width={18} height={18} className="faq-chevron shrink-0 text-muted" />
                 </summary>
-                <p className="pb-5 text-sm leading-relaxed text-muted">
-                  {item.a}
-                </p>
+                <p className="max-w-2xl pb-5 text-[15px] leading-relaxed text-muted">{item.a}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
-
-      {/* ── CTA final : invocation terminal ────────────────────────── */}
-      <section className="container-page pb-20">
-        <div className="section-dark relative overflow-hidden rounded-[10px] border border-line px-8 py-14 text-center sm:px-12">
-          <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
-          <div className="relative mx-auto max-w-xl">
-            <p className="mb-3 term-comment font-mono text-xs text-muted-soft">
-              omnilearn --start
-            </p>
-            <h2 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-              {t.home.ctaTitle}
-            </h2>
-            <p className="mt-3 font-sans text-sm text-muted sm:text-base">
-              {t.home.ctaSubtitle}
-            </p>
-            <Link
-              href={lp("/creer-compte")}
-              className="mt-7 inline-flex items-center gap-2 rounded-[3px] border border-primary/40 bg-brand-soft px-6 py-3.5 font-mono text-sm font-semibold text-primary transition hover:bg-primary hover:text-[#04130a] hover:shadow-[0_0_24px_-2px_var(--color-brand-soft)]"
-            >
-              <span className="opacity-70">$</span>
-              {t.home.ctaButton}
-              <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
-  );
-}
-
-/* Ligne de leçon dans le mockup produit du hero. */
-function MockLesson({
-  icon,
-  label,
-  done = false,
-  active = false,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  done?: boolean;
-  active?: boolean;
-}) {
-  return (
-    <li
-      className={`flex items-center gap-3 rounded-[3px] px-3 py-2.5 ${
-        active ? "bg-brand-soft ring-1 ring-primary/40" : "bg-bg/40"
-      }`}
-    >
-      <span
-        className={`grid h-7 w-7 shrink-0 place-items-center rounded-[3px] ${
-          active ? "bg-primary text-[#04130a]" : "border border-line bg-bg text-primary"
-        }`}
-      >
-        {icon}
-      </span>
-      <span className="min-w-0 flex-1 truncate font-mono text-[13px] font-medium text-ink">
-        {label}
-      </span>
-      {done && (
-        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[3px] bg-brand-soft text-primary">
-          <CheckIcon width={12} height={12} />
-        </span>
-      )}
-    </li>
   );
 }

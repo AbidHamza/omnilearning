@@ -7,14 +7,9 @@ import { useT } from "@/i18n/provider";
 type Theme = "light" | "dark";
 
 /**
- * Bascule sombre / clair.
- *
- * Design system « terminal » = SOMBRE par défaut. L'état réel est porté par la
- * classe `light` sur <html> (mode « paper »), posée AVANT le premier rendu par
- * un petit script inline (cf. note dans layout) uniquement si l'utilisateur a
- * choisi clair. Ce composant lit cet état réel comme un store externe (le DOM)
- * via useSyncExternalStore : pas de setState dans un effet, pas de flash, le
- * serveur ne décide pas du thème : c'est le DOM déjà peint qui fait foi.
+ * Light/dark switch. Light is the default; the real state is the `dark` class
+ * on <html>, set before first paint by the inline script in the layout. The
+ * DOM is read as an external store, so the server never decides the theme.
  */
 
 // Notifie React quand la classe `dark` de <html> change (depuis ce composant
@@ -34,23 +29,17 @@ function subscribe(callback: () => void) {
   };
 }
 
-/**
- * Lit le thème réellement appliqué. Sombre par défaut : on a le mode clair
- * « paper » si et seulement si la classe `light` est présente sur <html>.
- * On réaligne le DOM depuis la préférence stockée si besoin (idempotent).
- */
 function readTheme(): Theme {
   const root = document.documentElement;
-  if (root.classList.contains("light")) return "light";
+  if (root.classList.contains("dark")) return "dark";
   let stored: string | null = null;
   try {
     stored = localStorage.getItem("theme");
   } catch {
     stored = null;
   }
-  // Tout sauf "light" => sombre (défaut terminal). Réaligne le DOM si besoin.
-  const resolved: Theme = stored === "light" ? "light" : "dark";
-  root.classList.toggle("light", resolved === "light");
+  const resolved: Theme = stored === "dark" ? "dark" : "light";
+  root.classList.toggle("dark", resolved === "dark");
   return resolved;
 }
 
@@ -69,7 +58,7 @@ export default function ThemeToggle() {
     const root = document.documentElement;
     // Active les transitions de couleur le temps du switch.
     root.classList.add("theme-transition");
-    root.classList.toggle("light", next === "light");
+    root.classList.toggle("dark", next === "dark");
     try {
       localStorage.setItem("theme", next);
     } catch {

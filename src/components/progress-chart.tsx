@@ -66,10 +66,7 @@ export default function ProgressChart({
         {title && <p className="mb-3 text-sm font-semibold">{title}</p>}
         <div className="grid min-h-[180px] place-items-center rounded-[var(--radius-card)] border border-dashed border-line px-6 text-center">
           <div>
-            <p className="font-mono text-sm text-muted-soft">
-              <span className="text-primary">$</span> xp --last-14-days
-            </p>
-            <p className="mt-2 text-sm text-muted">{empty}</p>
+            <p className="text-sm text-muted">{empty}</p>
           </div>
         </div>
       </div>
@@ -88,9 +85,6 @@ export default function ProgressChart({
   return (
     <div className="rounded-[3px] bg-bg p-5">
       {title && <p className="mb-3 text-sm font-semibold">{title}</p>}
-      <p className="font-mono text-xs text-muted-soft">
-        <span className="text-primary">$</span> xp --last-14-days
-      </p>
 
       <svg
         viewBox={`0 0 ${W} ${H}`}

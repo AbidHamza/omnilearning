@@ -46,10 +46,10 @@ export default async function BecomeInstructorPage({
   return (
     <div className="container-page py-12">
       <span className="rule-accent mb-3" />
-      <p className="font-mono text-xs uppercase tracking-widest text-muted-soft">
+      <p className="text-xs uppercase tracking-widest text-muted-soft">
         {t.kicker}
       </p>
-      <h1 className="mt-2 max-w-3xl font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+      <h1 className="mt-2 max-w-3xl font-display text-4xl tracking-tight sm:text-5xl">
         {t.titleLead} <span className="text-primary">{t.titleAccent}</span>
       </h1>
       <p className="mt-4 max-w-2xl text-lg text-muted">{t.intro}</p>
@@ -57,11 +57,11 @@ export default async function BecomeInstructorPage({
       {/* Barème */}
       <section className="mt-10 rounded-[var(--radius-card)] bg-surface p-6 sm:p-8">
         <div className="flex flex-wrap items-center gap-6">
-          <div className="font-display text-6xl font-extrabold text-primary">
+          <div className="font-display text-6xl text-primary">
             {DEFAULT_REVENUE_SHARE_PCT} %
           </div>
           <div className="max-w-xl">
-            <h2 className="font-display text-xl font-bold">{t.shareTitle}</h2>
+            <h2 className="font-display text-xl font-semibold">{t.shareTitle}</h2>
             <p className="mt-2 text-sm text-muted">{t.shareText}</p>
           </div>
         </div>
@@ -69,17 +69,17 @@ export default async function BecomeInstructorPage({
 
       {/* Étapes */}
       <section className="mt-10">
-        <h2 className="font-display text-2xl font-bold">{t.stepsTitle}</h2>
+        <h2 className="font-display text-2xl font-semibold">{t.stepsTitle}</h2>
         <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {t.steps.map((s, idx) => (
             <li
               key={s.t}
               className="rounded-[var(--radius-card)] bg-surface p-5"
             >
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-soft font-display font-extrabold text-primary-dark">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-soft font-display text-primary-dark">
                 {idx + 1}
               </span>
-              <h3 className="mt-4 font-display font-bold">{s.t}</h3>
+              <h3 className="mt-4 font-display font-semibold">{s.t}</h3>
               <p className="mt-2 text-sm text-muted">{s.d}</p>
             </li>
           ))}
@@ -93,12 +93,12 @@ export default async function BecomeInstructorPage({
       >
         {me === null ? (
           <>
-            <h2 className="font-display text-2xl font-bold">{t.signInTitle}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t.signInTitle}</h2>
             <p className="mt-2 max-w-xl text-sm text-muted">{t.signInText}</p>
             <div className="mt-5 flex flex-wrap gap-3">
               <LocaleLink
                 href="/creer-compte"
-                className="rounded-[3px] bg-primary px-8 py-3 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+                className="rounded-[3px] bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
               >
                 {dict.signup.title}
               </LocaleLink>
@@ -112,24 +112,24 @@ export default async function BecomeInstructorPage({
           </>
         ) : me.state === "PENDING" ? (
           <>
-            <h2 className="font-display text-2xl font-bold">{t.successTitle}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t.successTitle}</h2>
             <p className="mt-2 max-w-xl text-sm text-muted">{t.successText}</p>
           </>
         ) : me.state === "APPROVED" ? (
           <>
-            <h2 className="font-display text-2xl font-bold">
+            <h2 className="font-display text-2xl font-semibold">
               {t.errors.alreadyApproved}
             </h2>
             <LocaleLink
               href="/formateur"
-              className="mt-5 inline-flex rounded-[3px] bg-primary px-8 py-3 text-sm font-semibold text-[#04130a] transition hover:bg-primary-deep"
+              className="mt-5 inline-flex rounded-[3px] bg-primary px-8 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-deep"
             >
               {dict.nav.dashboard}
             </LocaleLink>
           </>
         ) : (
           <>
-            <h2 className="font-display text-2xl font-bold">{t.formTitle}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t.formTitle}</h2>
             <p className="mt-2 max-w-xl text-sm text-muted">{t.formIntro}</p>
             <div className="mt-6 max-w-2xl">
               <ApplyForm defaultName={me.name} />
@@ -140,14 +140,14 @@ export default async function BecomeInstructorPage({
 
       {/* Questions fréquentes */}
       <section className="mt-10">
-        <h2 className="font-display text-2xl font-bold">{t.faqTitle}</h2>
+        <h2 className="font-display text-2xl font-semibold">{t.faqTitle}</h2>
         <dl className="mt-6 grid gap-4 sm:grid-cols-2">
           {t.faq.map((f) => (
             <div
               key={f.q}
               className="rounded-[var(--radius-card)] bg-surface p-5"
             >
-              <dt className="font-display font-bold">{f.q}</dt>
+              <dt className="font-display font-semibold">{f.q}</dt>
               <dd className="mt-2 text-sm text-muted">{f.a}</dd>
             </div>
           ))}

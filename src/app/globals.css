@@ -1,131 +1,99 @@
 @import "tailwindcss";
 
 /*
- * ============================================================================
- * OmniLearn, design system "TERMINAL / DEV-STUDIO" (direction B)
- * Monospace-first. Fond quasi-noir « void ». UN seul accent : vert phosphore.
- * Atmosphère : grille scanline + bloom accent + grain fin. Premium, pas cheesy.
- * Tokens canoniques : OmniLearn/02_Marques/OmniLearnStudio/05_Tech/site-corporate/DESIGN-SYSTEM.md
- * (source de vérité technique de ce document : son propre src/styles/main.css).
+ * OmniLearn design tokens.
  *
- * Stratégie : on conserve les JETONS SÉMANTIQUES existants (bg/surface/ink/
- * muted/line/brand/primary/accent…) consommés par toute l'UI, on les RECIBLE
- * sur la palette terminal. Toute la fonctionnalité (auth, rôles, Stripe, i18n,
- * dark mode) reste intacte, seul le rendu change.
+ * Light "paper" is the default; `.dark` on <html> is the opt-in night theme
+ * (set before first paint by the inline script in [lang]/layout.tsx).
+ * Components only consume the semantic tokens below, never raw hex values.
  *
- * Thème : SOMBRE par défaut (terminal = dark-first). Le mode clair « paper »
- * est opt-in via la classe `.light` sur <html> (cf. layout + theme-toggle).
- * ============================================================================
- */
-
-/*
- * Fonts: JetBrains Mono (la VOIX) + IBM Plex Sans (prose longue).
- * Auto-hébergées par next/font (cf. layout.tsx) → pas d'@import Google ici
- * (évite le double chargement et le warning « @import must precede »).
+ * Palette: warm paper and ink, one brick-red accent for actions, an ochre
+ * used sparingly for highlights. Type: Public Sans for UI and reading,
+ * Newsreader for headings, Cairo for Arabic, JetBrains Mono for code only.
  */
 
 @theme {
-  /* ── Canvas / surfaces : near-black to charcoal ── */
-  --color-bg: #07090c; /* page void */
-  --color-surface: #0b0e13; /* raised surface, barres */
-  --color-surface-2: #161b24; /* hover / inset */
+  --color-bg: #f6f3ec;
+  --color-surface: #fffdf8;
+  --color-surface-2: #efeae0;
 
-  /* ── Texte : encre froide ── */
-  --color-ink: #e8edf2; /* primaire */
-  --color-muted: #9aa6b2; /* secondaire */
-  --color-muted-soft: #5c6773; /* muted / commentaires */
+  --color-ink: #1d1a16;
+  --color-muted: #5a544b;
+  --color-muted-soft: #857d71;
 
-  /* ── Lignes ── */
-  --color-line: #1f2630; /* hairline */
-  --color-line-soft: #161b24; /* hairline atténuée */
+  --color-line: #ddd6c8;
+  --color-line-soft: #e9e3d7;
 
-  /* ── Brand = vert phosphore (teinte secondaire / bandeaux) ── */
-  --color-brand: #4ef08a;
-  --color-brand-soft: #0f3d24; /* remplissage teinté accent */
-  --color-brand-band: #0b0e13; /* bandeau */
+  --color-brand: #9b2c1f;
+  --color-brand-soft: #f3e1db;
+  --color-brand-band: #efeae0;
 
-  /* ── Primaire interactif = vert phosphore (THE accent) ── */
-  --color-primary: #4ef08a;
-  --color-primary-soft: #0f3d24;
-  --color-primary-dark: #4ef08a; /* sur sombre, l'accent reste lumineux */
-  --color-primary-deep: #2fae62;
+  --color-primary: #9b2c1f;
+  --color-primary-soft: #f3e1db;
+  --color-primary-dark: #7a2016;
+  --color-primary-deep: #7a2016;
+  --color-on-primary: #fffdf8;
 
-  /* ── Accent secondaire = ambre (signal rare : strings/badges) ── */
-  --color-accent: #f5c451;
-  --color-accent-soft: #2e2412;
-  --color-violet: #57c7ff; /* cyan : keywords/liens dans code (rare) */
+  --color-accent: #8a5a00;
+  --color-accent-soft: #f4e8cf;
+  --color-violet: #2d5a7b;
 
-  /* ── States ── */
-  --color-success: #4ef08a;
-  --color-success-soft: #0f3d24;
-  --color-warning: #f5c451;
-  --color-danger: #ff6b81;
-  --color-danger-soft: #341a1f;
+  --color-success: #2f6b3a;
+  --color-success-soft: #e0ecdf;
+  --color-warning: #8a5a00;
+  --color-danger: #b3261e;
+  --color-danger-soft: #f7e0dc;
 
-  /* ── Typo : mono pour la VOIX, sans pour la prose ── */
-  --font-display: var(--font-jetbrains), ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
-  --font-sans: var(--font-plex-sans), "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-public-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
   --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 
-  /* Terminal = tranchant : rayons minimes. */
-  --radius-card: 6px;
+  --radius-card: 4px;
 
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.02), 0 18px 50px -22px rgba(0, 0, 0, 0.8);
+  --shadow-card: 0 1px 2px rgba(40, 30, 15, 0.06);
 }
 
-/*
- * Mode clair « paper », opt-in via la classe `.light` sur <html>.
- * On réassigne les MÊMES jetons sémantiques : le passage clair se propage
- * automatiquement à toute l'UI. High-contrast, toujours mono.
- */
-.light {
-  --color-bg: #f4f2ec;
-  --color-surface: #ece9e0;
-  --color-surface-2: #e6e2d8;
+.dark {
+  --color-bg: #16130f;
+  --color-surface: #1f1b16;
+  --color-surface-2: #29241d;
 
-  --color-ink: #15181c;
-  --color-muted: #454c54;
-  --color-muted-soft: #6e7681;
+  --color-ink: #ece6da;
+  --color-muted: #b3aa9a;
+  --color-muted-soft: #857d71;
 
-  --color-line: #d8d3c6;
-  --color-line-soft: #e6e2d8;
+  --color-line: #3a332a;
+  --color-line-soft: #2b261f;
 
-  --color-brand: #0f8f48;
-  --color-brand-soft: #dbf0e2;
-  --color-brand-band: #ece9e0;
+  --color-brand: #e0775f;
+  --color-brand-soft: #3b211b;
+  --color-brand-band: #1f1b16;
 
-  --color-primary: #0f8f48;
-  --color-primary-soft: #dbf0e2;
-  --color-primary-dark: #0a6e37;
-  --color-primary-deep: #0a6e37;
+  --color-primary: #e0775f;
+  --color-primary-soft: #3b211b;
+  --color-primary-dark: #eb9380;
+  --color-primary-deep: #c75f48;
+  --color-on-primary: #16130f;
 
-  --color-accent: #9a6b00;
-  --color-accent-soft: #f3e4c6;
-  --color-violet: #0a6ca8;
+  --color-accent: #d9a74a;
+  --color-accent-soft: #33291a;
+  --color-violet: #8fb6d4;
 
-  --color-success: #0f8f48;
-  --color-success-soft: #dbf0e2;
-  --color-warning: #9a6b00;
-  --color-danger: #c0394f;
-  --color-danger-soft: #f6e3df;
+  --color-success: #7fb087;
+  --color-success-soft: #1f2d21;
+  --color-warning: #d9a74a;
+  --color-danger: #ef8a80;
+  --color-danger-soft: #3a1f1c;
 
-  --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.02), 0 18px 50px -28px rgba(40, 30, 10, 0.35);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-/*
- * Sections volontairement « surélevées » (bandeau stats, footer, CTA).
- * En terminal, ce sont des surfaces console légèrement plus claires que le void,
- * cernées d'une hairline. En clair, surface papier surélevée.
- */
+/* Raised band (footer, stats strip, closing call). */
 .section-dark {
-  background-color: #0b0e13;
-}
-.light .section-dark {
-  background-color: #ece9e0;
+  background-color: var(--color-surface-2);
 }
 
-/* Évite tout flash de transition au tout premier rendu / au switch de thème. */
 .theme-transition,
 .theme-transition * {
   transition:
@@ -141,7 +109,7 @@
   }
 }
 
-/* Arabe : police dédiée pour TOUT (la mono latine ne couvre pas l'arabe). */
+/* Arabic: Cairo everywhere, the Latin faces don't cover the script. */
 [dir="rtl"] body,
 [dir="rtl"] h1,
 [dir="rtl"] h2,
@@ -166,58 +134,40 @@ html {
 body {
   background: var(--color-bg);
   color: var(--color-ink);
-  font-family: var(--font-mono);
-  font-size: 15px;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
   overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--color-primary);
-  color: #05140b;
-}
-.light ::selection {
-  color: #f4f2ec;
+  background: var(--color-primary-soft);
+  color: var(--color-ink);
 }
 
-/* Scrollbar terminal */
-::-webkit-scrollbar {
-  width: 11px;
-  height: 11px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-bg);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-line);
-  border: 3px solid var(--color-bg);
-  border-radius: 8px;
-}
-
-/*
- * Titres / libellés UI = JetBrains Mono (la VOIX). Tracking serré, gras franc.
- * Règle DS : un titre / un libellé / un nombre = mono ; une phrase à lire = sans.
- */
 h1,
 h2,
 h3,
 .font-display {
   font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  font-weight: 560;
+  letter-spacing: -0.012em;
+  line-height: 1.12;
 }
 
-/*
- * « font-accent » : conservé pour compat (utilisé sur des mots mis en valeur).
- * En terminal, l'emphase = la couleur accent + la mono, pas l'italique serif.
- */
+/* Headings used to paint one word in the accent colour; in this system the
+   emphasis is an italic of the same ink. */
+h1 .text-primary,
+h2 .text-primary,
 .font-accent {
-  font-family: var(--font-display);
+  color: inherit;
+  font-style: italic;
+  font-weight: inherit;
+}
+[dir="rtl"] h1 .text-primary,
+[dir="rtl"] h2 .text-primary,
+[dir="rtl"] .font-accent {
   font-style: normal;
-  font-weight: 800;
-  color: var(--color-primary);
 }
 
 .container-page {
@@ -235,9 +185,8 @@ h3,
 }
 
 /*
- * Bande qui déborde jusqu'au bord de l'écran (carrousels). La marge négative
- * doit valoir exactement le retrait de .container-page : à 24px fixes la page
- * gagnait 8px de large sous 640px, et en arabe elle se décalait de 8px.
+ * Strip that bleeds to the screen edge (carousels). The negative margin must
+ * equal .container-page's padding or the page gains width under 640px.
  */
 .bleed-page {
   margin-inline: -1.5rem;
@@ -250,27 +199,22 @@ h3,
   }
 }
 
-/*
- * Champs de formulaire, registre terminal : tranchant (pas de pilule),
- * bordure hairline, focus accent + glow phosphore. mono.
- */
 .field {
-  height: 3rem;
+  height: 2.9rem;
   width: 100%;
   border-radius: 3px;
   border: 1px solid var(--color-line);
   background: var(--color-surface);
-  padding-inline: 0.9rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  letter-spacing: -0.01em;
+  padding-inline: 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
   color: var(--color-ink);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .field:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 22%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 18%, transparent);
 }
 .field::placeholder {
   color: var(--color-muted-soft);
@@ -278,8 +222,7 @@ h3,
 
 textarea.field {
   height: auto;
-  border-radius: 6px;
-  padding: 0.85rem 0.9rem;
+  padding: 0.8rem 0.85rem;
   resize: vertical;
 }
 
@@ -294,7 +237,7 @@ textarea.field {
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -302,17 +245,11 @@ textarea.field {
   }
 }
 .rise {
-  animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: rise 0.45s ease-out both;
 }
-
 .rise-stagger > * {
-  animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: rise 0.45s ease-out both;
 }
-.rise-stagger > *:nth-child(1) { animation-delay: 0.05s; }
-.rise-stagger > *:nth-child(2) { animation-delay: 0.12s; }
-.rise-stagger > *:nth-child(3) { animation-delay: 0.19s; }
-.rise-stagger > *:nth-child(4) { animation-delay: 0.26s; }
-
 @media (prefers-reduced-motion: reduce) {
   .rise,
   .rise-stagger > * {
@@ -320,75 +257,14 @@ textarea.field {
   }
 }
 
-/*
- * Atmosphère hero : bloom accent radial (haut-droite) + vignette.
- * (Remplace l'ancien mesh émeraude/ocre par le bloom phosphore du DS.)
- */
-.hero-mesh {
-  background-color: var(--color-bg);
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-brand-soft) 70%, var(--color-bg)),
-    var(--color-bg) 62%
-  );
-}
-
-/*
- * Grain fin posé en overlay fixe sur tout le document (feTurbulence inline,
- * zéro requête). Casse le côté « plat / généré » des aplats.
- */
-.paper-grain::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0.035;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.light .paper-grain::before {
-  opacity: 0.05;
-}
-
-/*
- * Filet d'accent sous un titre de section : en terminal, c'est un préfixe de
- * commande accent (barre courte vert phosphore).
- */
+/* Short rule under a section label. */
 .rule-accent {
   display: inline-block;
-  width: 2.75rem;
+  width: 2.25rem;
   height: 2px;
-  border-radius: 0;
   background: var(--color-primary);
-  box-shadow: 0 0 12px var(--color-brand-soft);
 }
 
-/*
- * Grille scanline en surimpression (lignes horizontales tous les 32px),
- * masquée vers les bords. Motif console du DS.
- */
-.hero-grid {
-  background-image:
-    linear-gradient(transparent, transparent 31px, color-mix(in srgb, var(--color-line) 60%, transparent) 32px);
-  background-size: 100% 32px;
-  -webkit-mask-image: radial-gradient(70% 70% at 50% 35%, #000 30%, transparent 100%);
-  mask-image: radial-gradient(70% 70% at 50% 35%, #000 30%, transparent 100%);
-}
-
-/* Carte « terminal » (remplace l'ancien glass-card). */
-.glass-card {
-  background: linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
-  border-radius: 10px;
-  box-shadow: var(--shadow-card);
-}
-.light .glass-card {
-  background: linear-gradient(180deg, #fbfaf6, var(--color-surface));
-}
-
-/*
- * Anneau de focus clavier homogène (focus-visible uniquement).
- */
 a:focus-visible,
 button:focus-visible,
 summary:focus-visible,
@@ -404,7 +280,6 @@ textarea:focus-visible {
   outline: none;
 }
 
-/* Accordéon FAQ natif : rotation du chevron à l'ouverture. */
 details[open] .faq-chevron {
   transform: rotate(180deg);
 }
@@ -418,90 +293,18 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
-/* ============================================================================
- * Primitives de VOIX terminal (réutilisables dans les composants).
- * ========================================================================= */
-
-/* Curseur bloc clignotant accent. */
-@keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-.term-cursor {
-  display: inline-block;
-  width: 0.55em;
-  height: 1.05em;
-  margin-inline-start: 0.15em;
-  vertical-align: -0.15em;
-  background: var(--color-primary);
-  animation: blink 1s steps(2, start) infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .term-cursor { animation: none; }
-}
-
-/* Point « session active » qui respire. */
-@keyframes term-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--color-brand-soft); }
-  50% { opacity: 0.6; box-shadow: 0 0 0 4px transparent; }
-}
-.term-live {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--color-primary);
-  animation: term-pulse 2s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .term-live { animation: none; }
-}
-
-/* Préfixe prompt « $ » accent (sur libellés/commandes). */
-.term-prompt::before {
-  content: "$ ";
-  color: var(--color-primary);
-  font-family: var(--font-mono);
-}
-/* Préfixe commentaire « # » muted. */
-.term-comment::before {
-  content: "# ";
-  color: var(--color-muted-soft);
-  font-family: var(--font-mono);
-}
-/* Préfixe titre de colonne « // » faible. */
-.term-slashes::before {
-  content: "// ";
-  color: var(--color-muted-soft);
-  font-family: var(--font-mono);
-}
-
-/* Barre de fenêtre terminal : 3 points. */
-.term-dots {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-}
-.term-dots i {
-  width: 11px;
-  height: 11px;
-  border-radius: 999px;
-  background: #42454d;
-}
-
-/* Tokens de coloration syntaxique (réservés aux blocs « code »). */
+/* Syntax colours, code blocks only. */
 .tok-flag { color: var(--color-accent); }
 .tok-str { color: var(--color-accent); }
 .tok-kw { color: var(--color-violet); }
 .tok-num { color: var(--color-primary); }
 .tok-cmt { color: var(--color-muted-soft); }
 
-/* ============================================================================
- * Contenu de leçon (composant Markdown) : figures SVG, images, tableaux.
- * Les SVG des leçons sont dessinés en `currentColor` pour les traits neutres ;
- * `.fig-accent` recible trait ET remplissage sur l'accent du thème, donc les
- * schémas suivent automatiquement le mode sombre/clair.
- * ========================================================================= */
+/*
+ * Lesson content (Markdown component): SVG figures, images, tables.
+ * Lesson SVGs draw neutral strokes in `currentColor`; `.fig-accent` retargets
+ * stroke and fill to the theme accent, so diagrams follow light/dark.
+ */
 
 .md-figure {
   margin-block: 1.75rem;
@@ -522,18 +325,11 @@ details > summary::-webkit-details-marker {
   margin-top: 0.6rem;
   max-width: 640px;
   margin-inline: auto;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--color-muted-soft);
+  font-size: 0.82rem;
+  color: var(--color-muted);
   text-align: center;
 }
-.md-figure figcaption::before {
-  content: "// ";
-  color: var(--color-muted-soft);
-}
 
-/* Éléments mis en avant dans un schéma : trait ET remplissage accent.
-   Les valeurs explicites `none` du dessin restent respectées. */
 .md-figure svg .fig-accent {
   stroke: var(--color-primary);
   fill: var(--color-primary);
@@ -545,7 +341,6 @@ details > summary::-webkit-details-marker {
   stroke: none;
 }
 
-/* Images de leçon. */
 .md-img {
   display: block;
   max-width: 640px;
@@ -556,7 +351,6 @@ details > summary::-webkit-details-marker {
   border-radius: var(--radius-card);
 }
 
-/* Tableaux sobres, registre mono. */
 .md-table-wrap {
   margin-block: 1.5rem;
   overflow-x: auto;
@@ -564,15 +358,14 @@ details > summary::-webkit-details-marker {
 .md-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   border: 1px solid var(--color-line);
 }
 .md-table th {
-  font-family: var(--font-mono);
-  font-weight: 700;
+  font-weight: 600;
   text-align: start;
   color: var(--color-ink);
-  background: var(--color-surface);
+  background: var(--color-surface-2);
 }
 .md-table th,
 .md-table td {
@@ -584,5 +377,5 @@ details > summary::-webkit-details-marker {
   border-bottom: none;
 }
 .md-table tbody tr:hover td {
-  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+  background: color-mix(in srgb, var(--color-surface-2) 60%, transparent);
 }

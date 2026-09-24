@@ -31,9 +31,21 @@ const fr = {
     formateur: "Formateur",
     admin: "Administrateur",
   },
+  // Clé : libellé stocké en base (français). Absent de la table : affiché tel quel.
+  categoryNames: {
+    "Développement Web": "Développement Web",
+    "Data engineering": "Data engineering",
+    "Cybersécurité": "Cybersécurité",
+    "Intelligence Artificielle": "Intelligence Artificielle",
+    "Cloud Computing": "Cloud Computing",
+    "Design UX": "Design UX",
+    "Gestion de projet": "Gestion de projet",
+    "Objets connectés (IoT)": "Objets connectés (IoT)",
+    "Infrastructure": "Infrastructure",
+  },
   footer: {
     tagline:
-      "Des formations tech gamifiées pour progresser sérieusement. Les deux premières leçons de chaque cours sont en accès libre.",
+      "Des cours écrits par des formateurs indépendants, relus avant publication. Les deux premières leçons de chacun s'ouvrent sans compte.",
     colPages: "Pages",
     colFormations: "Formations",
     colAccount: "Compte",
@@ -48,104 +60,74 @@ const fr = {
     privacy: "Confidentialité",
     instructorTerms: "Conditions formateurs",
     rights: "© 2026 OmniLearn. Tous droits réservés.",
-    motto: "Apprenez. Pratiquez. Progressez.",
+    motto: "Chaque cours est relu par une personne avant sa mise en ligne.",
   },
   home: {
-    heroBadge: "Les 2 premières leçons de chaque cours en accès libre",
-    heroTitle: "Apprenez les compétences",
-    heroHighlight: "tech de demain",
+    heroTitle: "Apprenez un métier auprès de quelqu'un qui l'exerce.",
     heroSubtitle:
-      "Vidéos, cours et quiz conçus par des experts. Progressez à votre rythme, gagnez de l'XP et gardez la trace de ce que vous maîtrisez.",
-    heroCtaPrimary: "Essayer une leçon",
-    heroCtaSecondary: "Voir les formations",
-    heroReassurance: "Les deux premières leçons de chaque cours s'ouvrent sans compte",
-    heroAlt: "Apprenants en formation",
+      "Les cours d'OmniLearn sont écrits par des formateurs indépendants et relus par notre équipe avant leur mise en ligne. Les deux premières leçons de chacun s'ouvrent sans compte ni carte.",
+    ctaBrowse: "Parcourir le catalogue",
+    ctaTeach: "Proposer l'un des premiers cours",
 
-    // Mockup produit du hero
-    mockTitle: "Cybersécurité",
-    mockSubtitle: "Module 2 · Identifier les menaces",
-    mockProgressLabel: "Progression",
-    mockLessonVideo: "Comprendre les menaces et leurs impacts",
-    mockLessonText: "Sécuriser ses informations personnelles",
-    mockLessonQuiz: "Quiz : les menaces de cybersécurité",
-    mockDuration: "6 h de contenu",
-    mockLevel: "Niveau débutant",
+    ledgerTitle: "Le catalogue aujourd'hui",
+    ledgerCourses: "cours publiés",
+    ledgerLessons: "leçons",
+    ledgerOpen: "leçons ouvertes sans compte",
+    ledgerEmpty:
+      "Aucun cours n'est encore publié. Les premiers viendront des formateurs qui postulent maintenant, et chacun est relu avant sa mise en ligne.",
 
-    // Bande de stats
-    statsTitle: "Ce que contient la plateforme aujourd'hui",
-    statCourses: "Formations publiées",
-    statLessons: "Leçons",
-    statHours: "Heures de contenu",
-    statFree: "Leçons ouvertes sans compte",
-
-    popularTitle: "Des cours populaires parmi les apprenants",
-    popularSubtitle:
-      "Les formations les plus suivies ce mois-ci, choisies par notre communauté.",
-    themesTitle: "Explorez par thème",
-    themesSubtitle: "Neuf domaines, un seul endroit pour monter en compétences.",
-
-    whyTitle: "Pourquoi apprendre avec OmniLearn ?",
-    whySubtitle:
-      "Tout ce qu'il faut pour apprendre sérieusement, sans le prix d'une école.",
-    features: [
-      "Testez chaque cours librement : les deux premières leçons sont ouvertes, sans compte.",
-      "Apprenez à votre rythme, où que vous soyez et quand vous le souhaitez.",
-      "Bénéficiez de l'expertise de formateurs passionnés et reconnus dans leur domaine.",
-      "Vérifiez vos acquis à chaque chapitre : quiz notés, points d'expérience et badges.",
-      "Repartez avec un certificat à votre nom dès la dernière leçon validée.",
-    ],
-    featureTitles: [
-      "Essai libre",
-      "À votre rythme",
-      "Formateurs experts",
-      "Quiz et progression",
-      "Certificat de fin",
-    ],
-
-    // Accès (section pricing)
-    pricingTitle: "Testez d'abord, inscrivez-vous ensuite.",
-    pricingSubtitle:
-      "Les deux premières leçons de chaque cours se consultent sans compte. Le compte ouvre la suite des formations gratuites, les quiz notés et la progression enregistrée. Les formations payantes s'achètent à l'unité, leur prix est affiché sur chaque fiche.",
-    pricingPlan: "Compte apprenant",
-    pricingPrice: "0 €",
-    pricingPeriod: "sans engagement",
-    pricingIncludes: [
-      "Toutes les leçons des formations gratuites",
-      "Quiz notés, XP, série et badges",
-      "Suivi de progression sur tous vos appareils",
-      "Interface en français, en anglais et en arabe",
-      "Aucune publicité",
-    ],
-    pricingCta: "Créer mon compte",
-    pricingNote: "Inscription en moins d'une minute.",
-
-    // FAQ
-    faqTitle: "Questions fréquentes",
-    faqSubtitle: "Tout ce que vous voulez savoir avant de commencer.",
-    faq: [
+    howTitle: "Comment se passe un cours ici",
+    how: [
       {
-        q: "Que puis-je consulter sans compte ?",
-        a: "Les deux premières leçons de chaque cours, librement. La suite des leçons, les quiz notés et la progression demandent un compte apprenant, dont la création ne coûte rien. Sur les formations payantes, repérables à leur prix, la suite s'ouvre après l'achat.",
+        t: "Deux leçons avant toute inscription",
+        d: "Ouvrez les deux premières leçons de n'importe quel cours sans compte. Si la pédagogie ne vous convient pas, vous avez perdu dix minutes, pas d'argent.",
       },
       {
-        q: "Ai-je besoin d'une carte bancaire pour m'inscrire ?",
-        a: "Non, pas pour s'inscrire : une adresse email suffit, et plusieurs cours restent gratuits. La carte n'intervient qu'au moment d'acheter une formation payante, une fois, sans abonnement.",
+        t: "Des quiz qui comptent",
+        d: "Les chapitres se terminent par un quiz noté. À partir de 70 %, la leçon est validée et l'XP s'ajoute à votre profil.",
+      },
+      {
+        t: "Une progression qui vous suit",
+        d: "Commencez sur l'ordinateur, reconnectez-vous sur le téléphone : vous retrouvez la même leçon.",
+      },
+      {
+        t: "Un certificat à votre nom",
+        d: "Toutes les leçons terminées, le cours délivre un certificat de fin de parcours imprimable. Il atteste ce que vous avez fait sur OmniLearn ; ce n'est pas un diplôme d'État.",
+      },
+    ],
+
+    latestTitle: "Derniers cours publiés",
+
+    teachTitle: "Enseignez ici et gardez 70 % de chaque vente.",
+    teachBody:
+      "La plateforme garde les 30 % restants. Cette part paie les frais de paiement, l'hébergement et la relecture de votre cours avant publication. Vous fixez le prix, ou vous le publiez gratuitement.",
+    teachTopics: "Thèmes pour lesquels nous cherchons des formateurs",
+    teachCta: "Devenir formateur",
+    teachTerms: "Lire les conditions formateurs",
+
+    faqTitle: "Les questions qu'on nous pose d'abord",
+    faq: [
+      {
+        q: "Que puis-je ouvrir sans compte ?",
+        a: "Les deux premières leçons de chaque cours. Les leçons suivantes, les quiz notés et la progression enregistrée demandent un compte apprenant, gratuit.",
+      },
+      {
+        q: "Faut-il une carte bancaire pour s'inscrire ?",
+        a: "Non. Une adresse e-mail ou un compte Google suffit. La carte n'intervient que si vous achetez un cours payant, une fois, sans abonnement.",
+      },
+      {
+        q: "Qui écrit les cours ?",
+        a: "Des formateurs indépendants. Ils postulent, construisent le cours dans notre éditeur, et quelqu'un de l'équipe le relit avant publication.",
       },
       {
         q: "Comment les quiz sont-ils notés ?",
-        a: "Chaque quiz compte un point par bonne réponse. À partir de 70 % de réussite, la leçon est validée et l'expérience est créditée sur votre compte.",
+        a: "Un point par bonne réponse. À partir de 70 %, la leçon est validée et les points d'expérience sont crédités sur votre compte.",
       },
       {
-        q: "Puis-je apprendre à mon rythme ?",
-        a: "Oui. Les cours restent accessibles à tout moment et votre progression est sauvegardée. Vous reprenez exactement où vous vous êtes arrêté, sur n'importe quel appareil.",
+        q: "Le certificat est-il reconnu ?",
+        a: "Non. Il atteste que vous avez suivi les leçons et réussi les quiz d'un cours sur OmniLearn. Ce n'est ni un diplôme d'État ni une certification RNCP.",
       },
     ],
-
-    // CTA final
-    ctaTitle: "Prêt à apprendre quelque chose de nouveau ?",
-    ctaSubtitle:
-      "Rejoignez les apprenants qui montent en compétences chaque jour. Commencez par une leçon en accès libre.",
-    ctaButton: "Commencer maintenant",
   },
   card: {
     levelPrefix: "Niveau :",
@@ -156,7 +138,7 @@ const fr = {
   },
   catalog: {
     metaDescription:
-      "Le catalogue complet : développement, cybersécurité, IA, data, design. Les premières leçons de chaque formation sont ouvertes à tous, sans compte.",
+      "Les cours publiés sur OmniLearn, écrits par des formateurs indépendants et relus avant mise en ligne. Les deux premières leçons de chacun s’ouvrent sans compte.",
     searchPlaceholder: "Chercher une formation",
     filterLevel: "Niveau de difficulté",
     filterDuration: "Durée de vidéo",
@@ -173,6 +155,10 @@ const fr = {
     durGt6: "Plus de 6 heures",
     resultsFor: "résultat(s) pour",
     empty: "Aucune formation ne correspond à vos filtres.",
+    emptyCatalogTitle: "Le catalogue s'ouvre avec ses premiers formateurs.",
+    emptyCatalogBody:
+      "Rien n'est encore publié. Chaque cours est relu par notre équipe avant sa mise en ligne : les premiers apparaîtront ici au fil des validations.",
+    emptyCatalogCta: "Proposer l'un d'eux",
     defaultLabel: "toutes les formations",
   },
   curriculum: {
@@ -664,10 +650,10 @@ const fr = {
   teach: {
     metaTitle: "Devenir formateur",
     metaDescription:
-      "Vendez vos formations sur OmniLearning. Vous fixez le prix, vous gardez 70 % de chaque vente, Stripe verse directement sur votre compte.",
+      "Vendez vos formations sur OmniLearn. Vous fixez le prix, vous gardez 70 % de chaque vente, Stripe verse directement sur votre compte.",
     kicker: "formateurs",
     titleLead: "Vendez vos formations sur",
-    titleAccent: "OmniLearning",
+    titleAccent: "OmniLearn",
     intro:
       "Vous gardez 70 % de chaque vente. La plateforme prend en charge le paiement, l'hébergement, les quiz et le suivi des apprenants.",
     shareTitle: "Ce que vous touchez",
@@ -751,6 +737,7 @@ const fr = {
     wrongAddress: "Ce n'est pas la bonne adresse ? Modifier",
   },
   signup: {
+    emailPlaceholder: "vous@email.com",
     mismatch: "Les mots de passe ne correspondent pas.",
     title: "Créer votre compte",
     subtitle:

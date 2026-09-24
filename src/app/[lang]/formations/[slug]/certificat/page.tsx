@@ -40,11 +40,11 @@ export default async function CertificatePage(
     <div className="container-page py-10">
       <style>{printCss}</style>
       <article className="certificate-sheet mx-auto max-w-3xl border border-line bg-surface px-8 py-12 sm:px-14 sm:py-16">
-        <p className="font-mono text-xs uppercase tracking-wide text-muted">{siteName}</p>
-        <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight">{c.title}</h1>
+        <p className="text-xs uppercase tracking-wide text-muted">{siteName}</p>
+        <h1 className="mt-4 font-display text-3xl tracking-tight">{c.title}</h1>
 
         <p className="mt-10 text-sm text-muted">{c.issuedTo}</p>
-        <p className="mt-1 font-display text-4xl font-bold">{cert.userName}</p>
+        <p className="mt-1 font-display text-4xl font-semibold">{cert.userName}</p>
 
         <p className="mt-8 text-sm text-muted">{c.forCourse}</p>
         <p className="mt-1 text-2xl font-semibold">{cert.courseTitle}</p>

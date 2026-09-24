@@ -11,8 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Développement, cybersécurité, data et design. Les deux premières leçons de chaque formation sont ouvertes.",
     start_url: "/fr",
     display: "standalone",
-    background_color: "#07090c",
-    theme_color: "#07090c",
+    background_color: "#f6f3ec",
+    theme_color: "#f6f3ec",
     icons: [
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml" },
       { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

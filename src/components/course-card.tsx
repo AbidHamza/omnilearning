@@ -56,14 +56,14 @@ export default function CourseCard({
           />
         </div>
         <div className="flex flex-1 flex-col p-3.5">
-          <h3 className="font-display text-sm font-bold leading-snug tracking-tight transition-colors group-hover:text-primary">
+          <h3 className="font-display text-sm font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
             {course.title}
           </h3>
           <p className="mt-1 line-clamp-2 font-sans text-xs leading-relaxed text-muted">
             {course.tagline}
           </p>
           {price && (
-            <span className="mt-2 font-mono text-[11px] font-bold text-primary">
+            <span className="mt-2 text-[11px] font-bold text-primary">
               {price}
             </span>
           )}
@@ -95,12 +95,12 @@ export default function CourseCard({
           sizes="(min-width:1024px) 360px, 100vw"
           className="object-cover transition duration-500 group-hover:scale-[1.07]"
         />
-        <span className="absolute start-3 top-3 rounded-[3px] border border-line bg-bg px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wide text-primary">
+        <span className="absolute start-3 top-3 rounded-[3px] border border-line bg-bg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">
           {course.category}
         </span>
         {price && (
           <span
-            className={`absolute end-3 top-3 rounded-[3px] border bg-bg px-2.5 py-1 font-mono text-[11px] font-bold ${
+            className={`absolute end-3 top-3 rounded-[3px] border bg-bg px-2.5 py-1 text-[11px] font-bold ${
               isFree ? "border-line text-muted" : "border-primary/50 text-ink"
             }`}
           >
@@ -109,13 +109,13 @@ export default function CourseCard({
         )}
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-display text-lg font-bold leading-tight tracking-tight transition-colors group-hover:text-primary">
+        <h3 className="font-display text-lg font-semibold leading-tight tracking-tight transition-colors group-hover:text-primary">
           {course.title}
         </h3>
         <p className="mt-1.5 line-clamp-2 font-sans text-sm leading-relaxed text-muted">
           {course.tagline}
         </p>
-        <div className="mt-4 flex items-center gap-3 font-mono text-xs text-muted">
+        <div className="mt-4 flex items-center gap-3 text-xs text-muted">
           <span>
             {cardLabels.levelPrefix} {course.level}
           </span>
@@ -124,8 +124,7 @@ export default function CourseCard({
             {course.hours} {cardLabels.hoursUnit}
           </span>
         </div>
-        <span className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-[3px] border border-line bg-bg px-4 py-2 font-mono text-sm font-semibold text-ink transition group-hover:border-primary group-hover:bg-primary group-hover:text-[#04130a]">
-          <span className="text-primary opacity-70 group-hover:text-[#04130a]">$</span>
+        <span className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-[3px] border border-line bg-bg px-4 py-2 text-sm font-semibold text-ink transition group-hover:border-primary group-hover:bg-primary group-hover:text-on-primary">
           {cardLabels.access}
         </span>
       </div>

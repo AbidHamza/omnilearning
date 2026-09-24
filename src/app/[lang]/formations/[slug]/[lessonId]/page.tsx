@@ -26,9 +26,7 @@ import {
 import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 
-export function generateStaticParams() {
-  return [];
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: PageProps<"/[lang]/formations/[slug]/[lessonId]">,
@@ -171,24 +169,10 @@ export default async function LessonPage(
             )}
 
             <div className="mt-6 overflow-hidden rounded-[var(--radius-card)] border border-line">
-              <div className="flex items-center gap-2 border-b border-line bg-surface px-4 py-2.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-danger/70" />
-                <span className="h-2.5 w-2.5 rounded-full bg-warning/70" />
-                <span className="h-2.5 w-2.5 rounded-full bg-success/70" />
-              </div>
-              <div className="bg-bg px-5 py-6 font-mono text-sm" dir="ltr">
-                <p>
-                  <span className="text-primary">$</span>{" "}
-                  <span className="text-muted">
-                    open {course.slug}/{lesson.id}
-                  </span>
-                </p>
-                <p className="mt-2 text-ink">
-                  {c.lockedPrompt}
-                  <span className="term-cursor" aria-hidden />
-                </p>
-              </div>
-              <div className="border-t border-line px-5 py-5">
+              <p className="border-b border-line bg-surface px-5 py-4 text-sm text-ink">
+                {c.lockedPrompt}
+              </p>
+              <div className="px-5 py-5">
                 <p className="flex items-center gap-2 font-semibold">
                   <LockIcon width={16} height={16} className="text-primary" />
                   {needsPurchase ? c.lockedPaidTitle : c.lockedTitle}
@@ -213,7 +197,7 @@ export default async function LessonPage(
                   <div className="mt-5 flex flex-wrap items-center gap-3">
                     <Link
                       href={lp(`/creer-compte?next=${nextParam}`)}
-                      className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep"
+                      className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
                     >
                       {c.lockedCreate}
                       <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
@@ -305,7 +289,7 @@ export default async function LessonPage(
           {next ? (
             <Link
               href={lp(`/formations/${course.slug}/${next.id}`)}
-              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:bg-primary-deep"
+              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
             >
               {c.nextLesson}
               <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
@@ -313,7 +297,7 @@ export default async function LessonPage(
           ) : (
             <Link
               href={lp("/tableau-de-bord")}
-              className="inline-flex items-center gap-2 rounded-[3px] bg-success px-5 py-2.5 text-sm font-semibold text-[#04130a] hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-[3px] bg-success px-5 py-2.5 text-sm font-semibold text-on-primary hover:opacity-90"
             >
               {c.finish}
               <CheckIcon width={16} height={16} />
