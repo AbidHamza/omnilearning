@@ -245,7 +245,7 @@ export default function CatalogClient({
             <CourseCard
               key={c.slug}
               course={{ ...c, category: categoryName(t, c.category) }}
-              labels={t.card}
+              labels={{ ...t.card, levelNames: levelLabels }}
               locale={locale}
             />
           ))}

@@ -37,7 +37,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
   const [gamification, xpByDay] = userId
     ? await Promise.all([getGamification(userId), getXpByDay(userId, 14)])
     : [null, []];
-  const allCourses = await getCourses();
+  const allCourses = await getCourses(locale);
   const bySlug = new Map(allCourses.map((c) => [c.slug, c]));
 
   // Point de reprise réel : `lastLesson` stocke une KEY de leçon (ex. "l7").

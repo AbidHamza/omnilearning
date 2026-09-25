@@ -25,8 +25,10 @@ export async function checkQuizAnswerAction(input: {
   lessonKey: string;
   questionId: string;
   selected: number;
+  /** Langue affichée : l'explication revient dans la même langue que l'énoncé. */
+  locale?: string;
 }): Promise<QuizVerdict | null> {
-  const { courseSlug, lessonKey, questionId, selected } = input;
+  const { courseSlug, lessonKey, questionId, selected, locale } = input;
   if (!courseSlug || !lessonKey || !questionId) return null;
 
   const lesson = await prisma.lesson.findFirst({
@@ -37,7 +39,7 @@ export async function checkQuizAnswerAction(input: {
   const session = await auth();
   if (!(await canUseLesson(session?.user?.id ?? null, courseSlug, lesson.isFree))) return null;
 
-  const questions = await getLessonQuestions(courseSlug, lessonKey);
+  const questions = await getLessonQuestions(courseSlug, lessonKey, locale);
   const question = questions.find((q) => q.id === questionId);
   if (!question) return null;
 

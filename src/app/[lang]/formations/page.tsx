@@ -33,10 +33,11 @@ export async function generateMetadata(
 export default async function FormationsPage(
   props: PageProps<"/[lang]/formations">,
 ) {
-  const { q, cat } = await props.searchParams;
+  const [{ lang }, { q, cat }] = await Promise.all([props.params, props.searchParams]);
+  const locale = isLocale(lang) ? lang : defaultLocale;
   // getCourses() ne renvoie que le sommaire : aucun corps de lecon, aucun quiz
   // ne transite par cette page (elle n'affiche que des cartes).
-  const [courses, categories] = await Promise.all([getCourses(), getCategories()]);
+  const [courses, categories] = await Promise.all([getCourses(locale), getCategories()]);
   return (
     <CatalogClient
       courses={courses}

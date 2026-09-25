@@ -146,3 +146,38 @@ export interface PlatformUser {
   role: string;
   joined: string;
 }
+
+/**
+ * Traduction d'un cours, colonne `Course.i18n` : { en: {...}, ar: {...} }.
+ * Les titres des parties et des leçons vivent ici plutôt que sur chaque leçon :
+ * le catalogue les traduit ainsi sans charger le corps des leçons.
+ */
+export type CourseTranslation = {
+  title?: string;
+  tagline?: string;
+  description?: string;
+  instructorBio?: string;
+  language?: string;
+  software?: string;
+  prerequisites?: string[];
+  summary?: string[];
+  objectives?: string[];
+  skills?: string[];
+  /** Titres des parties, dans l'ordre des parties. */
+  parts?: string[];
+  /** Titres des leçons, par clé ("l1"). */
+  lessons?: Record<string, string>;
+};
+
+/**
+ * Traduction d'une leçon, colonne `Lesson.i18n`. Les questions s'alignent par
+ * position sur celles du français : seuls l'énoncé, les propositions et
+ * l'explication changent. `id` et `correctIndex` restent ceux de la base, sinon
+ * la correction dépendrait de la langue affichée.
+ */
+export type LessonTranslation = {
+  title?: string;
+  body?: string;
+  videoLabel?: string;
+  questions?: { prompt?: string; options?: string[]; explanation?: string }[];
+};

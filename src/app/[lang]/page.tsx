@@ -123,7 +123,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   const lp = (path: string) => localePath(lang, path);
   const topicHref = (label: string) => `${lp("/formations")}?cat=${encodeURIComponent(label)}`;
 
-  const [courses, categories] = await Promise.all([getCourses(), getCategories()]);
+  const [courses, categories] = await Promise.all([getCourses(lang), getCategories()]);
   const n = catalogCounts(courses);
   const nf = new Intl.NumberFormat(intlTag(lang));
   // getCourses() is oldest first; the home page shows what arrived last.

@@ -3,7 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import type { PublicQuizQuestion, QuizVerdict } from "@/lib/types";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, XIcon } from "./icons";
-import { useT } from "@/i18n/provider";
+import { useI18n, useT } from "@/i18n/provider";
 import { recordQuizAttemptAction } from "@/lib/actions/progress";
 import { checkQuizAnswerAction } from "@/lib/actions/quiz";
 import { QUIZ_PASS_RATIO } from "@/lib/curriculum";
@@ -29,6 +29,7 @@ export default function Quiz({
   lessonKey: string;
 }) {
   const t = useT();
+  const { locale } = useI18n();
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [verdict, setVerdict] = useState<QuizVerdict | null>(null);
@@ -52,6 +53,7 @@ export default function Quiz({
         lessonKey,
         questionId: question.id,
         selected: chosen,
+        locale,
       });
       if (!result) {
         setFailedCheck(true);

@@ -705,10 +705,22 @@ export const getPurchasesForUser = cache(
   },
 );
 
+/** Titre du cours dans la langue de la page, le français de base à défaut. */
+function localizedTitle(base: string, raw: string | null, locale?: string): string {
+  if (!raw || !locale || locale === "fr") return base;
+  try {
+    const t = (JSON.parse(raw) as Record<string, { title?: unknown } | undefined>)[locale]?.title;
+    return typeof t === "string" && t.trim() ? t : base;
+  } catch {
+    return base;
+  }
+}
+
 /** Une inscription terminée ouvre le certificat. Sinon null. */
 export const getCompletedEnrollment = cache(
   async (
     courseSlug: string,
+    locale?: string,
   ): Promise<{ userName: string; courseTitle: string; instructorName: string; completedAt: Date; hours: number } | null> => {
     const session = await auth();
     const userId = session?.user?.id;
@@ -718,13 +730,13 @@ export const getCompletedEnrollment = cache(
       select: {
         completedAt: true,
         user: { select: { name: true, email: true } },
-        course: { select: { title: true, instructorName: true, hours: true } },
+        course: { select: { title: true, instructorName: true, hours: true, i18n: true } },
       },
     });
     if (!e || !e.completedAt) return null;
     return {
       userName: e.user.name ?? e.user.email,
-      courseTitle: e.course.title,
+      courseTitle: localizedTitle(e.course.title, e.course.i18n, locale),
       instructorName: e.course.instructorName,
       completedAt: e.completedAt,
       hours: e.course.hours,

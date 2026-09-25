@@ -23,7 +23,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { lang, slug } = await props.params;
   const locale = isLocale(lang) ? lang : defaultLocale;
-  const course = await getCourseOutline(slug);
+  const course = await getCourseOutline(slug, locale);
   if (!course) return {};
 
   const path = `/formations/${course.slug}`;
@@ -53,7 +53,7 @@ export default async function CoursePage(
   const t = await getDictionary(lang);
   const lp = (path: string) => localePath(lang, path);
   // Sommaire seul : cette page n'affiche aucun corps de lecon ni quiz.
-  const course = await getCourseOutline(slug);
+  const course = await getCourseOutline(slug, lang);
   if (!course) notFound();
 
   const lessons = allLessons(course);
@@ -150,7 +150,15 @@ export default async function CoursePage(
   const meta = [
     `${c.durationLabel} : ${course.hours} ${c.hoursUnit}`,
     course.language && `${c.languageLabel} : ${course.language}`,
-    `${c.levelLabel} : ${course.level}`,
+    `${c.levelLabel} : ${
+      (
+        {
+          Débutant: t.catalog.levelBeginner,
+          Intermédiaire: t.catalog.levelIntermediate,
+          Avancé: t.catalog.levelAdvanced,
+        } as Record<string, string>
+      )[course.level] ?? course.level
+    }`,
     course.software && `${c.softwareLabel} : ${course.software}`,
   ].filter(Boolean) as string[];
 
