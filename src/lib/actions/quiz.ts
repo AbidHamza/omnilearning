@@ -1,6 +1,9 @@
 "use server";
 
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { getLessonQuestions } from "@/lib/courses";
+import { canUseLesson } from "@/lib/entitlements";
 import type { QuizVerdict } from "@/lib/types";
 
 /**
@@ -12,10 +15,10 @@ import type { QuizVerdict } from "@/lib/types";
  * des propositions est la bonne, ce qui n'était pas le cas quand les quiz
  * partaient entiers dans le HTML.
  *
- * Volontairement sans garde d'authentification : les leçons en accès libre ont
- * des quiz, et cette action ne divulgue une réponse qu'une question à la fois,
- * après une tentative. Le score qui compte pour l'XP est recalculé ailleurs
- * (`recordQuizAttemptAction`), à partir de la base.
+ * Sans compte, seuls les quiz des leçons offertes se corrigent. Ceux d'une
+ * leçon payante exigent l'accès au cours : sans cette garde, un script qui
+ * soumettait chaque indice récupérait tout l'examen blanc. Le score qui compte
+ * pour l'XP est recalculé ailleurs (`recordQuizAttemptAction`), depuis la base.
  */
 export async function checkQuizAnswerAction(input: {
   courseSlug: string;
@@ -25,6 +28,14 @@ export async function checkQuizAnswerAction(input: {
 }): Promise<QuizVerdict | null> {
   const { courseSlug, lessonKey, questionId, selected } = input;
   if (!courseSlug || !lessonKey || !questionId) return null;
+
+  const lesson = await prisma.lesson.findFirst({
+    where: { key: lessonKey, part: { course: { slug: courseSlug } } },
+    select: { isFree: true },
+  });
+  if (!lesson) return null;
+  const session = await auth();
+  if (!(await canUseLesson(session?.user?.id ?? null, courseSlug, lesson.isFree))) return null;
 
   const questions = await getLessonQuestions(courseSlug, lessonKey);
   const question = questions.find((q) => q.id === questionId);
