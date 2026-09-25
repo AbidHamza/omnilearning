@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Course } from "@/lib/types";
 import { type Locale, defaultLocale } from "@/i18n/config";
-import { formatPrice } from "@/lib/pricing";
+import { DEFAULT_CURRENCY, formatPrice } from "@/lib/pricing";
 
 type CardLabels = {
   levelPrefix: string;
@@ -20,7 +20,7 @@ type CardLabels = {
  */
 function priceLabel(course: Course, locale: Locale, freeLabel: string): string {
   if (course.accessType !== "PAID" || !course.priceCents) return freeLabel;
-  return formatPrice(course.priceCents, course.currency ?? "eur", locale);
+  return formatPrice(course.priceCents, course.currency ?? DEFAULT_CURRENCY, locale);
 }
 
 /**

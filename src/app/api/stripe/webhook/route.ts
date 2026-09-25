@@ -1,6 +1,7 @@
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
+import { DEFAULT_CURRENCY } from "@/lib/pricing";
 
 // Webhook Stripe : synchronise l'état des abonnements en DB.
 // Endpoint à déclarer dans le dashboard Stripe : <APP_URL>/api/stripe/webhook.
@@ -147,7 +148,7 @@ async function fulfillCoursePurchase(s: Stripe.Checkout.Session) {
   if (existing?.status === "paid") return;
 
   const amountCents = s.amount_total ?? existing?.amountCents ?? 0;
-  const currency = s.currency ?? existing?.currency ?? "eur";
+  const currency = s.currency ?? existing?.currency ?? DEFAULT_CURRENCY;
 
   await prisma.purchase.upsert({
     where: { userId_courseId: { userId, courseId } },

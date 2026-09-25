@@ -72,9 +72,9 @@ export default function CreerFormationClient({
   const [level, setLevel] = useState(initial?.level ?? "");
   const [skills, setSkills] = useState(initial?.skills ?? "");
   const [prereq, setPrereq] = useState(initial?.prerequisites ?? "");
-  // Le formateur saisit des euros, la base stocke des centimes. La conversion
+  // Le formateur saisit des dollars US, la base stocke des centimes. La conversion
   // se fait une seule fois, ici, au moment de l'envoi.
-  const [priceEuros, setPriceEuros] = useState(
+  const [priceDollars, setPriceDollars] = useState(
     initial && initial.priceCents > 0 ? String(initial.priceCents / 100) : "",
   );
 
@@ -114,7 +114,7 @@ export default function CreerFormationClient({
   }
 
   function payload(submit: boolean) {
-    const euros = Number(priceEuros.replace(",", "."));
+    const dollars = Number(priceDollars.replace(",", "."));
     return {
       id: draftId ?? undefined,
       category,
@@ -127,7 +127,7 @@ export default function CreerFormationClient({
       curriculum: modules,
       activities: activities.map(({ type, instruction }) => ({ type, instruction })),
       uploads,
-      priceCents: Number.isFinite(euros) && euros > 0 ? Math.round(euros * 100) : 0,
+      priceCents: Number.isFinite(dollars) && dollars > 0 ? Math.round(dollars * 100) : 0,
       submit,
     };
   }
@@ -178,9 +178,9 @@ export default function CreerFormationClient({
     Intermédiaire: c.levelIntermediate,
     Avancé: c.levelAdvanced,
   };
-  const euros = Number(priceEuros.replace(",", "."));
+  const dollars = Number(priceDollars.replace(",", "."));
   const priceRecap =
-    Number.isFinite(euros) && euros > 0 ? `${euros.toFixed(2)} €` : c.priceFree;
+    Number.isFinite(dollars) && dollars > 0 ? `$${dollars.toFixed(2)}` : c.priceFree;
   const lessonCount = modules.reduce((n, m) => n + m.lessons.length, 0);
 
   return (
@@ -277,8 +277,8 @@ export default function CreerFormationClient({
                     inputMode="decimal"
                     min={0}
                     step="0.01"
-                    value={priceEuros}
-                    onChange={(e) => setPriceEuros(e.target.value)}
+                    value={priceDollars}
+                    onChange={(e) => setPriceDollars(e.target.value)}
                     placeholder={c.pricePlaceholder}
                     className={inputCls}
                   />
