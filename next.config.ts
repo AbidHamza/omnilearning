@@ -59,6 +59,16 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
+  // Les paquets SCORM vivent sous public/ mais ne doivent pas être servis en
+  // statique : `beforeFiles` passe avant la lecture de public/ et les envoie
+  // à la route qui vérifie l'accès à la leçon (src/app/api/scorm).
+  async rewrites() {
+    return {
+      beforeFiles: [{ source: "/uploads/scorm/:path*", destination: "/api/scorm/:path*" }],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async headers() {
     return [
       {
