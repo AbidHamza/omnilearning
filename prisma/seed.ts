@@ -541,6 +541,64 @@ async function main() {
     );
   }
 
+  // Parcours réels : créés une fois, jamais réécrits ensuite (update vide),
+  // pour ne pas écraser une retouche faite en base. Un parcours dont une
+  // formation manque n'est pas créé du tout plutôt que créé à moitié.
+  const seedPaths = [
+    {
+      slug: "cloud-et-ia-les-bases",
+      title: "Cloud et IA : les bases",
+      summary:
+        "Manipuler une vraie console Azure, puis comprendre comment un modèle apprend à partir de données.",
+      description:
+        "Les ateliers Azure viennent d'abord : machine virtuelle, stockage, estimation de coût et verrou de ressource. Tu sais ensuite où tourne un service et ce qu'il coûte.\n\nLe cours de machine learning prend le relais : régression, classification, réseaux de neurones, modèles de langue, jusqu'à la mise en production.",
+      i18n: {
+        en: {
+          title: "Cloud and AI: the basics",
+          summary:
+            "Work in a real Azure console, then understand how a model learns from data.",
+          description:
+            "The Azure labs come first: virtual machine, storage, cost estimate and resource lock. You then know where a service runs and what it costs.\n\nThe machine learning course takes over: regression, classification, neural networks, language models, all the way to production.",
+        },
+        ar: {
+          title: "السحابة والذكاء الاصطناعي: الأساسيات",
+          summary:
+            "العمل في وحدة تحكم Azure حقيقية، ثم فهم كيف يتعلّم النموذج من البيانات.",
+          description:
+            "تبدأ بورش Azure: آلة افتراضية، تخزين، تقدير التكلفة وقفل الموارد. بعدها تعرف أين تعمل الخدمة وكم تكلّف.\n\nثم يأتي مقرر تعلّم الآلة: الانحدار، التصنيف، الشبكات العصبية، نماذج اللغة، وصولاً إلى النشر.",
+        },
+      },
+      courses: ["azure-fondamentaux-labs", "ml-fondamentaux"],
+    },
+  ];
+  for (const sp of seedPaths) {
+    const found = await prisma.course.findMany({
+      where: { slug: { in: sp.courses } },
+      select: { id: true, slug: true },
+    });
+    if (found.length !== sp.courses.length) continue;
+    const path = await prisma.learningPath.upsert({
+      where: { slug: sp.slug },
+      create: {
+        slug: sp.slug,
+        title: sp.title,
+        summary: sp.summary,
+        description: sp.description,
+        i18n: JSON.stringify(sp.i18n),
+      },
+      update: {},
+    });
+    for (const [position, courseSlug] of sp.courses.entries()) {
+      const courseId = found.find((c) => c.slug === courseSlug)!.id;
+      await prisma.learningPathCourse.upsert({
+        where: { pathId_courseId: { pathId: path.id, courseId } },
+        create: { pathId: path.id, courseId, position },
+        update: {},
+      });
+    }
+    console.log(`  parcours ${sp.slug}`);
+  }
+
   console.log("Seed terminé.");
 }
 

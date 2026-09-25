@@ -45,18 +45,22 @@ export default function Navbar() {
   const linksByRole: Record<Role, NavLink[]> = {
     visiteur: [
       { href: "/formations", label: t.nav.formations },
+      { href: "/parcours", label: t.nav.paths },
     ],
     etudiant: [
       { href: "/formations", label: t.nav.formations },
+      { href: "/parcours", label: t.nav.paths },
       { href: "/tableau-de-bord", label: t.nav.dashboard },
     ],
     formateur: [
       { href: "/formations", label: t.nav.formations },
+      { href: "/parcours", label: t.nav.paths },
       { href: "/formateur", label: t.nav.dashboard },
     ],
     admin: [
       { href: "/admin", label: t.nav.moderation },
       { href: "/formations", label: t.nav.formations },
+      { href: "/parcours", label: t.nav.paths },
     ],
   };
 

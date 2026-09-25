@@ -744,3 +744,81 @@ export const getCompletedEnrollment = cache(
     };
   },
 );
+
+/**
+ * Fil de discussion et note privée d'une leçon. Les messages masqués par la
+ * modération ne sortent pas d'ici ; la note n'est lue que pour son auteur.
+ */
+export async function getLessonSocial(courseSlug: string, lessonKey: string, locale: string) {
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
+  const lesson = await prisma.lesson.findFirst({
+    where: { key: lessonKey, part: { course: { slug: courseSlug } } },
+    select: { id: true },
+  });
+  if (!lesson) return null;
+
+  const [comments, note] = await Promise.all([
+    prisma.lessonComment.findMany({
+      where: { lessonId: lesson.id, hidden: false },
+      orderBy: { createdAt: "asc" },
+      take: 200,
+      select: { id: true, userId: true, authorName: true, body: true, createdAt: true },
+    }),
+    userId
+      ? prisma.lessonNote.findUnique({
+          where: { userId_lessonId: { userId, lessonId: lesson.id } },
+          select: { body: true },
+        })
+      : null,
+  ]);
+
+  return {
+    userId,
+    isAdmin: session?.user?.role === "ADMIN",
+    note: note?.body ?? "",
+    comments: comments.map((c) => ({
+      id: c.id,
+      authorName: c.authorName,
+      body: c.body,
+      date: formatDate(c.createdAt, locale),
+      mine: c.userId === userId,
+    })),
+  };
+}
+
+/** Les derniers messages de toutes les leçons, masqués compris, pour la modération. */
+export async function getRecentComments(locale: string, take = 50) {
+  const rows = await prisma.lessonComment.findMany({
+    orderBy: { createdAt: "desc" },
+    take,
+    select: {
+      id: true,
+      authorName: true,
+      body: true,
+      hidden: true,
+      createdAt: true,
+      user: { select: { email: true } },
+      lesson: {
+        select: {
+          key: true,
+          title: true,
+          part: { select: { course: { select: { slug: true, title: true } } } },
+        },
+      },
+    },
+  });
+  return rows.map((c) => ({
+    id: c.id,
+    authorName: c.authorName,
+    email: c.user.email,
+    body: c.body,
+    hidden: c.hidden,
+    date: formatDate(c.createdAt, locale),
+    courseTitle: c.lesson.part.course.title,
+    lessonTitle: c.lesson.title,
+    href: `/formations/${c.lesson.part.course.slug}/${c.lesson.key}`,
+  }));
+}
+
+export type AdminComment = Awaited<ReturnType<typeof getRecentComments>>[number];

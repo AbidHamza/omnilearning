@@ -7,7 +7,7 @@ import {
   getCourseOutline,
   toPublicQuestions,
 } from "@/lib/courses";
-import { getCourseViewerState } from "@/lib/dal";
+import { getCourseViewerState, getLessonSocial } from "@/lib/dal";
 import { getCourseAccess, isLessonLocked } from "@/lib/entitlements";
 import { formatPrice } from "@/lib/pricing";
 import BuyCourseButton from "@/components/buy-course-button";
@@ -16,6 +16,8 @@ import Quiz from "@/components/quiz";
 import Markdown from "@/components/markdown";
 import LessonTypeIcon from "@/components/lesson-type-icon";
 import LessonTracker from "@/components/lesson-tracker";
+import LessonNote from "@/components/lesson-note";
+import LessonComments from "@/components/lesson-comments";
 import LessonVideo, { type CaptionTrack } from "@/components/lesson-video";
 import ScormPlayer from "@/components/scorm-player";
 import {
@@ -135,6 +137,7 @@ export default async function LessonPage(
   // Chemin de retour NON préfixé par la locale : useLocaleRouter.push() du
   // formulaire de connexion re-préfixe lui-même.
   const nextParam = encodeURIComponent(`/formations/${course.slug}/${lessonId}`);
+  const social = locked ? null : await getLessonSocial(course.slug, lesson.id, lang);
 
   return (
     <div className="container-page grid gap-10 py-8 lg:grid-cols-[1fr_320px]">
@@ -317,6 +320,22 @@ export default async function LessonPage(
             </Link>
           )}
         </div>
+
+        {social && (
+          <>
+            {social.userId && (
+              <LessonNote slug={course.slug} lessonKey={lesson.id} initial={social.note} />
+            )}
+            <LessonComments
+              slug={course.slug}
+              lessonKey={lesson.id}
+              comments={social.comments}
+              canPost={Boolean(social.userId)}
+              canModerate={social.isAdmin}
+              loginHref={lp(`/connexion?next=${nextParam}`)}
+            />
+          </>
+        )}
       </div>
 
       <aside className="lg:sticky lg:top-20 lg:self-start">

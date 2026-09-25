@@ -9,6 +9,7 @@ import { siteUrl } from "@/lib/site";
 const publicPaths = [
   "",
   "/formations",
+  "/parcours",
   "/devenir-formateur",
   "/a-propos",
   "/contact",
@@ -27,6 +28,11 @@ export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const courses = await prisma.course.findMany({
+    where: { status: "PUBLISHED" },
+    select: { slug: true, updatedAt: true },
+  });
+
+  const paths = await prisma.learningPath.findMany({
     where: { status: "PUBLISHED" },
     select: { slug: true, updatedAt: true },
   });
@@ -52,6 +58,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: course.updatedAt,
         changeFrequency: "monthly",
         priority: 0.8,
+        alternates: { languages: languagesFor(path) },
+      });
+    }
+  }
+
+  for (const lp of paths) {
+    const path = `/parcours/${lp.slug}`;
+    for (const locale of locales) {
+      entries.push({
+        url: `${siteUrl}/${locale}${path}`,
+        lastModified: lp.updatedAt,
+        changeFrequency: "monthly",
+        priority: 0.7,
         alternates: { languages: languagesFor(path) },
       });
     }
