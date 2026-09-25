@@ -50,7 +50,7 @@ export default function CourseCard({
 
   return (
     <Link href={href} className={`group block ${className}`}>
-      <div className={`relative overflow-hidden rounded-[16px] bg-surface-2 ${compact ? "aspect-[4/5]" : "aspect-[5/4]"}`}>
+      <div className="relative aspect-[8/5] overflow-hidden rounded-[16px] bg-surface-2">
         <Image
           src={course.image}
           alt={course.title}

@@ -311,8 +311,12 @@ export async function getLessonQuestions(
   return translateQuestions(parseQuestions(lesson?.questions ?? null), tr?.questions) ?? [];
 }
 
+/** Domaines qui ont au moins une formation en ligne : un filtre vide mène à « 0 résultat ». */
 export const getCategories = cache(async (): Promise<Category[]> => {
-  const rows = await prisma.category.findMany({ orderBy: { label: "asc" } });
+  const rows = await prisma.category.findMany({
+    where: { courses: { some: { status: "PUBLISHED" } } },
+    orderBy: { label: "asc" },
+  });
   return rows.map((c) => ({ id: c.slug, label: c.label, icon: c.icon }));
 });
 
