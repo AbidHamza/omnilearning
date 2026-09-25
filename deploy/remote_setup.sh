@@ -28,16 +28,22 @@ sed -i 's#"@prisma/adapter-better-sqlite3",#"@prisma/adapter-pg",#' next.config.
 sed -i '/"better-sqlite3",/d' next.config.ts
 grep -n 'output\|adapter-pg\|standalone' next.config.ts
 
-echo "===> 5. Drop SQLite migrations (db push utilisé pour Postgres)"
+echo "===> 5. Historique de migrations Postgres (remplace l'historique dev SQLite)"
+# prisma/migrations = historique SQLite (dev). prisma/migrations-postgres = historique
+# versionne Postgres, seul valide en prod. Prod est baseline sur 0_init (voir AGENTS.md) ;
+# ce swap ne rejoue jamais le DDL de 0_init, il rend juste l'historique visible pour
+# `migrate deploy`, qui saute tout ce qui est deja marque applique dans _prisma_migrations.
 rm -rf prisma/migrations
+mv prisma/migrations-postgres prisma/migrations
 
 echo "===> 6. npm install + adapter-pg"
 npm install --no-audit --no-fund @prisma/adapter-pg pg >/dev/null 2>&1 || npm install @prisma/adapter-pg pg
 npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
 
-echo "===> 7. prisma db push + generate"
-# Prisma 7 : `db push` ne prend plus --skip-generate ; generate est appelé juste après.
-npx prisma db push
+echo "===> 7. prisma migrate deploy + generate"
+# db push (schema-sync, sans historique) remplacé par migrate deploy (versionné,
+# rejoue uniquement les migrations non encore marquées dans _prisma_migrations).
+npx prisma migrate deploy
 npx prisma generate
 
 echo "===> 8. seed"
