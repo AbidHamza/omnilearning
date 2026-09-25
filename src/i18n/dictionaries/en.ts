@@ -789,7 +789,7 @@ const en: Dict = {
     manage: "Manage my subscription",
   },
   certificate: {
-    title: "Certificate of completion",
+    title: "OmniLearn certificate of completion",
     issuedTo: "Issued to",
     forCourse: "for following and completing the course",
     hoursLabel: "{n} hours of training",
@@ -798,7 +798,7 @@ const en: Dict = {
     issuer: "Issued by OmniLearnConsultingCommerce LLC, OmniLearn platform",
     print: "Print or save as PDF",
     back: "Back to the course",
-    verifyNote: "This certificate attests that the course lessons and quizzes were completed on the platform. It is not a state diploma.",
+    verifyNote: "This document confirms that the course lessons and quizzes were completed on the OmniLearn platform. It is not a state diploma, nor a Microsoft, Google or other vendor certification, and it does not replace any official exam.",
     linkLabel: "Certificate",
   },
   chart: {

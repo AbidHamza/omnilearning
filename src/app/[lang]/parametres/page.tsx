@@ -35,7 +35,7 @@ export default async function ParametresPage({ params }: PageProps<"/[lang]">) {
   }
 
   // Résoudre les titres des cours suivis (slug -> titre) depuis la DB.
-  const courses = await getCourses();
+  const courses = await getCourses(locale);
   const courseTitles = Object.fromEntries(courses.map((c) => [c.slug, c.title]));
 
   return (

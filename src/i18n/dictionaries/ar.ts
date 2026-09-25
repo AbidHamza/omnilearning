@@ -787,7 +787,7 @@ const ar: Dict = {
     manage: "إدارة اشتراكي",
   },
   certificate: {
-    title: "شهادة إتمام الدورة",
+    title: "إفادة إتمام من OmniLearn",
     issuedTo: "مُنحت إلى",
     forCourse: "لمتابعة وإتمام الدورة",
     hoursLabel: "{n} ساعة من التدريب",
@@ -796,8 +796,8 @@ const ar: Dict = {
     issuer: "صادرة عن OmniLearnConsultingCommerce LLC، منصة OmniLearn",
     print: "طباعة أو حفظ بصيغة PDF",
     back: "العودة إلى الدورة",
-    verifyNote: "تشهد هذه الشهادة بإتمام دروس واختبارات الدورة على المنصة. وهي ليست شهادة رسمية من الدولة.",
-    linkLabel: "الشهادة",
+    verifyNote: "تُثبت هذه الإفادة إتمام دروس الدورة واختباراتها على منصة OmniLearn. وهي ليست شهادة رسمية من الدولة، ولا شهادة اعتماد من Microsoft أو Google أو أي جهة أخرى، ولا تحلّ محلّ أي امتحان رسمي.",
+    linkLabel: "الإفادة",
   },
   chart: {
     empty:

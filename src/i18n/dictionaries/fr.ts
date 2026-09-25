@@ -795,7 +795,7 @@ const fr = {
     manage: "Gérer mon abonnement",
   },
   certificate: {
-    title: "Certificat de fin de formation",
+    title: "Attestation de réussite OmniLearn",
     issuedTo: "Délivré à",
     forCourse: "pour avoir suivi et terminé la formation",
     hoursLabel: "{n} heures de formation",
@@ -804,8 +804,8 @@ const fr = {
     issuer: "Délivré par OmniLearnConsultingCommerce LLC, plateforme OmniLearn",
     print: "Imprimer ou enregistrer en PDF",
     back: "Retour à la formation",
-    verifyNote: "Ce certificat atteste de la complétion des leçons et quiz du cours sur la plateforme. Il n'est pas un diplôme d'État.",
-    linkLabel: "Certificat",
+    verifyNote: "Cette attestation confirme que les leçons et les quiz du cours ont été terminés sur la plateforme OmniLearn. Ce n'est ni un diplôme d'État ni une certification Microsoft, Google ou d'un autre éditeur, et elle ne remplace aucun examen officiel.",
+    linkLabel: "Attestation",
   },
   chart: {
     empty:

@@ -34,7 +34,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { lang, slug, lessonId } = await props.params;
   const locale = isLocale(lang) ? lang : defaultLocale;
-  const outline = await getCourseOutline(slug);
+  const outline = await getCourseOutline(slug, locale);
   const lesson = outline && allLessons(outline).find((l) => l.id === lessonId);
   if (!outline || !lesson) return {};
 
@@ -111,7 +111,7 @@ export default async function LessonPage(
   const t = await getDictionary(lang);
   const c = t.course;
   const lp = (path: string) => localePath(lang, path);
-  const course = await getCourse(slug);
+  const course = await getCourse(slug, lang);
   if (!course) notFound();
 
   const lessons = allLessons(course);

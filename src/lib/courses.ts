@@ -5,7 +5,9 @@ import type {
   Category,
   Course,
   CoursePart,
+  CourseTranslation,
   Lesson,
+  LessonTranslation,
   PublicQuizQuestion,
   QuizQuestion,
 } from "@/lib/types";
@@ -66,6 +68,7 @@ type LessonRow = {
   scormPackagePath?: string | null;
   scormEntryPath?: string | null;
   scormVersion?: string | null;
+  i18n?: string | null;
 };
 
 /**
@@ -112,8 +115,45 @@ type CourseRow = {
   accessType: string;
   priceCents: number;
   currency: string;
+  i18n: string | null;
   parts: { id: string; title: string; lessons: LessonRow[] }[];
 };
+
+function pickTranslation<T>(
+  raw: string | null | undefined,
+  locale: string | undefined,
+): T | undefined {
+  if (!raw || !locale || locale === "fr") return undefined;
+  try {
+    const v = JSON.parse(raw);
+    const t = v && typeof v === "object" ? (v as Record<string, unknown>)[locale] : undefined;
+    return t && typeof t === "object" ? (t as T) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function translateQuestions(
+  base: QuizQuestion[] | undefined,
+  tr: LessonTranslation["questions"],
+): QuizQuestion[] | undefined {
+  if (!base || !Array.isArray(tr)) return base;
+  return base.map((q, i) => {
+    const t = tr[i];
+    if (!t) return q;
+    // Un nombre de propositions différent décalerait correctIndex : on garde
+    // alors celles de la base.
+    const options =
+      Array.isArray(t.options) && t.options.length === q.options.length ? t.options : q.options;
+    const explanation = t.explanation || q.explanation;
+    return {
+      ...q,
+      prompt: t.prompt || q.prompt,
+      options,
+      ...(explanation ? { explanation } : null),
+    };
+  });
+}
 
 /** Sommaire seul : parties + métadonnées de leçons. */
 const outlineInclude = {
@@ -135,12 +175,16 @@ const fullInclude = {
   },
 } as const;
 
-function toUiCourse(c: CourseRow): Course {
-  const parts: CoursePart[] = c.parts.map((p) => ({
+function toUiCourse(c: CourseRow, locale?: string): Course {
+  const ct = pickTranslation<CourseTranslation>(c.i18n, locale);
+  const parts: CoursePart[] = c.parts.map((p, pi) => ({
     id: p.id,
-    title: p.title,
+    title: ct?.parts?.[pi] || p.title,
     lessons: p.lessons.map((l): Lesson => {
-      const questions = parseQuestions(l.questions ?? null);
+      const lt = pickTranslation<LessonTranslation>(l.i18n, locale);
+      const questions = translateQuestions(parseQuestions(l.questions ?? null), lt?.questions);
+      const body = lt?.body || l.body;
+      const videoLabel = lt?.videoLabel || l.videoLabel;
       const captions = parseCaptions(l.captions);
       // Les champs optionnels ne sont posés que s'ils existent. Une clé à
       // `undefined` traverse quand même le payload RSC : écrites pour les
@@ -148,12 +192,12 @@ function toUiCourse(c: CourseRow): Course {
       // tout sur /formations.
       return {
         id: l.key,
-        title: l.title,
+        title: ct?.lessons?.[l.key] || lt?.title || l.title,
         type: l.type as Lesson["type"],
         duration: l.duration,
         isFree: l.isFree,
-        ...(l.body ? { body: l.body } : null),
-        ...(l.videoLabel ? { videoLabel: l.videoLabel } : null),
+        ...(body ? { body } : null),
+        ...(videoLabel ? { videoLabel } : null),
         ...(l.videoUrl ? { videoUrl: l.videoUrl } : null),
         ...(l.videoPoster ? { videoPoster: l.videoPoster } : null),
         ...(l.videoDurationSec ? { videoDurationSec: l.videoDurationSec } : null),
@@ -168,24 +212,24 @@ function toUiCourse(c: CourseRow): Course {
 
   return {
     slug: c.slug,
-    title: c.title,
-    tagline: c.tagline,
-    description: c.description,
+    title: ct?.title || c.title,
+    tagline: ct?.tagline || c.tagline,
+    description: ct?.description || c.description,
     category: c.category,
     level: c.level as Course["level"],
     instructor: c.instructorName,
-    instructorBio: c.instructorBio ?? undefined,
+    instructorBio: ct?.instructorBio || c.instructorBio || undefined,
     hours: c.hours,
     rating: c.rating,
     learners: c.learners,
     accent: c.accent,
     image: c.image,
-    language: c.language ?? undefined,
-    software: c.software ?? undefined,
-    prerequisites: parseArr(c.prerequisites),
-    summary: parseArr(c.summary),
-    objectives: parseArr(c.objectives),
-    skills: parseArr(c.skills),
+    language: ct?.language || c.language || undefined,
+    software: ct?.software || c.software || undefined,
+    prerequisites: ct?.prerequisites ?? parseArr(c.prerequisites),
+    summary: ct?.summary ?? parseArr(c.summary),
+    objectives: ct?.objectives ?? parseArr(c.objectives),
+    skills: ct?.skills ?? parseArr(c.skills),
     contentTypes: parseArr(c.contentTypes),
     accessType: c.accessType === "PAID" ? "PAID" : "FREE",
     priceCents: c.priceCents,
@@ -199,23 +243,23 @@ function toUiCourse(c: CourseRow): Course {
  * le tableau de bord et les paramètres : aucun de ces écrans n'affiche le corps
  * d'une leçon, donc aucun n'a de raison de le transporter jusqu'au navigateur.
  */
-export const getCourses = cache(async (): Promise<Course[]> => {
+export const getCourses = cache(async (locale?: string): Promise<Course[]> => {
   const rows = await prisma.course.findMany({
     where: { status: "PUBLISHED" },
     include: outlineInclude,
     orderBy: { createdAt: "asc" },
   });
-  return rows.map(toUiCourse);
+  return rows.map((r) => toUiCourse(r, locale));
 });
 
 /** Fiche cours : métadonnées + sommaire, sans le contenu des leçons. */
 export const getCourseOutline = cache(
-  async (slug: string): Promise<Course | undefined> => {
+  async (slug: string, locale?: string): Promise<Course | undefined> => {
     const c = await prisma.course.findFirst({
       where: { slug, status: "PUBLISHED" },
       include: outlineInclude,
     });
-    return c ? toUiCourse(c) : undefined;
+    return c ? toUiCourse(c, locale) : undefined;
   },
 );
 
@@ -224,13 +268,15 @@ export const getCourseOutline = cache(
  * leçon, et à ne jamais passer tel quel à un composant client : les quiz
  * portent leur `correctIndex`. Pour l'affichage, voir `toPublicQuestions`.
  */
-export const getCourse = cache(async (slug: string): Promise<Course | undefined> => {
-  const c = await prisma.course.findFirst({
-    where: { slug, status: "PUBLISHED" },
-    include: fullInclude,
-  });
-  return c ? toUiCourse(c) : undefined;
-});
+export const getCourse = cache(
+  async (slug: string, locale?: string): Promise<Course | undefined> => {
+    const c = await prisma.course.findFirst({
+      where: { slug, status: "PUBLISHED" },
+      include: fullInclude,
+    });
+    return c ? toUiCourse(c, locale) : undefined;
+  },
+);
 
 /**
  * Questions d'un quiz débarrassées de leur réponse. C'est cette forme-là qui
@@ -255,12 +301,14 @@ export function toPublicQuestions(
 export async function getLessonQuestions(
   courseSlug: string,
   lessonKey: string,
+  locale?: string,
 ): Promise<QuizQuestion[]> {
   const lesson = await prisma.lesson.findFirst({
     where: { key: lessonKey, part: { course: { slug: courseSlug } } },
-    select: { questions: true, isFree: true },
+    select: { questions: true, isFree: true, i18n: true },
   });
-  return parseQuestions(lesson?.questions ?? null) ?? [];
+  const tr = pickTranslation<LessonTranslation>(lesson?.i18n, locale);
+  return translateQuestions(parseQuestions(lesson?.questions ?? null), tr?.questions) ?? [];
 }
 
 export const getCategories = cache(async (): Promise<Category[]> => {

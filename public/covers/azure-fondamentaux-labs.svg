@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="Azure Fondamentaux : ateliers pratiques">
+  <defs>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0 H0 V64" fill="none" stroke="#0a84d6" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="4" height="6" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" opacity="0.02"/>
+    </pattern>
+    <radialGradient id="glow" cx="78%" cy="28%" r="60%">
+      <stop offset="0%" stop-color="#0a84d6" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#0a84d6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="800" fill="#0b0f0d"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+
+
+    <g transform="translate(900 90)" stroke="#0a84d6" fill="none" stroke-width="3">
+      <path d="M38 68 a22 22 0 0 1 3 -43.6 a28 28 0 0 1 51 -7.4 a24 24 0 0 1 43 13.8 a19 19 0 0 1 -5 37.2 z" opacity="0.85"/>
+      <line x1="58" y1="68" x2="58" y2="108" opacity="0.5"/>
+      <line x1="98" y1="68" x2="98" y2="108" opacity="0.5"/>
+      <rect x="18" y="108" width="180" height="38" rx="4" opacity="0.35"/>
+      <circle cx="34" cy="127" r="3" fill="#0a84d6" stroke="none" opacity="0.6"/>
+      <circle cx="46" cy="127" r="3" fill="#0a84d6" stroke="none" opacity="0.6"/>
+      <rect x="18" y="156" width="180" height="38" rx="4" opacity="0.2"/>
+      <circle cx="34" cy="175" r="3" fill="#0a84d6" stroke="none" opacity="0.4"/>
+      <circle cx="46" cy="175" r="3" fill="#0a84d6" stroke="none" opacity="0.4"/>
+    </g>
+
+  <!-- prompt -->
+  <text x="84" y="128" font-size="30" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#0a84d6">$ <tspan fill="#9fb4a8">azure-fondamentaux-labs</tspan><tspan fill="#0a84d6"> ▍</tspan></text>
+
+  <!-- titre -->
+  <text x="84" y="479" font-size="60" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">Azure Fondamentaux :</text>
+  <text x="84" y="556" font-size="60" font-weight="700" fill="#e8f2ec" font-family="'JetBrains Mono', ui-monospace, monospace" letter-spacing="-1">ateliers pratiques</text>
+  <rect x="84" y="582" width="120" height="6" fill="#0a84d6"/>
+
+  <!-- pied -->
+  <text x="84" y="736" font-size="22" font-family="'JetBrains Mono', ui-monospace, monospace" fill="#5c6f64">omnilearn<tspan fill="#0a84d6">.</tspan>formations</text>
+
+  <rect width="1280" height="800" fill="url(#scan)"/>
+  <rect x="1.5" y="1.5" width="1277" height="797" fill="none" stroke="#0a84d6" stroke-opacity="0.28" stroke-width="3"/>
+</svg>

@@ -17,6 +17,7 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import bcrypt from "bcryptjs";
 import { categories } from "../src/lib/data";
 import { contentCourses } from "../src/lib/content";
+import { freeCourses } from "../src/lib/content/catalogue-libre";
 import { seedPricing } from "../src/lib/pricing";
 import { badges, ghostLearners } from "./seed-data";
 
@@ -223,6 +224,88 @@ async function main() {
   }
 
   if (SEED_DEMO) console.log(`  ${contentCourses.length} formations de démo`);
+
+  // --- Catalogue libre ---
+  // Seul contenu que le seed écrit en prod. Aucun deleteMany ici : une leçon
+  // effacée emporterait en cascade la progression et les quiz des apprenants.
+  // Les parties se retrouvent par leur rang, les leçons par leur clé.
+  for (const course of freeCourses) {
+    const fields = {
+      title: course.title,
+      tagline: course.tagline,
+      description: course.description,
+      category: course.category,
+      level: course.level,
+      instructorName: course.instructor,
+      instructorBio: course.instructorBio ?? null,
+      hours: course.hours,
+      accent: course.accent,
+      image: course.image,
+      language: course.language ?? null,
+      software: course.software ?? null,
+      prerequisites: j(course.prerequisites),
+      summary: j(course.summary),
+      objectives: j(course.objectives),
+      skills: j(course.skills),
+      contentTypes: j(course.contentTypes),
+      i18n: JSON.stringify(course.i18n),
+      status: "PUBLISHED",
+      accessType: "FREE",
+      priceCents: 0,
+    };
+    const saved = await prisma.course.upsert({
+      where: { slug: course.slug },
+      update: fields,
+      create: {
+        ...fields,
+        slug: course.slug,
+        rating: 0,
+        learners: 0,
+        pricingSeededAt: new Date(),
+      },
+    });
+
+    const existingParts = await prisma.coursePart.findMany({
+      where: { courseId: saved.id },
+      include: { lessons: { select: { id: true, key: true } } },
+    });
+    const partByOrder = new Map(existingParts.map((p) => [p.order, p]));
+    const lessonByKey = new Map(
+      existingParts.flatMap((p) => p.lessons.map((l) => [l.key, l.id] as const)),
+    );
+
+    let lessonRank = 0;
+    for (const [pi, part] of course.parts.entries()) {
+      const known = partByOrder.get(pi);
+      const partId = known
+        ? (await prisma.coursePart.update({ where: { id: known.id }, data: { title: part.title } })).id
+        : (await prisma.coursePart.create({
+            data: { courseId: saved.id, title: part.title, order: pi },
+          })).id;
+      for (const [li, lesson] of part.lessons.entries()) {
+        const data = {
+          partId,
+          title: lesson.title,
+          type: lesson.type,
+          duration: lesson.duration,
+          body: lesson.body ?? null,
+          videoLabel: lesson.videoLabel ?? null,
+          questions: j(lesson.questions),
+          i18n: JSON.stringify(lesson.i18n),
+          xp: lesson.type === "quiz" ? XP.quiz_passed : XP.lesson_complete,
+          order: li,
+          isFree: lessonRank < 2,
+        };
+        const id = lessonByKey.get(lesson.id);
+        if (id) await prisma.lesson.update({ where: { id }, data });
+        else await prisma.lesson.create({ data: { ...data, key: lesson.id } });
+        lessonRank++;
+      }
+    }
+    const extra = existingParts.filter((p) => p.order >= course.parts.length).length;
+    if (extra) console.warn(`  ${course.slug} : ${extra} partie(s) en base absentes de la source, laissées en place`);
+  }
+  console.log(`  ${freeCourses.length} formations du catalogue libre`);
 
   // --- Badges ---
   for (const b of badges) {

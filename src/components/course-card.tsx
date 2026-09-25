@@ -9,6 +9,8 @@ type CardLabels = {
   hoursUnit: string;
   access: string;
   free: string;
+  // Le niveau est stocké en français ; sans table, il s'affiche tel quel.
+  levelNames?: Record<string, string>;
 };
 
 /**
@@ -76,7 +78,7 @@ export default function CourseCard({
             <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted">{course.tagline}</p>
             {labels && (
               <p className="mt-2 text-xs text-muted">
-                {labels.levelPrefix} {course.level} · {course.hours} {labels.hoursUnit}
+                {labels.levelPrefix} {labels.levelNames?.[course.level] ?? course.level} · {course.hours} {labels.hoursUnit}
               </p>
             )}
             {/* Formateur : n'existe que pour les cours signés par une personne

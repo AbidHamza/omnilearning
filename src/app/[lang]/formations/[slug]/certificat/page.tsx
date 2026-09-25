@@ -33,7 +33,7 @@ export default async function CertificatePage(
       ),
     );
   }
-  const cert = await getCompletedEnrollment(slug);
+  const cert = await getCompletedEnrollment(slug, locale);
   if (!cert) notFound();
 
   return (
