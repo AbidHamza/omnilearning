@@ -4,9 +4,12 @@
 //   node deploy/stripe_live_setup.mjs            lecture seule : dit ce qui manque et ce qui serait cree
 //   node deploy/stripe_live_setup.mjs --apply    cree produit, prix, webhook live puis met a jour les .env et relance pm2
 //   node deploy/stripe_live_setup.mjs --test     meme lecture seule contre la cle test (calibrage du script)
+//   node deploy/stripe_live_setup.mjs --cles=STRIPE_LLC_TEST [--apply]
+//                                                 branche un autre jeu de cles (ici le compte LLC en mode test)
 //
 // Entree : C:/Users/abidh/.claude/secrets/omnilearning-prod.env doit porter
-// STRIPE_LIVE_SECRET_KEY (sk_live_ ou rk_live_) et STRIPE_LIVE_PUBLISHABLE_KEY (pk_live_).
+// <PREFIXE>_SECRET_KEY et <PREFIXE>_PUBLISHABLE_KEY, PREFIXE valant STRIPE_LIVE par defaut.
+// Une cle live exige un compte active ; une cle test n'est acceptee que par --cles.
 // Aucune valeur secrete n'est jamais affichee.
 // Idempotent : produit retrouve par metadata, prix par lookup_key, webhook par URL.
 
@@ -41,6 +44,7 @@ const NICKNAMES = { soutien: "Soutien", mecene: "Mécène", partenaire: "Partena
 const APPLY = process.argv.includes("--apply");
 const TEST = process.argv.includes("--test");
 if (APPLY && TEST) throw new Error("--apply et --test sont exclusifs");
+const PREFIX = (process.argv.find((a) => a.startsWith("--cles=")) || "--cles=STRIPE_LIVE").slice(7);
 
 const readEnv = (text) =>
   Object.fromEntries(
@@ -51,16 +55,19 @@ const readEnv = (text) =>
       .map((m) => [m[1], m[2].replace(/^["']|["']$/g, "")]),
   );
 const env = readEnv(fs.readFileSync(SECRETS, "utf8"));
-const key = TEST ? env.STRIPE_SECRET_KEY : env.STRIPE_LIVE_SECRET_KEY;
-const pk = TEST ? env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY : env.STRIPE_LIVE_PUBLISHABLE_KEY;
+const key = TEST ? env.STRIPE_SECRET_KEY : env[`${PREFIX}_SECRET_KEY`];
+const pk = TEST ? env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY : env[`${PREFIX}_PUBLISHABLE_KEY`];
+const HOOK_VAR = `${PREFIX}_WEBHOOK_SECRET`;
 
 const stop = (msg) => {
   console.log("STOP :", msg);
   process.exit(2);
 };
-if (!key) stop("STRIPE_LIVE_SECRET_KEY absente du fichier de secrets.");
-if (!TEST && !/^(sk|rk)_live_/.test(key)) stop("STRIPE_LIVE_SECRET_KEY n'est pas une cle live.");
-if (!TEST && !/^pk_live_/.test(pk || "")) stop("STRIPE_LIVE_PUBLISHABLE_KEY absente ou pas live.");
+if (!key) stop(`${PREFIX}_SECRET_KEY absente du fichier de secrets.`);
+const LIVE = /^(sk|rk)_live_/.test(key);
+if (!TEST && PREFIX === "STRIPE_LIVE" && !LIVE) stop("STRIPE_LIVE_SECRET_KEY n'est pas une cle live.");
+if (!TEST && !new RegExp(`^pk_${LIVE ? "live" : "test"}_`).test(pk || ""))
+  stop(`${PREFIX}_PUBLISHABLE_KEY absente ou d'un autre mode que la cle secrete.`);
 
 function form(obj, prefix = "") {
   return Object.entries(obj).flatMap(([k, v]) => {
@@ -89,7 +96,7 @@ const acct = await api("GET", "account");
 console.log(
   `compte ${acct.id} pays=${acct.country} devise=${acct.default_currency} charges=${acct.charges_enabled} virements=${acct.payouts_enabled}`,
 );
-if (!TEST && !acct.charges_enabled) stop("le compte live n'accepte pas encore de paiements (activation Stripe a finir).");
+if (LIVE && !acct.charges_enabled) stop("le compte live n'accepte pas encore de paiements (activation Stripe a finir).");
 
 // Produit
 const products = await api("GET", "products/search?query=" + encodeURIComponent("metadata['omnilearn_key']:'support'"));
@@ -135,9 +142,9 @@ console.log("webhook :", hook ? `${hook.id} (${hook.enabled_events.length} evene
 if (hook && !TEST) {
   const missing = EVENTS.filter((e) => !hook.enabled_events.includes(e));
   if (missing.length) console.log("  evenements manquants :", missing.join(","));
-  if (APPLY && !env.STRIPE_LIVE_WEBHOOK_SECRET)
-    stop("webhook live deja present mais son secret n'est pas dans STRIPE_LIVE_WEBHOOK_SECRET ; le copier depuis le dashboard.");
-  hookSecret = env.STRIPE_LIVE_WEBHOOK_SECRET;
+  if (APPLY && !env[HOOK_VAR])
+    stop(`webhook deja present mais son secret n'est pas dans ${HOOK_VAR} ; le copier depuis le dashboard.`);
+  hookSecret = env[HOOK_VAR];
 }
 if (!hook && APPLY) {
   hook = await api("POST", "webhook_endpoints", {
@@ -155,8 +162,8 @@ if (!APPLY) {
   process.exit(0);
 }
 
-// Ecriture des .env : les valeurs test sont gardees sous STRIPE_TEST_* pour un retour arriere.
-const stamp = new Date().toISOString().slice(0, 10);
+// Ecriture des .env : les valeurs remplacees sont gardees sous STRIPE_PREV_* pour un retour arriere.
+const stamp = `${new Date().toISOString().slice(0, 10)}-${PREFIX.toLowerCase()}`;
 const live = {
   STRIPE_SECRET_KEY: key,
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk,
@@ -170,26 +177,29 @@ function patch(text) {
   let out = text;
   for (const [k, v] of Object.entries(live)) {
     if (!v) throw new Error(`valeur manquante pour ${k}`);
-    if (cur[k] && !/_live_/.test(cur[k]) && !cur[`STRIPE_TEST_${k.replace(/^(NEXT_PUBLIC_)?STRIPE_/, "")}`])
-      out += `\nSTRIPE_TEST_${k.replace(/^(NEXT_PUBLIC_)?STRIPE_/, "")}=${cur[k]}`;
+    const prev = `STRIPE_PREV_${k.replace(/^(NEXT_PUBLIC_)?STRIPE_/, "")}`;
+    if (cur[k] && cur[k] !== v) {
+      const pre = new RegExp(`^${prev}=.*$`, "m");
+      out = pre.test(out) ? out.replace(pre, `${prev}=${cur[k]}`) : out + `\n${prev}=${cur[k]}`;
+    }
     const re = new RegExp(`^${k}=.*$`, "m");
     out = re.test(out) ? out.replace(re, `${k}=${v}`) : out + `\n${k}=${v}`;
   }
-  if (hookSecret && !/^STRIPE_LIVE_WEBHOOK_SECRET=/m.test(out)) out += `\nSTRIPE_LIVE_WEBHOOK_SECRET=${hookSecret}`;
+  if (hookSecret && !new RegExp(`^${HOOK_VAR}=`, "m").test(out)) out += `\n${HOOK_VAR}=${hookSecret}`;
   return out.endsWith("\n") ? out : out + "\n";
 }
 
-fs.copyFileSync(SECRETS, `${SECRETS}.bak-${stamp}-live`);
+fs.copyFileSync(SECRETS, `${SECRETS}.bak-${stamp}`);
 fs.writeFileSync(SECRETS, patch(fs.readFileSync(SECRETS, "utf8")));
 const reread = readEnv(fs.readFileSync(SECRETS, "utf8"));
 console.log("secrets locaux :", reread.STRIPE_SECRET_KEY === key ? "OK" : "ECART");
 
 const ssh = (cmd, input) => execFileSync("ssh", [...SSH, cmd], { input, encoding: "utf8" });
-const remote = ssh(`cp ${REMOTE_ENV} ${REMOTE_ENV}.bak-${stamp}-live && cat ${REMOTE_ENV}`);
+const remote = ssh(`cp ${REMOTE_ENV} ${REMOTE_ENV}.bak-${stamp} && cat ${REMOTE_ENV}`);
 ssh(`cat > ${REMOTE_ENV}`, patch(remote));
 ssh(`cp ${REMOTE_ENV} /opt/omnilearning/.next/standalone/.env && bash /opt/omnilearning/deploy/start_pm2.sh >/dev/null`);
 const check = readEnv(ssh(`cat ${REMOTE_ENV}`));
 console.log("env VPS :", check.STRIPE_SECRET_KEY === key && check.STRIPE_PRICE_MECENE === priceIds.mecene ? "OK" : "ECART");
 const health = await fetch("https://omnilearn.org/api/health");
 console.log("sante :", health.status);
-console.log("Bascule faite. Retour arriere : restaurer les fichiers .bak-" + stamp + "-live puis start_pm2.sh.");
+console.log("Bascule faite. Retour arriere : restaurer les fichiers .bak-" + stamp + " puis start_pm2.sh.");
