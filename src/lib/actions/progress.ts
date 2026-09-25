@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { awardXp } from "@/lib/gamification";
 import { QUIZ_PASS_RATIO } from "@/lib/curriculum";
+import { getLessonQuestions } from "@/lib/courses";
+import { canUseLesson } from "@/lib/entitlements";
 
 // Persiste la progression (inscriptions, leçons terminées, tentatives de quiz)
 // liée à l'utilisateur connecté. No-op silencieux si non connecté (mode démo).
@@ -88,6 +90,7 @@ export async function markLessonCompleteAction(courseSlug: string, lessonKey: st
     where: { key: lessonKey, part: { courseId: course.id } },
   });
   if (!lesson) return { ok: false as const };
+  if (!(await canUseLesson(userId, courseSlug, lesson.isFree))) return { ok: false as const };
 
   const enrollment = await ensureEnrollment(userId, course.id);
 
@@ -144,6 +147,9 @@ export async function saveScormProgressAction(input: {
     where: { key: input.lessonKey, part: { courseId: course.id } },
   });
   if (!lesson) return { ok: false as const };
+  if (!(await canUseLesson(userId, input.courseSlug, lesson.isFree))) {
+    return { ok: false as const };
+  }
 
   const enrollment = await ensureEnrollment(userId, course.id);
 
@@ -202,17 +208,26 @@ export async function recordQuizAttemptAction(input: {
     where: { key: input.lessonKey, part: { courseId: course.id } },
   });
   if (!lesson) return { ok: false as const };
+  if (!(await canUseLesson(userId, input.courseSlug, lesson.isFree))) {
+    return { ok: false as const };
+  }
 
-  const isPassed =
-    input.maxScore > 0 && input.score / input.maxScore >= QUIZ_PASS_RATIO;
+  // Le score envoyé par le navigateur n'est qu'indicatif : on le recalcule
+  // depuis les bonnes réponses en base, sinon { score: 1, maxScore: 1 }
+  // suffisait à valider n'importe quel quiz.
+  const questions = await getLessonQuestions(input.courseSlug, input.lessonKey);
+  const answers = Array.isArray(input.answers) ? input.answers : [];
+  const score = questions.filter((q, i) => answers[i] === q.correctIndex).length;
+  const maxScore = questions.length;
+  const isPassed = maxScore > 0 && score / maxScore >= QUIZ_PASS_RATIO;
 
   await prisma.quizAttempt.create({
     data: {
       userId,
       lessonId: lesson.id,
-      answers: JSON.stringify(input.answers),
-      score: input.score,
-      maxScore: input.maxScore,
+      answers: JSON.stringify(answers),
+      score,
+      maxScore,
       isPassed,
     },
   });

@@ -129,3 +129,19 @@ export async function hasCourseAccess(
   });
   return purchase?.status === "paid";
 }
+
+/**
+ * Garde commune des actions qui écrivent de la progression ou corrigent un
+ * quiz : une leçon offerte reste ouverte à tous, le reste exige l'accès au
+ * cours. Sans elle, un compte gratuit pouvait marquer terminées les leçons
+ * d'une formation payante et obtenir son certificat sans l'acheter.
+ */
+export async function canUseLesson(
+  userId: string | null,
+  courseSlug: string,
+  lessonIsFree: boolean,
+): Promise<boolean> {
+  if (lessonIsFree) return true;
+  if (!userId) return false;
+  return hasCourseAccess(userId, courseSlug);
+}
