@@ -3,6 +3,8 @@
 set -euo pipefail
 APP=/opt/omnilearning
 cd "$APP"
+# Sans .env, le postinstall de prisma echoue sur DATABASE_URL (vu 2026-09-25).
+[ -f .env ] || { echo "ABORT: .env absent dans $APP"; exit 1; }
 
 echo "===> 1. Schema provider -> postgresql"
 # datasource db { provider = "sqlite" }  ->  "postgresql"
@@ -33,8 +35,11 @@ echo "===> 5. Historique de migrations Postgres (remplace l'historique dev SQLit
 # versionne Postgres, seul valide en prod. Prod est baseline sur 0_init (voir AGENTS.md) ;
 # ce swap ne rejoue jamais le DDL de 0_init, il rend juste l'historique visible pour
 # `migrate deploy`, qui saute tout ce qui est deja marque applique dans _prisma_migrations.
-rm -rf prisma/migrations
-mv prisma/migrations-postgres prisma/migrations
+# Garde : sur une relance, le swap est deja fait et migrations-postgres n existe plus.
+if [ -d prisma/migrations-postgres ]; then
+  rm -rf prisma/migrations
+  mv prisma/migrations-postgres prisma/migrations
+fi
 
 echo "===> 6. npm install + adapter-pg"
 npm install --no-audit --no-fund @prisma/adapter-pg pg >/dev/null 2>&1 || npm install @prisma/adapter-pg pg
@@ -51,6 +56,14 @@ npx tsx -r dotenv/config prisma/seed.ts || npx tsx prisma/seed.ts
 
 echo "===> 9. build (standalone)"
 rm -rf .next/cache  # cache Turbopack perime : casse la resolution next/font (vu 2026-09-24)
-NODE_OPTIONS="--max-old-space-size=2048" npm run build
+# next build vide .next/standalone, que pm2 sert en direct : un build rate laissait
+# la prod sans CSS (500 sur /_next/static, 2026-09-25). On garde la version servie.
+SNAP=/opt/backups/omnilearning-standalone-prebuild.tgz
+[ -d .next/standalone ] && tar czf "$SNAP" .next/standalone
+if ! NODE_OPTIONS="--max-old-space-size=2048" npm run build; then
+  echo "ABORT: build KO, restauration du standalone servi avant le build"
+  [ -f "$SNAP" ] && rm -rf .next/standalone && tar xzf "$SNAP"
+  exit 1
+fi
 
 echo "===> DONE remote_setup"
