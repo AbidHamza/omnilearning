@@ -41,6 +41,8 @@ model User {
   reviews       Review[]
   purchases     Purchase[]
   instructorProfile InstructorProfile?
+  lessonComments LessonComment[]
+  lessonNotes    LessonNote[]
 
   // ID client Stripe (pour le portail + abonnements)
   stripeCustomerId String? @unique
@@ -154,6 +156,7 @@ model Course {
   enrollments  Enrollment[]
   reviews      Review[]
   purchases    Purchase[]
+  pathLinks    LearningPathCourse[]
 
   @@index([slug])
   @@index([status])
@@ -216,6 +219,8 @@ model Lesson {
 
   part     CoursePart       @relation(fields: [partId], references: [id], onDelete: Cascade)
   progress LessonProgress[]
+  comments LessonComment[]
+  notes    LessonNote[]
 
   @@index([partId])
 }
@@ -481,4 +486,72 @@ model Review {
 
   @@index([courseId])
   @@index([courseId, locale])
+}
+
+// ----- Échanges sous une leçon -----
+
+// Commentaire public sous une leçon, lisible par tous ceux qui ont accès à la leçon.
+// `hidden` : masqué par la modération, conservé pour trace.
+model LessonComment {
+  id         String   @id @default(cuid())
+  lessonId   String
+  userId     String
+  authorName String
+  body       String
+  locale     String   @default("fr")
+  hidden     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId, createdAt])
+  @@index([userId])
+}
+
+// Note privée : une seule par apprenant et par leçon, jamais affichée à un tiers.
+model LessonNote {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  body      String
+  updatedAt DateTime @updatedAt
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+// ----- Parcours : plusieurs cours enchaînés dans un ordre voulu -----
+
+model LearningPath {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  summary     String
+  description String
+  // Traductions : { en: {title, summary, description}, ar: {...} }
+  i18n        String?
+  status      String   @default("PUBLISHED") // DRAFT | PUBLISHED
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  courses LearningPathCourse[]
+
+  @@index([status])
+}
+
+model LearningPathCourse {
+  id       String @id @default(cuid())
+  pathId   String
+  courseId String
+  position Int    @default(0)
+
+  path   LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([pathId, courseId])
+  @@index([courseId])
 }

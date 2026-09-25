@@ -1,6 +1,7 @@
 import { isLocale, defaultLocale } from "@/i18n/config";
-import { getAdminDashboard, getPendingInstructors, requireRole } from "@/lib/dal";
+import { getAdminDashboard, getPendingInstructors, getRecentComments, requireRole } from "@/lib/dal";
 import AdminClient from "./admin-client";
+import AdminComments from "./admin-comments";
 import type { Metadata } from "next";
 
 // Écran privé : derrière une session, sans contenu public. Il n'a rien à faire
@@ -17,9 +18,10 @@ export default async function AdminDashboard({ params }: PageProps<"/[lang]">) {
   // /connexion ; autre rôle -> son espace. Plus aucune donnée de démo n'est servie.
   await requireRole(locale, ["admin"]);
 
-  const [data, applicants] = await Promise.all([
+  const [data, applicants, comments] = await Promise.all([
     getAdminDashboard(locale),
     getPendingInstructors(locale),
+    getRecentComments(locale),
   ]);
   if (!data) {
     // requireRole a déjà filtré, donc on n'arrive ici qu'en cas d'incohérence DB.
@@ -27,11 +29,16 @@ export default async function AdminDashboard({ params }: PageProps<"/[lang]">) {
   }
 
   return (
-    <AdminClient
-      pending={data.pending}
-      stats={data.stats}
-      recentUsers={data.recentUsers}
-      applicants={applicants}
-    />
+    <>
+      <AdminClient
+        pending={data.pending}
+        stats={data.stats}
+        recentUsers={data.recentUsers}
+        applicants={applicants}
+      />
+      <div className="container-page -mt-4 pb-10">
+        <AdminComments comments={comments} />
+      </div>
+    </>
   );
 }
