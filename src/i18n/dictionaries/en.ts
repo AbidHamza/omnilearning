@@ -365,6 +365,7 @@ const en: Dict = {
       "The first two lessons of every course stay open without an account. A monthly contribution pays for reviewing new courses before they go live.",
     popular: "Most popular",
     perMonth: "/month",
+    localCurrency: "Prices in US dollars. At checkout you pay in your local currency (euro, pound, dirham…) when it is supported.",
     choose: "Choose {name}",
     otherWay: "Would you rather contribute another way?",
     otherWayLink: "Create and share your own course.",
@@ -443,7 +444,7 @@ const en: Dict = {
     recapPrereq: "Prerequisites",
     recapStructure: "Course structure",
     recapActivities: "Interactive activities",
-    priceLabel: "Selling price, in euros",
+    priceLabel: "Selling price, in US dollars",
     pricePlaceholder: "0 for a free course",
     priceHint:
       "You keep {pct}% of every sale. Leave 0 to open the course to everyone.",

@@ -131,7 +131,7 @@ model Course {
   accessType       String  @default("FREE")
   // Prix TTC en centimes, dans la devise ci-dessous. 0 tant que FREE.
   priceCents       Int     @default(0)
-  currency         String  @default("eur")
+  currency         String  @default("usd")
   // Part reversée au formateur, en % du montant encaissé (le reste = commission
   // plateforme). Figée à la publication : changer le barème ne réécrit pas les
   // ventes déjà faites, chaque Purchase garde son propre découpage.
@@ -300,7 +300,7 @@ model CourseDraft {
   status       String   @default("DRAFT") // DRAFT | SUBMITTED
   // Prix proposé par le formateur (centimes). L'admin tranche à la validation.
   priceCents   Int      @default(0)
-  currency     String   @default("eur")
+  currency     String   @default("usd")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -323,7 +323,7 @@ model Purchase {
   // refunded: remboursé, accès révoqué.
   status                  String  @default("pending")
   amountCents             Int     @default(0)
-  currency                String  @default("eur")
+  currency                String  @default("usd")
   // Découpage figé (centimes) : ce que garde la plateforme / ce qui part au formateur.
   platformFeeCents        Int     @default(0)
   instructorAmountCents   Int     @default(0)
@@ -382,7 +382,7 @@ model InstructorProfile {
 model Subscription {
   id                   String    @id @default(cuid())
   userId               String
-  // soutien (5€) | mecene (15€) | partenaire (50€)
+  // soutien ($5) | mecene ($15) | partenaire ($50), prix Stripe en USD avec currency_options
   tier                 String
   stripeSubscriptionId String?   @unique
   stripePriceId        String?

@@ -5,13 +5,16 @@ import type { Metadata } from "next";
 import { alternatesFor, pageUrl, shareCard, siteName } from "@/lib/site";
 import SupportButton from "@/components/support-button";
 import type { SupportTier } from "@/lib/stripe";
+import { formatPrice } from "@/lib/pricing";
 
 // Ordre + tarifs = données stables ; noms et avantages viennent du dictionnaire.
-const tierMeta: Array<{ tier: SupportTier; price: string; featured?: boolean }> =
+// Montants en centimes de dollar, alignés sur les prix Stripe (USD, avec des
+// currency_options : le Checkout encaisse ensuite dans la devise du visiteur).
+const tierMeta: Array<{ tier: SupportTier; cents: number; featured?: boolean }> =
   [
-    { tier: "soutien", price: "5 €" },
-    { tier: "mecene", price: "15 €", featured: true },
-    { tier: "partenaire", price: "50 €" },
+    { tier: "soutien", cents: 500 },
+    { tier: "mecene", cents: 1500, featured: true },
+    { tier: "partenaire", cents: 5000 },
   ];
 
 export async function generateMetadata(
@@ -70,7 +73,7 @@ export default async function SupportPage({ params }: PageProps<"/[lang]">) {
           >
             <h3 className="font-display text-lg text-ink">{t.name}</h3>
             <div className="mt-2 font-display text-3xl text-ink">
-              {t.price}
+              {formatPrice(t.cents, "usd", locale)}
               <span className="text-base font-normal text-muted"> {s.perMonth}</span>
             </div>
             <ul className="mt-5 flex-1 space-y-2 text-sm text-muted">
@@ -89,6 +92,8 @@ export default async function SupportPage({ params }: PageProps<"/[lang]">) {
           </div>
         ))}
       </div>
+
+      <p className="mt-6 text-center text-xs text-muted">{s.localCurrency}</p>
 
       <p className="mt-10 text-center text-sm text-muted">
         {s.otherWay}{" "}

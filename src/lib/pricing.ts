@@ -5,7 +5,7 @@
  * partage des recettes appliqué à une vente.
  *
  * Les montants sont en centimes. Un prix en flottant finit toujours par
- * produire un 58,99999999 € quelque part dans une addition.
+ * produire un 58,99999999 $ quelque part dans une addition.
  */
 
 export type AccessType = "FREE" | "PAID";
@@ -13,8 +13,12 @@ export type AccessType = "FREE" | "PAID";
 /** Part qui revient au formateur, en % de l'encaissement TTC. */
 export const DEFAULT_REVENUE_SHARE_PCT = 70;
 
-/** Devise de la place de marché. Stripe la veut en minuscules. */
-export const DEFAULT_CURRENCY = "eur";
+/**
+ * Devise de référence de la place de marché. Stripe la veut en minuscules.
+ * Le prix est posé en dollars ; Adaptive Pricing (actif sur le compte Stripe)
+ * l'affiche et l'encaisse au Checkout dans la devise locale de l'acheteur.
+ */
+export const DEFAULT_CURRENCY = "usd";
 
 /** Prix par niveau, en centimes. Sert d'amorçage, pas de règle figée. */
 const PRICE_BY_LEVEL: Record<string, number> = {
@@ -76,7 +80,7 @@ export function formatPrice(
   }).format(cents / 100);
 }
 
-/** Prix plancher accepté par Stripe en EUR (0,50 €). En dessous : refus. */
+/** Prix plancher accepté par Stripe en USD (0,50 $). En dessous : refus. */
 export const MIN_PRICE_CENTS = 50;
-/** Plafond de garde-fou côté formulaire (5 000 €). */
+/** Plafond de garde-fou côté formulaire (5 000 $). */
 export const MAX_PRICE_CENTS = 500_000;

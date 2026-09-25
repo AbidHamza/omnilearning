@@ -367,6 +367,7 @@ const fr = {
       "Les deux premières leçons de chaque cours restent ouvertes sans compte. Une contribution mensuelle paie la relecture des nouveaux cours avant leur mise en ligne.",
     popular: "Le plus populaire",
     perMonth: "/mois",
+    localCurrency: "Prix en dollars US. Au paiement, le montant s'affiche dans ta devise (euro, livre, dirham…) quand elle est prise en charge.",
     choose: "Choisir {name}",
     otherWay: "Vous préférez contribuer autrement ?",
     otherWayLink: "Créez et partagez votre propre formation.",
@@ -449,7 +450,7 @@ const fr = {
     recapPrereq: "Prérequis",
     recapStructure: "Structure du cours",
     recapActivities: "Activités interactives",
-    priceLabel: "Prix de vente, en euros",
+    priceLabel: "Prix de vente, en dollars US",
     pricePlaceholder: "0 pour une formation offerte",
     priceHint:
       "Vous touchez {pct} % de chaque vente. Laissez 0 pour ouvrir la formation à tous.",

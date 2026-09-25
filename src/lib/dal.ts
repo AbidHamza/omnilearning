@@ -8,6 +8,7 @@ import { homeByRole } from "@/lib/routes";
 import { localePath, type Locale } from "@/i18n/config";
 import { formatDate } from "@/lib/intl";
 import { parseCurriculum, type DraftModule } from "@/lib/curriculum";
+import { DEFAULT_CURRENCY } from "@/lib/pricing";
 import type {
   CreatedCourse,
   CourseStatus,
@@ -465,7 +466,7 @@ export const getInstructorPayouts = cache(
       payoutsEnabled: profile?.payoutsEnabled ?? false,
       detailsSubmitted: profile?.detailsSubmitted ?? false,
       hasAccount,
-      currency: paid[0]?.currency ?? "eur",
+      currency: paid[0]?.currency ?? DEFAULT_CURRENCY,
       salesCount: paid.length,
       grossCents,
       earnedCents,
