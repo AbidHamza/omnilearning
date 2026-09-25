@@ -311,10 +311,19 @@ export async function getLessonQuestions(
   return translateQuestions(parseQuestions(lesson?.questions ?? null), tr?.questions) ?? [];
 }
 
-/** Domaines qui ont au moins une formation en ligne : un filtre vide mène à « 0 résultat ». */
+/**
+ * Domaines qui ont au moins une formation en ligne : un filtre vide mène à « 0 résultat ».
+ * Le catalogue filtre sur `Course.category` (le libellé), pas sur `categoryId`, que
+ * les cours importés laissent vide : c'est donc le libellé qui fait foi ici aussi.
+ */
 export const getCategories = cache(async (): Promise<Category[]> => {
+  const used = await prisma.course.findMany({
+    where: { status: "PUBLISHED" },
+    select: { category: true },
+    distinct: ["category"],
+  });
   const rows = await prisma.category.findMany({
-    where: { courses: { some: { status: "PUBLISHED" } } },
+    where: { label: { in: used.map((c) => c.category) } },
     orderBy: { label: "asc" },
   });
   return rows.map((c) => ({ id: c.slug, label: c.label, icon: c.icon }));
