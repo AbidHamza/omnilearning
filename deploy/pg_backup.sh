@@ -8,7 +8,7 @@
 # 0 ET si le marqueur de fin de pg_dump figure dans ses dernières lignes
 # (depuis pg_dump 17.6, une ligne \unrestrict le suit).
 set -uo pipefail
-BDIR=/opt/omnilearning/backups
+BDIR=/opt/backups/omnilearning  # hors du dossier applicatif : un deploiement ne peut pas l effacer
 KEY=/root/.omnilearning-backup.key
 HOTE="u347972104@72.62.184.232"
 SSHO="-P 65002 -i /root/.ssh/olcc_shared -o BatchMode=yes -o ConnectTimeout=30"
