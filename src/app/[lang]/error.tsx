@@ -49,6 +49,12 @@ export default function RouteError({
             {t.serverError.back}
           </LocaleLink>
         </div>
+        <LocaleLink
+          href="/contact"
+          className="mt-6 inline-block text-sm text-muted underline decoration-line underline-offset-4 hover:text-ink"
+        >
+          {t.serverError.contact}
+        </LocaleLink>
       </div>
     </div>
   );

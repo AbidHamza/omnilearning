@@ -48,6 +48,11 @@ export default function GlobalError({
           >
             Reload
           </button>
+          <p style={{ marginTop: "1rem" }}>
+            <a href="/" style={{ color: "#9b2c1f" }}>
+              Back to home
+            </a>
+          </p>
         </div>
       </body>
     </html>

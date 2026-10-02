@@ -5,7 +5,7 @@ import { requireRole } from "@/lib/dal";
 import { auth } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/gamification";
 import { formatNumber } from "@/lib/intl";
-import { AwardIcon } from "@/components/icons";
+import { ArrowLeftIcon, AwardIcon } from "@/components/icons";
 import type { Metadata } from "next";
 
 // Écran privé : derrière une session, sans contenu public. Il n'a rien à faire
@@ -91,9 +91,9 @@ export default async function LeaderboardPage({ params }: PageProps<"/[lang]">) 
       <div className="mt-6">
         <Link
           href={localePath(locale, "/tableau-de-bord")}
-          className="text-sm font-semibold text-primary hover:underline"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
         >
-          ← {t.back}
+          <ArrowLeftIcon width={15} height={15} className="rtl:rotate-180" /> {t.back}
         </Link>
       </div>
     </div>

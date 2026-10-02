@@ -93,7 +93,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg">
       <div className="container-page flex h-16 items-center gap-4">
-        <LocaleLink href="/" className="group flex shrink-0 items-center gap-2.5">
+        <LocaleLink href="/" className="group flex min-h-11 shrink-0 items-center gap-2.5">
           <Logo />
         </LocaleLink>
 
@@ -154,7 +154,7 @@ export default function Navbar() {
                   </LocaleLink>
                   <LocaleLink
                     href="/creer-compte"
-                    className="btn-red h-10 px-4 text-sm"
+                    className="btn-red h-11 px-4 text-sm lg:h-10"
                   >
                     {t.common.signUp}
                   </LocaleLink>
@@ -164,7 +164,7 @@ export default function Navbar() {
               <button
                 aria-label="Menu"
                 onClick={() => setOpen((v) => !v)}
-                className="grid h-10 w-10 place-items-center rounded-full text-ink hover:bg-surface-2 lg:hidden"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink hover:bg-surface-2 lg:hidden"
               >
                 {open ? <XIcon /> : <MenuIcon />}
               </button>
@@ -178,7 +178,7 @@ export default function Navbar() {
             <LanguageSwitcher />
             <LocaleLink
               href="/connexion"
-              className="text-sm font-semibold text-primary-dark hover:underline"
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-dark hover:underline"
             >
               {t.common.signIn}
             </LocaleLink>
@@ -208,7 +208,7 @@ export default function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="block rounded-full px-4 py-2.5 text-[15px] font-medium hover:bg-surface-2"
+                className="block rounded-md px-4 py-2.5 text-[15px] font-medium hover:bg-surface-2"
               >
                 {l.label}
               </LocaleLink>
@@ -218,13 +218,13 @@ export default function Navbar() {
                 <LocaleLink
                   href={"/parametres"}
                   onClick={() => setOpen(false)}
-                  className="block rounded-full px-4 py-2.5 text-[15px] font-medium hover:bg-surface-2"
+                  className="block rounded-md px-4 py-2.5 text-[15px] font-medium hover:bg-surface-2"
                 >
                   {t.nav.myAccount} · {user.name}
                 </LocaleLink>
                 <button
                   onClick={logout}
-                  className="block w-full rounded-full px-4 py-2.5 text-start text-[15px] font-medium text-danger hover:bg-surface-2"
+                  className="block w-full rounded-md px-4 py-2.5 text-start text-[15px] font-medium text-danger hover:bg-surface-2"
                 >
                   {t.auth.logout}
                 </button>
@@ -272,10 +272,10 @@ function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="btn-soft h-10 gap-1.5 px-3 text-xs"
-        aria-label={t.nav.language}
+        className="btn-soft h-11 shrink-0 gap-1.5 px-3 text-xs lg:h-10"
       >
-        <GlobeIcon width={15} height={15} />
+        <GlobeIcon width={15} height={15} aria-hidden />
+        <span className="sr-only">{t.nav.language}</span>
         <span className="uppercase">{locale}</span>
         <ChevronDown width={13} height={13} />
       </button>
@@ -332,7 +332,7 @@ function AccountMenu({
     <div className="relative hidden md:block">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 rounded-full py-1 ps-1 pe-2.5 transition hover:bg-surface-2"
+        className="flex items-center gap-2.5 rounded-md py-1 ps-1 pe-2.5 transition hover:bg-surface-2"
         aria-haspopup="menu"
         aria-expanded={open}
       >
@@ -360,7 +360,7 @@ function AccountMenu({
               </div>
             </div>
             <div className="mx-2.5 mb-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-bold text-primary-dark">
+              <span className="inline-flex items-center gap-1.5 rounded bg-primary-soft px-2.5 py-1 text-[11px] font-bold text-primary-dark">
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 {roleLabel}
               </span>

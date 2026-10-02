@@ -118,16 +118,16 @@ export default function ConnexionPage() {
 
           <LocaleLink
             href="/mot-de-passe-oublie"
-            className="mt-4 block text-sm text-primary-dark underline-offset-4 hover:underline"
+            className="mt-2 block py-3 text-sm text-primary-dark underline-offset-4 hover:underline"
           >
             {t.auth.forgot}
           </LocaleLink>
 
-          <p className="mt-3 border-b border-line pb-6 text-sm text-muted">
+          <p className="mt-1 border-b border-line pb-3 text-sm text-muted">
             {t.auth.noAccount}{" "}
             <LocaleLink
               href="/creer-compte"
-              className="font-semibold text-primary-dark hover:underline"
+              className="inline-block py-3 font-semibold text-primary-dark hover:underline"
             >
               {t.common.signUp}
             </LocaleLink>
@@ -142,7 +142,7 @@ export default function ConnexionPage() {
                 localePath(locale, nextFromLocation() ?? "/tableau-de-bord"),
               )
             }
-            className="mt-3 flex h-12 w-full items-center justify-center gap-3 rounded-[16px] border border-line bg-surface text-sm font-medium text-ink transition hover:border-ink"
+            className="mt-3 flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-line bg-surface text-sm font-medium text-ink transition hover:border-ink"
           >
             <GoogleIcon width={20} height={20} aria-hidden="true" />
             Google
@@ -159,7 +159,7 @@ export default function ConnexionPage() {
           height={scenePhotos.reader.h}
           alt=""
           sizes="(min-width:1024px) 40vw, 0px"
-          className="my-8 aspect-[4/3] w-full max-w-md rounded-[24px] object-cover"
+          className="my-8 aspect-[4/3] w-full max-w-md rounded-xl object-cover"
         />
 
         <div>

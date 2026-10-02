@@ -36,7 +36,7 @@ export default function SupportButton({
       <button
         onClick={onClick}
         disabled={pending}
-        className={`w-full rounded-full py-2.5 text-sm font-semibold disabled:opacity-60 ${
+        className={`min-h-11 w-full rounded-full py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60 ${
           featured
             ? "bg-primary text-on-primary hover:bg-primary-deep"
             : "border border-line hover:bg-surface"

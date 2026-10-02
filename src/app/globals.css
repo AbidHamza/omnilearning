@@ -9,7 +9,7 @@
  *
  * Image-first: flat off-white surfaces, photos carry the colour, one warm
  * red for the actions that matter. No shadows; depth comes from surface
- * steps and 16px corners on everything that holds a picture.
+ * steps and 8px corners on everything that holds a picture.
  * Type: Schibsted Grotesk for headings, Public Sans for reading, Cairo for
  * Arabic, JetBrains Mono for code only.
  */
@@ -21,7 +21,7 @@
 
   --color-ink: #1c1b18;
   --color-muted: #5f5e57;
-  --color-muted-soft: #8d8c86;
+  --color-muted-soft: #706f69;
   --color-star: #9a5b00;
 
   --color-line: #dcdbd4;
@@ -57,9 +57,9 @@
   --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
   --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 16px;
-  --radius-tile: 16px;
-  --radius-panel: 32px;
+  --radius-card: 8px;
+  --radius-tile: 8px;
+  --radius-panel: 12px;
 
   --shadow-card: none;
 }
@@ -71,7 +71,7 @@
 
   --color-ink: #efeee8;
   --color-muted: #b3b2aa;
-  --color-muted-soft: #86857e;
+  --color-muted-soft: #8f8e87;
   --color-star: #f2b632;
 
   --color-line: #3a3935;
@@ -153,7 +153,7 @@
   justify-content: center;
   height: 2.75rem;
   padding-inline: 1.25rem;
-  border-radius: 9999px;
+  border-radius: 6px;
   background: var(--color-primary);
   color: var(--color-on-primary);
   font-size: 15px;
@@ -167,9 +167,9 @@
 .btn-soft {
   display: inline-flex;
   align-items: center;
-  height: 2.5rem;
+  height: 2.75rem;
   padding-inline: 1rem;
-  border-radius: 9999px;
+  border-radius: 6px;
   background: var(--color-surface-2);
   color: var(--color-ink);
   font-size: 14px;
@@ -179,15 +179,30 @@
 .btn-soft:hover {
   background: var(--color-line);
 }
+.btn-red:active,
+.btn-soft:active {
+  transform: translateY(1px);
+}
+.btn-red:disabled,
+.btn-soft:disabled,
+.btn-red[aria-disabled="true"],
+.btn-soft[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-red:disabled:hover {
+  background: var(--color-primary);
+}
 
 /* Filter / topic chip. `aria-pressed`, `aria-current` or `.is-on` flips it to ink. */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  height: 2.25rem;
+  height: 2.75rem;
   padding-inline: 0.9rem;
-  border-radius: 9999px;
+  border-radius: 6px;
   border: 1px solid var(--color-line);
   color: var(--color-ink);
   font-size: 14px;
@@ -210,7 +225,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 9999px;
+  border-radius: 8px;
   background: var(--color-surface-2);
   padding: 0.3rem;
   padding-inline-start: 1.1rem;
@@ -486,6 +501,13 @@ details > summary::-webkit-details-marker {
 .md-figure svg .fig-accent[stroke="none"] {
   stroke: none;
 }
+/* Text drawn on an accent shape: white on the light accent, dark ink on the lighter night accent. */
+.md-figure svg .fig-on-accent {
+  fill: #ffffff;
+}
+.dark .md-figure svg .fig-on-accent {
+  fill: #1c1b18;
+}
 
 .md-img {
   display: block;
@@ -533,4 +555,13 @@ details > summary::-webkit-details-marker {
   padding: 0.5rem;
   box-shadow: 0 16px 40px -18px rgba(28, 27, 24, 0.35), 0 0 0 1px var(--color-line);
 }
+}
+
+@media (min-width: 1024px) {
+  .chip {
+    height: 2.25rem;
+  }
+}
+button:disabled {
+  cursor: not-allowed;
 }

@@ -108,7 +108,7 @@ export default function CreerComptePage() {
 
           <p className="mt-4 text-sm text-muted">
             {s.haveAccount}{" "}
-            <LocaleLink href="/connexion" className="font-semibold text-primary hover:underline">
+            <LocaleLink href="/connexion" className="inline-block py-3 font-semibold text-primary hover:underline">
               {t.common.signIn}
             </LocaleLink>
           </p>

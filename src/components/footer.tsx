@@ -14,6 +14,9 @@ export default function Footer() {
         { label: t.footer.home, href: "/" },
         { label: t.nav.formations, href: "/formations" },
         { label: t.nav.dashboard, href: "/tableau-de-bord" },
+        { label: t.footer.about, href: "/a-propos" },
+        { label: t.footer.contact, href: "/contact" },
+        { label: t.nav.support, href: "/soutenir" },
       ],
     },
     {
@@ -47,15 +50,15 @@ export default function Footer() {
         </div>
         {cols.map((c) => (
           <div key={c.title}>
-            <h4 className="text-sm font-semibold text-ink">
+            <h2 className="text-sm font-semibold text-ink">
               {c.title}
-            </h4>
-            <ul className="mt-4 space-y-2.5">
+            </h2>
+            <ul className="mt-2 sm:mt-4 sm:space-y-2.5">
               {c.items.map((it) => (
                 <li key={it.label}>
                   <LocaleLink
                     href={it.href}
-                    className="text-sm text-muted hover:text-ink hover:underline hover:underline-offset-4"
+                    className="inline-flex min-h-11 items-center text-sm text-muted hover:text-ink hover:underline hover:underline-offset-4 sm:min-h-0"
                   >
                     {it.label}
                   </LocaleLink>

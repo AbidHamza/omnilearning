@@ -10,14 +10,36 @@ import CourseReviews from "@/components/course-reviews";
 import CourseFaq from "@/components/course-faq";
 import ReviewForm from "@/components/review-form";
 import Curriculum from "@/components/curriculum";
-import { CheckIcon, LockIcon, UserIcon } from "@/components/icons";
+import DomainProgress from "@/components/domain-progress";
+import { ArrowLeftIcon, CheckIcon, LockIcon, UserIcon } from "@/components/icons";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { defaultLocale, isLocale, localePath } from "@/i18n/config";
-import { alternatesFor, pageUrl, shareCard, siteName, siteUrl } from "@/lib/site";
+import { alternatesFor, pageUrl, siteName, siteUrl } from "@/lib/site";
 
 // Rendu à chaque requête : la fiche lit la session (accès, avis) et un cours
 // retiré ne doit pas survivre en page statique jusqu'au build suivant.
 export const dynamic = "force-dynamic";
+
+// Meta description entre 120 et 155 caractères : l'accroche seule est souvent
+// trop courte, on la complète par le début de la description, coupé sur un mot.
+// Si l'accroche seule dépasse déjà le plafond, elle est coupée aussi : aucune
+// branche ne doit pouvoir renvoyer un texte plus long que `max`.
+function metaDescription(tagline: string, description: string, max = 155): string {
+  const base = tagline.trim();
+  if (base.length >= max) {
+    const cut = base.slice(0, max - 1);
+    const trimmed = cut.slice(0, cut.lastIndexOf(" ")).replace(/[\s,;:(–-]+$/, "");
+    return `${trimmed}…`;
+  }
+  if (base.length >= 120 || !description) return base || description.slice(0, max);
+  const room = max - base.length - 2;
+  let tail = description.trim();
+  if (tail.length > room) {
+    tail = tail.slice(0, room);
+    tail = tail.slice(0, tail.lastIndexOf(" ")).replace(/[\s,;:(–-]+$/, "") + "…";
+  }
+  return `${base} ${tail}`;
+}
 
 export async function generateMetadata(
   props: PageProps<"/[lang]/formations/[slug]">,
@@ -28,18 +50,25 @@ export async function generateMetadata(
   if (!course) return {};
 
   const path = `/formations/${course.slug}`;
+  const description = metaDescription(course.tagline, course.description);
   return {
     title: course.title,
-    description: course.tagline || course.description.slice(0, 160),
+    description,
     alternates: alternatesFor(locale, path),
     openGraph: {
       type: "article",
       siteName,
       title: `${course.title} · ${siteName}`,
-      description: course.tagline || course.description.slice(0, 160),
+      description,
       url: pageUrl(locale, path),
       locale,
-      images: [shareCard(locale)],
+    },
+    // og:image et twitter:image viennent des fichiers opengraph-image.tsx et
+    // twitter-image.tsx de ce segment : une carte PNG propre au cours.
+    twitter: {
+      card: "summary_large_image",
+      title: `${course.title} · ${siteName}`,
+      description,
     },
   };
 }
@@ -159,10 +188,12 @@ export default async function CoursePage(
       },
     ],
   };
+  // Espace insecable avant les deux-points en francais seulement.
+  const sep = lang === "fr" ? " : " : ": ";
   const meta = [
-    `${c.durationLabel} : ${course.hours} ${c.hoursUnit}`,
-    course.language && `${c.languageLabel} : ${course.language}`,
-    `${c.levelLabel} : ${
+    `${c.durationLabel}${sep}${course.hours} ${c.hoursUnit}`,
+    course.language && `${c.languageLabel}${sep}${course.language}`,
+    `${c.levelLabel}${sep}${
       (
         {
           Débutant: t.catalog.levelBeginner,
@@ -171,7 +202,7 @@ export default async function CoursePage(
         } as Record<string, string>
       )[course.level] ?? course.level
     }`,
-    course.software && `${c.softwareLabel} : ${course.software}`,
+    course.software && `${c.softwareLabel}${sep}${course.software}`,
   ].filter(Boolean) as string[];
 
   return (
@@ -182,9 +213,9 @@ export default async function CoursePage(
       />
       <Link
         href={lp("/formations")}
-        className="text-sm text-muted transition hover:text-primary"
+        className="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted transition hover:text-primary"
       >
-        ← {c.backToAll}
+        <ArrowLeftIcon width={15} height={15} className="rtl:rotate-180" /> {c.backToAll}
       </Link>
 
       <h1 className="mt-2 max-w-3xl font-display text-4xl leading-tight tracking-tight sm:text-[2.6rem]">
@@ -205,7 +236,7 @@ export default async function CoursePage(
           {course.prerequisites.map((p) => (
             <span
               key={p}
-              className="rounded-[16px] border border-line bg-surface px-2.5 py-1 text-xs text-muted"
+              className="rounded-lg border border-line bg-surface px-2.5 py-1 text-xs text-muted"
             >
               {p}
             </span>
@@ -227,7 +258,7 @@ export default async function CoursePage(
         </div>
         <div className="mt-4 sm:mt-0">
           {access.hasPurchase || access.isOwner ? (
-            <p className="inline-flex items-center gap-2 rounded-[16px] border border-success/40 bg-success/10 px-4 py-2.5 text-sm font-semibold text-success">
+            <p className="inline-flex items-center gap-2 rounded-lg border border-success/40 bg-success/10 px-4 py-2.5 text-sm font-semibold text-success">
               <CheckIcon width={16} height={16} />
               {c.owned}
             </p>
@@ -250,7 +281,7 @@ export default async function CoursePage(
         {(achat === "ok" || achat === "annule") && (
           <p
             role="status"
-            className={`mt-4 rounded-[16px] px-4 py-3 text-sm font-semibold ${achat === "ok" ? "bg-success-soft text-success" : "bg-warning/15 text-warning"}`}
+            className={`mt-4 rounded-lg px-4 py-3 text-sm font-semibold ${achat === "ok" ? "bg-success-soft text-success" : "bg-warning/15 text-warning"}`}
           >
             {achat === "ok" ? c.purchaseSuccess : c.purchaseCancelled}
           </p>
@@ -260,6 +291,17 @@ export default async function CoursePage(
         <h2 className="text-xl font-bold">{c.description}</h2>
         <p className="mt-3 leading-relaxed text-muted">{course.description}</p>
       </div>
+
+      {/* Avancement par domaine d'examen (cours de préparation, membres) */}
+      {viewer.isAuthenticated && (
+        <DomainProgress
+          course={course}
+          completedKeys={viewer.completedKeys}
+          title={c.domainProgress}
+          lessonsWord={c.domainLessons}
+          labels={{ 1: t.exam.domain1, 2: t.exam.domain2, 3: t.exam.domain3 }}
+        />
+      )}
 
       {/* Programme détaillé (accordéon, cadenas pour les visiteurs, coches
           de complétion pour les membres) */}
@@ -297,7 +339,7 @@ export default async function CoursePage(
             {course.skills.map((s) => (
               <span
                 key={s}
-                className="rounded-[16px] bg-surface px-4 py-2 text-sm font-medium text-ink"
+                className="rounded-lg bg-surface px-4 py-2 text-sm font-medium text-ink"
               >
                 {s}
               </span>
@@ -314,7 +356,7 @@ export default async function CoursePage(
             {course.contentTypes.map((ct) => (
               <span
                 key={ct}
-                className="rounded-[16px] border border-line px-4 py-2 text-sm"
+                className="rounded-lg border border-line px-4 py-2 text-sm"
               >
                 {ct}
               </span>

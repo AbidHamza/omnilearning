@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import CheckBlock, { type CheckData } from "./check-block";
 
 // Rendu Markdown maison, volontairement limité au sous-ensemble utilisé dans les
 // cours (titres ##/###, listes, code, citations, tableaux, images, gras, code
@@ -37,6 +38,33 @@ function parseFigureMeta(line: string): { caption?: string } | null {
     if (meta && typeof meta === "object") return meta as { caption?: string };
   } catch {
     /* méta illisible -> figure rejetée */
+  }
+  return null;
+}
+
+// ----- auto-vérification (blocs ```check : un objet JSON) -----
+
+function parseCheck(raw: string): CheckData | null {
+  try {
+    const d = JSON.parse(raw) as Partial<CheckData>;
+    if (
+      typeof d.q === "string" &&
+      Array.isArray(d.options) &&
+      d.options.length >= 2 &&
+      d.options.every((o) => typeof o === "string") &&
+      Number.isInteger(d.answer) &&
+      (d.answer as number) >= 0 &&
+      (d.answer as number) < d.options.length
+    ) {
+      return {
+        q: d.q,
+        options: d.options,
+        answer: d.answer as number,
+        why: typeof d.why === "string" ? d.why : undefined,
+      };
+    }
+  } catch {
+    /* bloc illisible -> rien n'est affiché */
   }
   return null;
 }
@@ -128,6 +156,13 @@ export default function Markdown({ source, className }: Props) {
         continue;
       }
 
+      // ```check : question d'auto-vérification, rendue côté client.
+      if (lang === "check") {
+        const data = parseCheck(buf.join("\n"));
+        if (data) blocks.push(<CheckBlock key={`b${key++}`} data={data} />);
+        continue;
+      }
+
       blocks.push(
         <pre
           key={`b${key++}`}
@@ -176,12 +211,19 @@ export default function Markdown({ source, className }: Props) {
         buf.push(lines[i].replace(/^>\s?/, ""));
         i++;
       }
+      // Un encadré qui contient une liste ou plusieurs paragraphes (« À
+      // retenir ») est rendu comme du Markdown ; sinon, un seul paragraphe.
+      const structured = buf.some((l) => /^([-*]|\d+\.)\s+/.test(l) || l.trim() === "");
       blocks.push(
         <blockquote
           key={`b${key++}`}
-          className="my-4 rounded-r-[var(--radius-card)] border-s-4 border-primary bg-primary-soft/50 px-4 py-3 text-ink/90"
+          className="md-quote my-4 rounded-r-[var(--radius-card)] border-s-4 border-primary bg-primary-soft/50 px-4 py-3 text-ink/90"
         >
-          {renderInline(buf.join(" "), `q${key}`)}
+          {structured ? (
+            <Markdown source={buf.join("\n")} className="[&>*:first-child]:mt-0 [&>*:last-child]:mb-0" />
+          ) : (
+            renderInline(buf.join(" "), `q${key}`)
+          )}
         </blockquote>,
       );
       continue;

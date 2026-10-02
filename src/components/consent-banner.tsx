@@ -84,7 +84,7 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
             color: "var(--color-muted)",
             background: "var(--color-surface)",
             border: "1px solid var(--color-line)",
-            borderRadius: 9999,
+            borderRadius: 4,
             padding: "6px 12px",
             cursor: "pointer",
           }}
@@ -99,29 +99,26 @@ export default function ConsentBanner({ lang }: { lang: Locale }) {
           aria-label={t.manage}
           style={{
             position: "fixed",
-            left: 14,
-            right: 14,
-            bottom: 14,
+            left: 0,
+            right: 0,
+            bottom: 0,
             zIndex: 70,
-            maxWidth: 560,
-            margin: choice !== null ? "0 auto 0 14px" : undefined,
             background: "var(--color-surface)",
-            border: "1px solid var(--color-line)",
-            borderRadius: 20,
-            padding: "16px 18px",
-            boxShadow: "0 16px 40px -18px rgba(28,27,24,0.35)",
+            borderTop: "1px solid var(--color-line)",
+            padding: "14px max(16px, calc((100vw - 1180px) / 2))",
             display: "flex",
-            flexDirection: "column",
-            gap: 10,
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "10px 24px",
             fontFamily: "var(--font-sans)",
           }}
         >
-          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "var(--color-ink)" }}>{t.text}</p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" onClick={() => respond("denied")} className="btn-soft h-10 flex-1 justify-center">
+          <p style={{ margin: 0, flex: "1 1 420px", fontSize: 13, lineHeight: 1.5, color: "var(--color-ink)" }}>{t.text}</p>
+          <div style={{ display: "flex", gap: 8, flex: "1 1 240px", maxWidth: 360 }}>
+            <button type="button" onClick={() => respond("denied")} className="btn-soft h-11 flex-1 justify-center">
               {t.decline}
             </button>
-            <button type="button" onClick={() => respond("granted")} className="btn-red h-10 flex-1 text-sm">
+            <button type="button" onClick={() => respond("granted")} className="btn-red h-11 flex-1 text-sm">
               {t.accept}
             </button>
           </div>

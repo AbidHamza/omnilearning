@@ -44,7 +44,12 @@ export default async function PathsPage(props: PageProps<"/[lang]/parcours">) {
       <p className="mt-3 max-w-2xl text-muted">{p.lead}</p>
 
       {paths.length === 0 ? (
-        <p className="mt-10 text-sm text-muted">{p.empty}</p>
+        <div className="mt-10 border-y border-line py-10">
+          <p className="text-muted">{p.empty}</p>
+          <Link href={localePath(lang, "/formations")} className="btn-soft mt-5">
+            {p.emptyCta}
+          </Link>
+        </div>
       ) : (
         <ul className="mt-10 divide-y divide-line border-y border-line">
           {paths.map((path) => (
@@ -71,7 +76,7 @@ export default async function PathsPage(props: PageProps<"/[lang]/parcours">) {
                 </span>
                 <Link
                   href={localePath(lang, `/parcours/${path.slug}`)}
-                  className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
+                  className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
                 >
                   {p.open}
                 </Link>

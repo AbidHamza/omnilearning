@@ -94,6 +94,17 @@ export default async function SupportPage({ params }: PageProps<"/[lang]">) {
       </div>
 
       <p className="mt-6 text-center text-xs text-muted">{s.localCurrency}</p>
+      <p className="mx-auto mt-2 max-w-2xl text-center text-xs text-muted">
+        {s.legalLead}{" "}
+        <LocaleLink href="/cgu" className="underline hover:text-ink">
+          {s.termsLink}
+        </LocaleLink>{" "}
+        {s.legalAnd}{" "}
+        <LocaleLink href="/confidentialite" className="underline hover:text-ink">
+          {s.privacyLink}
+        </LocaleLink>
+        .
+      </p>
 
       <p className="mt-10 text-center text-sm text-muted">
         {s.otherWay}{" "}

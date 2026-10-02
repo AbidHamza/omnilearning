@@ -13,6 +13,7 @@ import { formatPrice } from "@/lib/pricing";
 import BuyCourseButton from "@/components/buy-course-button";
 import { alternatesFor, pageUrl, shareCard, siteName } from "@/lib/site";
 import Quiz from "@/components/quiz";
+import ExamSimulator from "@/components/exam-simulator";
 import Markdown from "@/components/markdown";
 import LessonTypeIcon from "@/components/lesson-type-icon";
 import LessonTracker from "@/components/lesson-tracker";
@@ -157,12 +158,12 @@ export default async function LessonPage(
         </Link>
 
         <div className="mt-3 flex items-center gap-2 text-sm text-muted">
-          <span className="rounded-[16px] bg-surface px-2.5 py-0.5">
+          <span className="rounded-lg bg-surface px-2.5 py-0.5">
             {t.lessonType[lesson.type]}
           </span>
           <span>· {lesson.duration}</span>
           {locked && (
-            <span className="inline-flex items-center gap-1.5 rounded-[16px] border border-line px-2.5 py-0.5 text-xs">
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-0.5 text-xs">
               <LockIcon width={12} height={12} />
               {c.lockedBadge}
             </span>
@@ -214,7 +215,7 @@ export default async function LessonPage(
                     </Link>
                     <Link
                       href={lp(`/connexion?next=${nextParam}`)}
-                      className="inline-flex items-center gap-2 rounded-[16px] border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
+                      className="inline-flex items-center gap-2 rounded-lg border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
                     >
                       {c.lockedSignIn}
                     </Link>
@@ -267,6 +268,16 @@ export default async function LessonPage(
                 />
               )}
 
+              {lesson.type === "exam" && lesson.questions && (
+                <ExamSimulator
+                  // Sans les reponses : la correction est demandee au serveur,
+                  // en pratique comme en examen blanc.
+                  questions={toPublicQuestions(lesson.questions)}
+                  courseSlug={course.slug}
+                  lessonKey={lesson.id}
+                />
+              )}
+
               {lesson.type === "scorm" && lesson.scormPackagePath && lesson.scormEntryPath && (
                 <ScormPlayer
                   courseSlug={course.slug}
@@ -281,7 +292,8 @@ export default async function LessonPage(
             {/* Auto-enrollment + point de reprise. La complétion automatique
                 ne vaut que pour une leçon écrite : un quiz se valide en le
                 réussissant, une vidéo en la regardant (le lecteur s'en charge
-                à 90 %), un SCORM en posant lui-même son statut de complétion.
+                à 90 %), un SCORM en posant lui-même son statut de complétion,
+                un examen blanc en le réussissant (score >= 700/1000).
                 Marquer « terminé » une vidéo de 20 min au bout de 3 secondes
                 ne mesurait rien du tout. */}
             <LessonTracker
@@ -296,7 +308,7 @@ export default async function LessonPage(
           {prev ? (
             <Link
               href={lp(`/formations/${course.slug}/${prev.id}`)}
-              className="inline-flex items-center gap-2 rounded-[16px] border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
+              className="inline-flex items-center gap-2 rounded-lg border border-line px-5 py-2.5 text-sm font-semibold hover:bg-surface"
             >
               <ArrowLeftIcon width={16} height={16} className="rtl:rotate-180" />
               {c.prevLesson}
@@ -333,7 +345,7 @@ export default async function LessonPage(
                   ? `/formations/${course.slug}/certificat`
                   : `/formations/${course.slug}`,
               )}
-              className="inline-flex items-center gap-2 rounded-[16px] bg-success px-5 py-2.5 text-sm font-semibold text-on-primary hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-lg bg-success px-5 py-2.5 text-sm font-semibold text-on-primary hover:opacity-90"
             >
               {completed.size >= lessons.length ? c.finishAndCertificate : c.finish}
               <CheckIcon width={16} height={16} />
