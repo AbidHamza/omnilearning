@@ -2,6 +2,7 @@ import type { Dict } from "./fr";
 
 const en: Dict = {
   common: {
+    skipToContent: "Skip to content",
     explore: "Explore courses",
     viewAll: "View all",
     search: "Search for a course",
@@ -343,6 +344,13 @@ const en: Dict = {
     recommendTitle: "Pick up a new course",
     recommendBecause: "Because you took “{title}”",
     recommendDefault: "Courses picked to start a fresh track",
+    quizTitle: "My quizzes",
+    bestScore: "Best score",
+    lastAttempts: "Latest attempts",
+    noAttempts: "No attempts yet. Take a quiz from any lesson.",
+    passed: "Passed",
+    toReview: "To review",
+    scoreOf: "{n} of {t}",
   },
   leaderboard: {
     kicker: "learners",

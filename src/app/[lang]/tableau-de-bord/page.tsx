@@ -4,6 +4,8 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { getCourses } from "@/lib/courses";
 import { requireRole } from "@/lib/dal";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { formatDate } from "@/lib/intl";
 import { getGamification, getXpByDay } from "@/lib/gamification";
 import { allLessons } from "@/lib/courses";
 import type { Course } from "@/lib/types";
@@ -38,6 +40,29 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
     ? await Promise.all([getGamification(userId), getXpByDay(userId, 14)])
     : [null, []];
   const allCourses = await getCourses(locale);
+
+  // Quiz : meilleur score (en part du maximum) et dernières tentatives.
+  const attempts = userId
+    ? await prisma.quizAttempt.findMany({
+        where: { userId },
+        orderBy: { completedAt: "desc" },
+        take: 50,
+        select: { id: true, lessonId: true, score: true, maxScore: true, isPassed: true, completedAt: true },
+      })
+    : [];
+  const quizLessons = attempts.length
+    ? await prisma.lesson.findMany({
+        where: { id: { in: [...new Set(attempts.map((a) => a.lessonId))] } },
+        select: { id: true, title: true },
+      })
+    : [];
+  const quizTitleById = new Map(quizLessons.map((l) => [l.id, l.title]));
+  const bestAttempt = attempts.reduce<(typeof attempts)[number] | null>(
+    (best, a) =>
+      a.maxScore > 0 && (!best || a.score / a.maxScore > best.score / best.maxScore) ? a : best,
+    null,
+  );
+  const recentAttempts = attempts.slice(0, 5);
   const bySlug = new Map(allCourses.map((c) => [c.slug, c]));
 
   // Point de reprise réel : `lastLesson` stocke une KEY de leçon (ex. "l7").
@@ -87,7 +112,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
 
       {/* Ligne 1 : cours suivis + objectif hebdo */}
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <section className="rounded-[var(--radius-card)] bg-surface p-6">
+        <section className="min-w-0 rounded-[var(--radius-card)] bg-surface p-6">
           <h2 className="text-sm text-muted">{d.enrolledTitle}</h2>
           <div className="mt-4 space-y-6">
             {enrolled.map((e) => {
@@ -154,7 +179,7 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
             dict={dict}
           />
         ) : (
-          <section className="rounded-[var(--radius-card)] bg-surface p-6">
+          <section className="min-w-0 rounded-[var(--radius-card)] bg-surface p-6">
             <h2 className="text-sm text-muted">{d.progressTitle}</h2>
             <p className="mt-2 text-sm text-muted">{d.progressConnect}</p>
           </section>
@@ -188,6 +213,45 @@ export default async function DashboardPage({ params }: PageProps<"/[lang]">) {
           </div>
           <ProgressChart data={xpByDay} />
         </div>
+      </section>
+
+      {/* Quiz : meilleur score et dernières tentatives */}
+      <section className="mt-6 rounded-[var(--radius-card)] bg-surface p-6" aria-labelledby="quiz-heading">
+        <h2 id="quiz-heading" className="font-display text-xl font-semibold">
+          {d.quizTitle}
+        </h2>
+        {bestAttempt ? (
+          <>
+            <p className="mt-3 text-sm text-muted">
+              {d.bestScore} :{" "}
+              <span className="font-semibold">
+                {d.scoreOf
+                  .replace("{n}", String(bestAttempt.score))
+                  .replace("{t}", String(bestAttempt.maxScore))}
+              </span>
+            </p>
+            <h3 className="mt-5 text-sm font-semibold">{d.lastAttempts}</h3>
+            <ul className="mt-2 divide-y divide-line text-sm">
+              {recentAttempts.map((a) => (
+                <li key={a.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2.5">
+                  <span className="min-w-0 break-words">
+                    {quizTitleById.get(a.lessonId) ?? "-"}
+                    <span className="ms-2 text-xs text-muted">{formatDate(a.completedAt, locale)}</span>
+                  </span>
+                  <span className="whitespace-nowrap">
+                    {d.scoreOf.replace("{n}", String(a.score)).replace("{t}", String(a.maxScore))}
+                    {" · "}
+                    <span className={a.isPassed ? "font-semibold" : "font-semibold text-danger"}>
+                      {a.isPassed ? d.passed : d.toReview}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p className="mt-3 text-sm text-muted">{d.noAttempts}</p>
+        )}
       </section>
 
       {/* Suivre de nouvelles formations */}

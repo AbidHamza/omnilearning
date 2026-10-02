@@ -1,6 +1,7 @@
 // Dictionnaire source (français). Sert de référence de type pour en/ar.
 const fr = {
   common: {
+    skipToContent: "Aller au contenu",
     explore: "Explorer les formations",
     viewAll: "Tout voir",
     search: "Chercher une formation",
@@ -345,6 +346,13 @@ const fr = {
     recommendBecause: "Parce que vous avez suivi « {title} »",
     recommendDefault:
       "Des formations choisies pour démarrer un nouveau parcours",
+    quizTitle: "Mes quiz",
+    bestScore: "Meilleur score",
+    lastAttempts: "Dernières tentatives",
+    noAttempts: "Aucune tentative pour l'instant. Passez un quiz depuis une leçon.",
+    passed: "Réussi",
+    toReview: "À retravailler",
+    scoreOf: "{n} sur {t}",
   },
   leaderboard: {
     kicker: "apprenants",

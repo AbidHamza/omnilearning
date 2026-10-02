@@ -2,6 +2,7 @@ import type { Dict } from "./fr";
 
 const ar: Dict = {
   common: {
+    skipToContent: "انتقل إلى المحتوى",
     explore: "استكشف الدورات",
     viewAll: "عرض الكل",
     search: "ابحث عن دورة",
@@ -342,6 +343,13 @@ const ar: Dict = {
     recommendTitle: "ابدأ دورة جديدة",
     recommendBecause: "لأنك تابعت «{title}»",
     recommendDefault: "دورات مختارة لتبدأ مسارًا جديدًا",
+    quizTitle: "اختباراتي",
+    bestScore: "أفضل نتيجة",
+    lastAttempts: "آخر المحاولات",
+    noAttempts: "لا توجد محاولات بعد. أجرِ اختبارًا من أي درس.",
+    passed: "ناجح",
+    toReview: "للمراجعة",
+    scoreOf: "{n} من {t}",
   },
   leaderboard: {
     kicker: "المتعلّمون",

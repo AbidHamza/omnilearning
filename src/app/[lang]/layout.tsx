@@ -130,8 +130,16 @@ export default async function RootLayout({
       <body className="flex min-h-full flex-col">
         <I18nProvider locale={lang} dict={dict} dir={dir}>
           <SessionProvider serverRole={session?.role} serverUser={session?.user}>
+            <a
+              href="#contenu"
+              className="sr-only focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-on-primary"
+            >
+              {dict.common.skipToContent}
+            </a>
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main id="contenu" tabIndex={-1} className="flex-1 outline-none">
+              {children}
+            </main>
             <Footer />
           </SessionProvider>
         </I18nProvider>
