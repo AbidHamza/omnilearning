@@ -263,8 +263,16 @@ const fr = {
       "Achetez la formation une fois, gardez l'accès sans limite de durée.",
     lifetimeAccess: "Accès à vie",
     securePayment: "Paiement sécurisé par Stripe",
-    refundNote:
-      "Remboursement sous 14 jours tant que vous n'avez pas ouvert plus d'une leçon.",
+    refundNote: "Remboursement sous 14 jours tant qu'aucune leçon payante n'a été ouverte.",
+    faqTitle: "Avant d'acheter",
+    faqLegal: "Conditions de vente et de remboursement",
+    faq: [
+      { q: "Puis-je regarder avant de payer ?", a: "Oui. Les leçons signalées comme gratuites dans le programme s'ouvrent sans achat. Les autres restent verrouillées jusqu'au paiement.", paidOnly: true },
+      { q: "Combien de temps dure l'accès ?", a: "Sans limite. Vous payez une fois, il n'y a pas d'abonnement ni de renouvellement.", paidOnly: true },
+      { q: "Puis-je me faire rembourser ?", a: "Oui, sur simple demande à info@omnilearn.org dans les 14 jours, tant qu'aucune leçon payante n'a été ouverte. Après, nous remboursons si le cours ne correspond pas à sa description ou si un défaut technique vous empêche de le suivre.", paidOnly: true },
+      { q: "Que reçois-je à la fin ?", a: "Une attestation OmniLearn avec un code que n'importe qui peut vérifier en ligne. Elle prouve que vous avez terminé les leçons et les quiz. Ce n'est pas une certification Microsoft, Google ou d'un autre éditeur, et elle ne remplace aucun examen officiel." },
+      { q: "Qui encaisse le paiement ?", a: "Stripe. Le numéro de carte est saisi sur la page de Stripe, il ne passe pas par OmniLearn.", paidOnly: true },
+    ],
     purchaseSuccess: "Paiement confirmé. La formation est débloquée.",
     purchaseCancelled: "Paiement annulé. Aucun montant n'a été prélevé.",
   },

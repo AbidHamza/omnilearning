@@ -7,6 +7,7 @@ import { getCourseAccess } from "@/lib/entitlements";
 import { formatPrice } from "@/lib/pricing";
 import BuyCourseButton from "@/components/buy-course-button";
 import CourseReviews from "@/components/course-reviews";
+import CourseFaq from "@/components/course-faq";
 import ReviewForm from "@/components/review-form";
 import Curriculum from "@/components/curriculum";
 import { CheckIcon, LockIcon, UserIcon } from "@/components/icons";
@@ -72,6 +73,9 @@ export default async function CoursePage(
   const reviewsTitle = t.reviews.title;
 
   const c = t.course;
+  const faqItems = c.faq
+    .filter((i) => !("paidOnly" in i && i.paidOnly) || access.accessType === "PAID")
+    .map(({ q, a }) => ({ q, a }));
 
   // Données structurées : Course + fil d'Ariane. L'aggregateRating reprend
   // EXACTEMENT les avis affichés plus bas sur la page (CourseReviews).
@@ -121,6 +125,14 @@ export default async function CoursePage(
               },
             }
           : {}),
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((i) => ({
+          "@type": "Question",
+          name: i.q,
+          acceptedAnswer: { "@type": "Answer", text: i.a },
+        })),
       },
       {
         "@type": "BreadcrumbList",
@@ -332,6 +344,13 @@ export default async function CoursePage(
       )}
 
       {/* Avis */}
+      <CourseFaq
+        title={c.faqTitle}
+        items={faqItems}
+        legalHref={lp("/cgu")}
+        legalLabel={c.faqLegal}
+      />
+
       <CourseReviews
         summary={reviews}
         title={reviewsTitle}

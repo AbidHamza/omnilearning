@@ -262,8 +262,16 @@ const en: Dict = {
     lockedPaidText: "Buy the course once, keep access with no time limit.",
     lifetimeAccess: "Lifetime access",
     securePayment: "Secure payment by Stripe",
-    refundNote:
-      "Refund within 14 days as long as you have not opened more than one lesson.",
+    refundNote: "Refund within 14 days as long as no paid lesson has been opened.",
+    faqTitle: "Before you buy",
+    faqLegal: "Terms of sale and refunds",
+    faq: [
+      { q: "Can I look before paying?", a: "Yes. Lessons marked as free in the syllabus open without a purchase. The others stay locked until payment.", paidOnly: true },
+      { q: "How long does access last?", a: "No time limit. You pay once; there is no subscription and no renewal.", paidOnly: true },
+      { q: "Can I get a refund?", a: "Yes, on request at info@omnilearn.org within 14 days, as long as no paid lesson has been opened. After that we refund if the course does not match its description or a technical fault stops you from following it.", paidOnly: true },
+      { q: "What do I get at the end?", a: "An OmniLearn certificate with a code anyone can check online. It shows you finished the lessons and quizzes. It is not a Microsoft, Google or other vendor certification, and it does not replace any official exam." },
+      { q: "Who takes the payment?", a: "Stripe. You type your card number on Stripe's page; it never goes through OmniLearn.", paidOnly: true },
+    ],
     purchaseSuccess: "Payment confirmed. The course is unlocked.",
     purchaseCancelled: "Payment cancelled. Nothing was charged.",
   },
