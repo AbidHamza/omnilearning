@@ -172,7 +172,7 @@ export default function ConnexionPage() {
           </p>
         </div>
 
-        <p className="text-xs text-muted-soft">
+        <p className="text-xs text-muted">
           {t.footer.motto}
         </p>
       </div>
