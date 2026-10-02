@@ -288,6 +288,7 @@ const fr = {
     title: "Page introuvable",
     text: "La page que vous cherchez n'existe pas ou a été déplacée.",
     back: "Retour à l'accueil",
+    catalog: "Parcourir les formations",
   },
   serverError: {
     title: "Erreur côté serveur",

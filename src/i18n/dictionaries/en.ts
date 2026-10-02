@@ -287,6 +287,7 @@ const en: Dict = {
     title: "Page not found",
     text: "The page you are looking for doesn't exist or has been moved.",
     back: "Back to home",
+    catalog: "Browse the courses",
   },
   serverError: {
     title: "Server-side error",

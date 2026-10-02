@@ -17,6 +17,12 @@ export default function NotFound() {
         >
           {t.notFound.back}
         </LocaleLink>
+        <LocaleLink
+          href="/formations"
+          className="mt-4 block text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink"
+        >
+          {t.notFound.catalog}
+        </LocaleLink>
       </div>
     </div>
   );
