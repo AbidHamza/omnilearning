@@ -29,12 +29,14 @@ export default function ConnexionPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [limited, setLimited] = useState(false);
   const [pending, setPending] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
     setError(false);
+    setLimited(false);
     const fd = new FormData();
     fd.set("email", identifier);
     fd.set("password", password);
@@ -42,6 +44,7 @@ export default function ConnexionPage() {
     setPending(false);
     if (!res.ok) {
       setError(true);
+      setLimited(res.code === "rate_limited");
       return;
     }
     // Retour à la leçon d'origine si on venait d'un contenu verrouillé,
@@ -93,7 +96,7 @@ export default function ConnexionPage() {
 
           {error && (
             <p className="mt-3 text-sm font-medium text-danger">
-              {t.auth.invalid}
+              {limited ? t.auth.tooMany : t.auth.invalid}
             </p>
           )}
 

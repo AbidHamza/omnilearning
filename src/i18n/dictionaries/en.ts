@@ -276,6 +276,7 @@ const en: Dict = {
     noAccount: "Don't have an account yet?",
     orContinue: "Or continue with",
     invalid: "Incorrect username or password.",
+    tooMany: "Too many sign-in attempts. Please wait fifteen minutes before trying again.",
     logout: "Sign out",
     loginImageAlt: "Learner signed in to the platform",
     resumeLead: "Pick your journey back up right where you left",

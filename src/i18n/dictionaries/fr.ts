@@ -277,6 +277,7 @@ const fr = {
     noAccount: "Vous n'avez pas encore de compte ?",
     orContinue: "Ou continuez avec",
     invalid: "Identifiant ou mot de passe incorrect.",
+    tooMany: "Trop de tentatives de connexion. Patientez un quart d'heure avant de réessayer.",
     logout: "Se déconnecter",
     loginImageAlt: "Apprenant connecté à la plateforme",
     resumeLead: "Reprenez votre parcours là où vous l'avez",

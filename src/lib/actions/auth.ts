@@ -6,11 +6,12 @@ import { prisma } from "@/lib/db";
 import { signIn, signOut } from "@/lib/auth";
 import { signInSchema, signUpSchema } from "@/lib/validations";
 import { toUiRole } from "@/lib/roles";
+import { clientIp, isLoginBlocked } from "@/lib/login-throttle";
 import type { Role } from "@/lib/types";
 
 export type AuthResult =
   | { ok: true; role: Role }
-  | { ok: false; error: string };
+  | { ok: false; error: string; code?: "rate_limited" };
 
 /** Connexion par identifiants (email/mot de passe). */
 export async function loginAction(formData: FormData): Promise<AuthResult> {
@@ -22,6 +23,11 @@ export async function loginAction(formData: FormData): Promise<AuthResult> {
     return { ok: false, error: "Identifiants invalides." };
   }
 
+  // Trop d'échecs : même message neutre pour tous, traduit côté client.
+  if (isLoginBlocked(parsed.data.email, await clientIp())) {
+    return { ok: false, error: "Trop de tentatives.", code: "rate_limited" };
+  }
+
   try {
     // redirect:false → on gère la navigation côté client (locale).
     await signIn("credentials", {
@@ -31,6 +37,10 @@ export async function loginAction(formData: FormData): Promise<AuthResult> {
     });
   } catch (error) {
     if (error instanceof AuthError) {
+      // Le compteur a pu atteindre le plafond avec cet échec précis.
+      if (isLoginBlocked(parsed.data.email, await clientIp())) {
+        return { ok: false, error: "Trop de tentatives.", code: "rate_limited" };
+      }
       return { ok: false, error: "E-mail ou mot de passe incorrect." };
     }
     throw error;

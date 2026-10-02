@@ -5,6 +5,12 @@ import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
+import {
+  clearLoginFailures,
+  clientIp,
+  isLoginBlocked,
+  recordLoginFailure,
+} from "@/lib/login-throttle";
 
 // Rôles applicatifs en base : USER (étudiant) | INSTRUCTOR (formateur) | ADMIN.
 export type AppRole = "USER" | "INSTRUCTOR" | "ADMIN";
@@ -46,11 +52,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials?.password as string | undefined;
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user || !user.password) return null;
+        // Plafond d'échecs par e-mail et par IP : bloqué, on ne compare même pas.
+        const ip = await clientIp();
+        if (isLoginBlocked(email, ip)) return null;
 
-        const valid = await bcrypt.compare(password, user.password);
-        if (!valid) return null;
+        const user = await prisma.user.findUnique({ where: { email } });
+        const valid = user?.password ? await bcrypt.compare(password, user.password) : false;
+        if (!user || !valid) {
+          recordLoginFailure(email, ip);
+          return null;
+        }
+        clearLoginFailures(email);
 
         return {
           id: user.id,
