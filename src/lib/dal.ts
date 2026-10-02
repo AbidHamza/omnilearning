@@ -8,6 +8,7 @@ import { homeByRole } from "@/lib/routes";
 import { localePath, type Locale } from "@/i18n/config";
 import { formatDate } from "@/lib/intl";
 import { parseCurriculum, type DraftModule } from "@/lib/curriculum";
+import { issueCertificate } from "@/lib/certificates";
 import { DEFAULT_CURRENCY } from "@/lib/pricing";
 import type {
   CreatedCourse,
@@ -722,7 +723,7 @@ export const getCompletedEnrollment = cache(
   async (
     courseSlug: string,
     locale?: string,
-  ): Promise<{ userName: string; courseTitle: string; instructorName: string; completedAt: Date; hours: number } | null> => {
+  ): Promise<{ userName: string; courseTitle: string; instructorName: string; completedAt: Date; hours: number; code: string } | null> => {
     const session = await auth();
     const userId = session?.user?.id;
     if (!userId) return null;
@@ -730,12 +731,17 @@ export const getCompletedEnrollment = cache(
       where: { userId, course: { slug: courseSlug }, completedAt: { not: null } },
       select: {
         completedAt: true,
+        courseId: true,
         user: { select: { name: true, email: true } },
         course: { select: { title: true, instructorName: true, hours: true, i18n: true } },
       },
     });
     if (!e || !e.completedAt) return null;
+    // Attestation émise paresseusement : couvre les inscriptions achevées avant le modèle.
+    const issued = await issueCertificate(userId, e.courseId);
+    if (!issued) return null;
     return {
+      code: issued.code,
       userName: e.user.name ?? e.user.email,
       courseTitle: localizedTitle(e.course.title, e.course.i18n, locale),
       instructorName: e.course.instructorName,

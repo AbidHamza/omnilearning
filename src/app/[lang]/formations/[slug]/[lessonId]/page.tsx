@@ -28,6 +28,8 @@ import {
 } from "@/components/icons";
 import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { finishLessonAction } from "@/lib/actions/progress";
+import { isAutoCompletable } from "@/lib/curriculum";
 
 export const dynamic = "force-dynamic";
 
@@ -136,6 +138,10 @@ export default async function LessonPage(
 
   // Chemin de retour NON préfixé par la locale : useLocaleRouter.push() du
   // formulaire de connexion re-préfixe lui-même.
+  // Le geste unique ne vaut que pour un lecteur connecté sur une leçon ouverte
+  // et marquable ; ailleurs le bouton reste un simple lien vers la suite.
+  const canFinishHere =
+    viewer.isAuthenticated && !locked && isAutoCompletable(lesson.type, lesson.videoUrl);
   const nextParam = encodeURIComponent(`/formations/${course.slug}/${lessonId}`);
   const social = locked ? null : await getLessonSocial(course.slug, lesson.id, lang);
 
@@ -281,11 +287,7 @@ export default async function LessonPage(
             <LessonTracker
               courseSlug={course.slug}
               lessonKey={lesson.id}
-              markComplete={
-                lesson.type !== "quiz" &&
-                lesson.type !== "scorm" &&
-                !(lesson.type === "video" && Boolean(lesson.videoUrl))
-              }
+              markComplete={isAutoCompletable(lesson.type, lesson.videoUrl)}
             />
           </>
         )}
@@ -302,7 +304,21 @@ export default async function LessonPage(
           ) : (
             <span />
           )}
-          {next ? (
+          {canFinishHere ? (
+            <form action={finishLessonAction.bind(null, course.slug, lesson.id, lang)}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
+              >
+                {next ? c.finishAndNext : c.finishAndCertificate}
+                {next ? (
+                  <ArrowRightIcon width={16} height={16} className="rtl:rotate-180" />
+                ) : (
+                  <CheckIcon width={16} height={16} />
+                )}
+              </button>
+            </form>
+          ) : next ? (
             <Link
               href={lp(`/formations/${course.slug}/${next.id}`)}
               className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-deep"
@@ -312,10 +328,14 @@ export default async function LessonPage(
             </Link>
           ) : (
             <Link
-              href={lp("/tableau-de-bord")}
+              href={lp(
+                completed.size >= lessons.length
+                  ? `/formations/${course.slug}/certificat`
+                  : `/formations/${course.slug}`,
+              )}
               className="inline-flex items-center gap-2 rounded-[16px] bg-success px-5 py-2.5 text-sm font-semibold text-on-primary hover:opacity-90"
             >
-              {c.finish}
+              {completed.size >= lessons.length ? c.finishAndCertificate : c.finish}
               <CheckIcon width={16} height={16} />
             </Link>
           )}

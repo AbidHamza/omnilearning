@@ -3,9 +3,12 @@
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { awardXp } from "@/lib/gamification";
-import { QUIZ_PASS_RATIO } from "@/lib/curriculum";
-import { getLessonQuestions } from "@/lib/courses";
+import { redirect } from "next/navigation";
+import { isAutoCompletable, QUIZ_PASS_RATIO } from "@/lib/curriculum";
+import { allLessons, getCourse, getLessonQuestions } from "@/lib/courses";
+import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { canUseLesson } from "@/lib/entitlements";
+import { issueCertificate } from "@/lib/certificates";
 
 // Persiste la progression (inscriptions, leçons terminées, tentatives de quiz)
 // liée à l'utilisateur connecté. No-op silencieux si non connecté (mode démo).
@@ -33,13 +36,19 @@ async function recomputeProgress(enrollmentId: string, courseId: string) {
     where: { enrollmentId, isCompleted: true },
   });
   const progress = totalLessons > 0 ? Math.round((done / totalLessons) * 100) : 0;
+  const current = await prisma.enrollment.findUnique({
+    where: { id: enrollmentId },
+    select: { completedAt: true, userId: true },
+  });
   await prisma.enrollment.update({
     where: { id: enrollmentId },
     data: {
       progress,
-      completedAt: progress >= 100 ? new Date() : null,
+      // La date d'achèvement reste celle du premier passage à 100 %.
+      completedAt: progress >= 100 ? (current?.completedAt ?? new Date()) : null,
     },
   });
+  if (progress >= 100 && current) await issueCertificate(current.userId, courseId);
   return progress;
 }
 
@@ -125,6 +134,49 @@ export async function markLessonCompleteAction(courseSlug: string, lessonKey: st
   }
 
   return { ok: true as const, progress, reward };
+}
+
+/**
+ * Un seul geste : « Terminer et passer à la suite ». Marque la leçon terminée
+ * quand sa nature le permet (texte, vidéo sans fichier), puis redirige vers la
+ * suivante. Sur la dernière : l'attestation si le cours est bouclé, sinon la
+ * page du cours. Si le marquage est refusé (non connecté, leçon verrouillée),
+ * on avance quand même : la page suivante porte sa propre garde d'accès.
+ */
+export async function finishLessonAction(courseSlug: string, lessonKey: string, lang: string) {
+  const locale = isLocale(lang) ? lang : defaultLocale;
+  const course = await getCourse(courseSlug, locale);
+  if (!course) redirect(localePath(locale, "/formations"));
+
+  const lessons = allLessons(course);
+  const idx = lessons.findIndex((l) => l.id === lessonKey);
+  if (idx === -1) redirect(localePath(locale, `/formations/${course.slug}`));
+  const lesson = lessons[idx];
+  const next = lessons[idx + 1];
+
+  let progress = 0;
+  if (isAutoCompletable(lesson.type, lesson.videoUrl)) {
+    const res = await markLessonCompleteAction(course.slug, lesson.id);
+    if (res.ok) progress = res.progress;
+  } else {
+    // Quiz, examen, SCORM, vidéo : rien à marquer, on lit l'état réel.
+    const userId = await currentUserId();
+    if (userId) {
+      const e = await prisma.enrollment.findFirst({
+        where: { userId, course: { slug: course.slug } },
+        select: { progress: true },
+      });
+      progress = e?.progress ?? 0;
+    }
+  }
+
+  if (next) redirect(localePath(locale, `/formations/${course.slug}/${next.id}`));
+  redirect(
+    localePath(
+      locale,
+      progress >= 100 ? `/formations/${course.slug}/certificat` : `/formations/${course.slug}`,
+    ),
+  );
 }
 
 /**

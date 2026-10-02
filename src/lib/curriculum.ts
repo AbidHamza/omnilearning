@@ -36,6 +36,17 @@ export interface DraftModule {
 /** Seuil de réussite d'un quiz, commun au serveur et à l'écran de résultat. */
 export const QUIZ_PASS_RATIO = 0.7;
 
+/**
+ * Une leçon se marque terminée à la lecture seulement si elle est écrite (ou
+ * une vidéo sans fichier). Un quiz, un examen et un SCORM se valident par leur
+ * propre résultat, une vidéo hébergée par le lecteur à 90 %.
+ */
+export function isAutoCompletable(type: string, videoUrl?: string | null): boolean {
+  if (type === "quiz" || type === "scorm" || type === "exam") return false;
+  if (type === "video" && Boolean(videoUrl)) return false;
+  return true;
+}
+
 export const MAX_MODULES = 30;
 export const MAX_LESSONS_PER_MODULE = 40;
 export const MAX_QUESTIONS = 30;

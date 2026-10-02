@@ -6,7 +6,7 @@ import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getCompletedEnrollment, getCurrentUser } from "@/lib/dal";
 import { formatDate } from "@/lib/intl";
-import { siteName } from "@/lib/site";
+import { siteName, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -35,6 +35,8 @@ export default async function CertificatePage(
   }
   const cert = await getCompletedEnrollment(slug, locale);
   if (!cert) notFound();
+  const verifyUrl = `${siteUrl}/${locale}/certificats/${cert.code}`;
+  const linkedIn = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(verifyUrl)}`;
 
   return (
     <div className="container-page py-10">
@@ -63,7 +65,14 @@ export default async function CertificatePage(
             <dt className="text-muted">{c.completedOn}</dt>
             <dd className="font-semibold">{formatDate(cert.completedAt, locale)}</dd>
           </div>
+          <div className="flex justify-between gap-6 border-b border-line py-2.5">
+            <dt className="text-muted">{c.codeLabel}</dt>
+            <dd className="font-mono font-semibold">{cert.code}</dd>
+          </div>
         </dl>
+        <p className="mt-3 break-all text-xs text-muted">
+          {c.verifyUrlLabel} : {verifyUrl}
+        </p>
 
         <p className="mt-8 text-sm">{c.issuer}</p>
         <p className="mt-2 text-xs leading-relaxed text-muted">{c.verifyNote}</p>
@@ -71,6 +80,14 @@ export default async function CertificatePage(
 
       <div className="mx-auto mt-6 flex max-w-3xl flex-wrap items-center gap-4">
         <PrintButton label={c.print} />
+        <a
+          href={linkedIn}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-full border border-line px-5 py-2.5 text-sm font-semibold hover:border-primary"
+        >
+          {c.shareLinkedIn}
+        </a>
         <Link
           href={localePath(locale, `/formations/${slug}`)}
           className="text-sm font-semibold text-primary-dark hover:underline"

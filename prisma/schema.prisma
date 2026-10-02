@@ -43,6 +43,7 @@ model User {
   instructorProfile InstructorProfile?
   lessonComments LessonComment[]
   lessonNotes    LessonNote[]
+  certificates   Certificate[]
 
   // ID client Stripe (pour le portail + abonnements)
   stripeCustomerId String? @unique
@@ -157,6 +158,7 @@ model Course {
   reviews      Review[]
   purchases    Purchase[]
   pathLinks    LearningPathCourse[]
+  certificates Certificate[]
 
   @@index([slug])
   @@index([status])
@@ -553,5 +555,26 @@ model LearningPathCourse {
   course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([pathId, courseId])
+  @@index([courseId])
+}
+
+// ----- Certificat : attestation vérifiable par un code public -----
+
+// Émis une seule fois par (apprenant, cours) quand le cours est achevé. Le code
+// est tiré au hasard (pas de séquence), il sert d'URL publique. `userName` est
+// une copie du nom au moment de l'émission : la page publique ne lit jamais le
+// compte, donc jamais l'e-mail.
+model Certificate {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String
+  courseId  String
+  userName  String
+  issuedAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
   @@index([courseId])
 }
