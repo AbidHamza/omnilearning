@@ -190,7 +190,7 @@ export async function moderateDraftAction(
         instructorName: draft.author.name ?? "Formateur",
         instructorBio: draft.author.instructorProfile?.bio ?? null,
         instructorId: draft.author.id,
-        image: cover ?? "/og.png",
+        image: cover ?? "/og-fr.png",
         hours: Math.max(1, Math.ceil(totalMinutes(modules) / 60)),
         status: "PUBLISHED",
         accessType: priceCents > 0 ? "PAID" : "FREE",
