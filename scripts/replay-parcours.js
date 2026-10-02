@@ -7,8 +7,8 @@ const path = require("path");
 const ROOT = path.join(__dirname, "..");
 let chromium; try { ({ chromium } = require("playwright")); } catch { ({ chromium } = require("C:/Users/abidh/browser-bot/node_modules/playwright")); }
 const Database = require(ROOT + "/node_modules/better-sqlite3");
-const db = new Database(ROOT + "/dev.db");
-const BASE = "http://localhost:3005";
+const db = new Database(process.env.DB_FILE || ROOT + "/dev.db");
+const BASE = process.env.BASE_URL || "http://localhost:3005";
 const seed = fs.readFileSync(ROOT + "/prisma/seed.ts", "utf8");
 const PW = seed.match(/bcrypt\.hash\("([^"]+)"/)[1];
 const STUDENT = "etudiant@omnilearn.tech", INSTR = "formateur@omnilearn.tech", ADMIN = "admin@omnilearn.tech";

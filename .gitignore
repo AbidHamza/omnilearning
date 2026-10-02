@@ -53,3 +53,6 @@ replay-result.json
 replay-prod-result.json
 replay-shots/
 lang-check-result.json
+
+# base et artefacts des tests locaux
+/.test/

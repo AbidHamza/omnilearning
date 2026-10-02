@@ -12,7 +12,10 @@
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:seed": "tsx -r dotenv/config prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test:reset": "node scripts/test-reset.mjs",
+    "test:local": "node scripts/test-local.mjs --smoke",
+    "test:replay": "node scripts/test-local.mjs --smoke --replay"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
