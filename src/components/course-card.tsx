@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Course } from "@/lib/types";
-import { type Locale, defaultLocale } from "@/i18n/config";
+import { type Locale, defaultLocale, localePath } from "@/i18n/config";
 import { DEFAULT_CURRENCY, formatPrice } from "@/lib/pricing";
 
 type CardLabels = {
@@ -43,7 +43,7 @@ export default function CourseCard({
   variant?: "catalog" | "compact";
   className?: string;
 }) {
-  const href = `/formations/${course.slug}`;
+  const href = localePath(locale, `/formations/${course.slug}`);
   const isFree = course.accessType !== "PAID" || !course.priceCents;
   const price = labels ? priceLabel(course, locale, labels.free) : null;
   const compact = variant === "compact";

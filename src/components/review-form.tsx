@@ -57,7 +57,7 @@ export default function ReviewForm({ slug }: { slug: string }) {
               aria-checked={rating === n}
               aria-label={String(n)}
               onClick={() => setRating(n)}
-              className={`text-2xl leading-none ${n <= rating ? "text-amber-500" : "text-muted-soft"}`}
+              className={`text-2xl leading-none ${n <= rating ? "text-star" : "text-muted-soft"}`}
             >
               ★
             </button>

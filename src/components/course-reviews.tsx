@@ -5,7 +5,7 @@ function Stars({ rating, className = "" }: { rating: number; className?: string 
   // Étoiles pleines/vides, arrondi au demi près pour l'affichage agrégé.
   const full = Math.round(rating);
   return (
-    <span className={`inline-flex text-amber-500 ${className}`} aria-hidden>
+    <span className={`inline-flex text-star ${className}`} aria-hidden>
       {Array.from({ length: 5 }, (_, i) => (
         <span key={i}>{i < full ? "★" : "☆"}</span>
       ))}
