@@ -1,3 +1,4 @@
+import Logo from "@/components/logo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -6,7 +7,7 @@ import { defaultLocale, isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getCompletedEnrollment, getCurrentUser } from "@/lib/dal";
 import { formatDate } from "@/lib/intl";
-import { siteName, siteUrl } from "@/lib/site";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -42,7 +43,7 @@ export default async function CertificatePage(
     <div className="container-page py-10">
       <style>{printCss}</style>
       <article className="certificate-sheet mx-auto max-w-3xl border border-line bg-surface px-8 py-12 sm:px-14 sm:py-16">
-        <p className="text-xs uppercase tracking-wide text-muted">{siteName}</p>
+        <Logo />
         <h1 className="mt-4 font-display text-3xl tracking-tight">{c.title}</h1>
 
         <p className="mt-10 text-sm text-muted">{c.issuedTo}</p>

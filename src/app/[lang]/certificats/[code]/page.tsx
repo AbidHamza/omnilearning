@@ -1,3 +1,4 @@
+import Logo from "@/components/logo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,7 +7,6 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { parseCertificateCode } from "@/lib/certificates";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/intl";
-import { siteName } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 // Le nom d'un apprenant ne s'indexe pas : la page se partage, elle ne se référence pas.
@@ -38,7 +38,7 @@ export default async function PublicCertificatePage(
   return (
     <div className="container-page py-10">
       <article className="mx-auto max-w-3xl border border-line bg-surface px-8 py-12 sm:px-14 sm:py-16">
-        <p className="text-xs uppercase tracking-wide text-muted">{siteName}</p>
+        <Logo />
         <h1 className="mt-4 font-display text-3xl tracking-tight">{c.authentic}</h1>
         <p className="mt-2 text-sm text-muted">{c.authenticNote}</p>
 
