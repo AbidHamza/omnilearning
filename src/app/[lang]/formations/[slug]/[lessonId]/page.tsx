@@ -402,7 +402,7 @@ export default async function LessonPage(
                       <LessonTypeIcon type={l.type} className="h-8 w-8" />
                       <span
                         className={`line-clamp-2 flex-1 ${
-                          active ? "font-semibold text-primary" : ""
+                          active ? "font-semibold text-primary-dark" : ""
                         } ${isLocked ? "text-muted" : ""}`}
                       >
                         {l.title}
